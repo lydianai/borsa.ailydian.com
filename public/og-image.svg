@@ -1,0 +1,56 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0a0a0a"/>
+  
+  <!-- Grid pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  
+  <!-- Gradient overlay -->
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5A3C;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:0.8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grad1)"/>
+  
+  <!-- Logo/Icon Area -->
+  <circle cx="200" cy="315" r="80" fill="#8B5A3C" opacity="0.3"/>
+  <circle cx="200" cy="315" r="60" fill="none" stroke="#8B5A3C" stroke-width="3"/>
+  <text x="200" y="335" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#8B5A3C" text-anchor="middle">AI</text>
+  
+  <!-- Main Title -->
+  <text x="320" y="260" font-family="Arial, sans-serif" font-size="64" font-weight="bold" fill="#ffffff">
+    Ailydian Signal
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="320" y="320" font-family="Arial, sans-serif" font-size="32" fill="#cccccc">
+    Yapay Zeka Destekli Kripto Trading
+  </text>
+  
+  <!-- Features -->
+  <text x="320" y="380" font-family="Arial, sans-serif" font-size="24" fill="#8B5A3C">
+    ✓ 617 Kripto Para Analizi
+  </text>
+  <text x="320" y="420" font-family="Arial, sans-serif" font-size="24" fill="#8B5A3C">
+    ✓ 18+ AI Trading Stratejisi
+  </text>
+  <text x="320" y="460" font-family="Arial, sans-serif" font-size="24" fill="#8B5A3C">
+    ✓ Gerçek Zamanlı Whale Tracker
+  </text>
+  
+  <!-- URL -->
+  <text x="320" y="540" font-family="Arial, sans-serif" font-size="28" fill="#666666">
+    borsa.ailydian.com
+  </text>
+  
+  <!-- Decorative elements -->
+  <circle cx="1050" cy="150" r="40" fill="none" stroke="#8B5A3C" stroke-width="2" opacity="0.3"/>
+  <circle cx="1050" cy="480" r="30" fill="none" stroke="#8B5A3C" stroke-width="2" opacity="0.3"/>
+</svg>

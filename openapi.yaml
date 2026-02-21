@@ -1,0 +1,682 @@
+openapi: 3.0.3
+info:
+  title: SarDag Trading Signals API
+  description: |
+    Production-ready trading signals API powered by 18 strategies, AI analysis, and real-time data.
+
+    ## Features
+    - 🎯 18 Advanced Trading Strategies
+    - 🤖 AI-Powered Signal Analysis (3-layer system)
+    - 📊 Real-time Market Data (Binance WebSocket)
+    - 🔔 Push Notification System
+    - 🌍 Traditional Markets Support (Stocks, Gold, Oil)
+    - 🧪 Conservative & Aggressive Signal Modes
+    - 📈 Historical Backtesting Data
+    - 🔐 Circuit Breaker Protection
+    - 📝 White-hat Compliance Logging
+
+    ## Base URL
+    - Development: `http://localhost:3001`
+    - Production: `https://your-domain.vercel.app`
+
+    ## Rate Limiting
+    - Standard: 100 requests/minute
+    - Authenticated: 500 requests/minute
+
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3001
+    description: Development server (port 3001)
+  - url: https://your-domain.vercel.app
+    description: Production server
+
+tags:
+  - name: Signals
+    description: Trading signal generation endpoints
+  - name: AI Analysis
+    description: AI-powered market analysis
+  - name: Health
+    description: Service health and monitoring
+  - name: Push Notifications
+    description: Browser push notification management
+  - name: Traditional Markets
+    description: Stocks, commodities, forex analysis
+  - name: Data Service
+    description: Market data and queue management
+  - name: Settings
+    description: User preferences and configuration
+
+paths:
+  /api/health:
+    get:
+      tags:
+        - Health
+      summary: Service health check
+      description: Returns overall system health status
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  uptime:
+                    type: number
+                  version:
+                    type: string
+
+  /api/signals:
+    get:
+      tags:
+        - Signals
+      summary: Get trading signals for all symbols
+      description: Returns signals from all 18 strategies for top trading pairs
+      parameters:
+        - name: limit
+          in: query
+          description: Number of symbols to analyze
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  signals:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Signal'
+                  timestamp:
+                    type: string
+                    format: date-time
+                  count:
+                    type: integer
+
+  /api/unified-signals:
+    post:
+      tags:
+        - Signals
+      summary: Get unified signal for a specific symbol
+      description: |
+        Analyzes a symbol using all 18 strategies and returns a unified BUY/WAIT/SELL decision
+        with confidence percentage and detailed breakdown.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                symbol:
+                  type: string
+                  example: "BTCUSDT"
+                  description: Trading pair symbol (uppercase)
+              required:
+                - symbol
+      responses:
+        '200':
+          description: Unified signal analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnifiedSignal'
+        '400':
+          description: Invalid request (missing symbol)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/conservative-signals:
+    post:
+      tags:
+        - Signals
+      summary: Conservative buy signals only
+      description: |
+        Ultra-safe signals with 9-condition confirmation system.
+        Only returns BUY signals with 80%+ confidence.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                symbol:
+                  type: string
+                  example: "ETHUSDT"
+              required:
+                - symbol
+      responses:
+        '200':
+          description: Conservative signal analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Signal'
+
+  /api/breakout-retest:
+    post:
+      tags:
+        - Signals
+      summary: Breakout-Retest pattern detection
+      description: Detects breakout-retest patterns using real historical candlestick data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                symbol:
+                  type: string
+                  example: "BNBUSDT"
+              required:
+                - symbol
+      responses:
+        '200':
+          description: Breakout-retest analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Signal'
+
+  /api/ai-signals:
+    post:
+      tags:
+        - AI Analysis
+      summary: 3-layer AI signal analysis
+      description: |
+        Groq AI-powered signal generation with:
+        - Layer 1: Conservative Buy Signal
+        - Layer 2: Breakout-Retest Pattern
+        - Layer 3: Unified 18-strategy aggregation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                symbol:
+                  type: string
+                  example: "SOLUSDT"
+              required:
+                - symbol
+      responses:
+        '200':
+          description: AI signal analysis with 3 layers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  symbol:
+                    type: string
+                  analysis:
+                    type: string
+                    description: AI-generated analysis text
+                  layers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Signal'
+                  finalRecommendation:
+                    type: string
+                    enum: [BUY, WAIT, SELL, NEUTRAL]
+                  confidence:
+                    type: number
+                  timestamp:
+                    type: string
+
+  /api/ai-assistant:
+    post:
+      tags:
+        - AI Analysis
+      summary: Interactive AI trading assistant
+      description: Chat with AI assistant for market insights and trading advice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Should I buy BTC now?"
+                context:
+                  type: object
+                  description: Optional context (symbol, price data)
+      responses:
+        '200':
+          description: AI assistant response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+
+  /api/traditional-markets:
+    get:
+      tags:
+        - Traditional Markets
+      summary: Get traditional market data
+      description: Returns stock indices, gold, oil, and forex data
+      responses:
+        '200':
+          description: Traditional market data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stocks:
+                    type: array
+                    items:
+                      type: object
+                  commodities:
+                    type: array
+                    items:
+                      type: object
+                  forex:
+                    type: array
+                    items:
+                      type: object
+
+  /api/traditional-markets-analysis/{symbol}:
+    get:
+      tags:
+        - Traditional Markets
+      summary: Analyze traditional market symbol
+      description: Detailed analysis for stock, commodity, or forex pair
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "AAPL"
+      responses:
+        '200':
+          description: Symbol analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Signal'
+
+  /api/push/register:
+    post:
+      tags:
+        - Push Notifications
+      summary: Register device for push notifications
+      description: Register FCM token for receiving browser push notifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: FCM device token
+                userId:
+                  type: string
+                  description: Optional user identifier
+              required:
+                - token
+      responses:
+        '200':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+  /api/push/send:
+    post:
+      tags:
+        - Push Notifications
+      summary: Send push notification
+      description: Send notification to registered devices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                message:
+                  type: string
+                data:
+                  type: object
+                tokens:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Notification sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  sent:
+                    type: integer
+
+  /api/push/stats:
+    get:
+      tags:
+        - Push Notifications
+      summary: Get push notification statistics
+      description: Returns delivery stats and registered device count
+      responses:
+        '200':
+          description: Push notification stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalDevices:
+                    type: integer
+                  totalSent:
+                    type: integer
+                  successRate:
+                    type: number
+
+  /api/market-correlation:
+    get:
+      tags:
+        - Signals
+      summary: Market correlation matrix
+      description: BTC-ETH correlation and market phase detection
+      responses:
+        '200':
+          description: Correlation data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  btcEthCorrelation:
+                    type: number
+                  marketPhase:
+                    type: string
+                  leadingAsset:
+                    type: string
+
+  /api/settings:
+    get:
+      tags:
+        - Settings
+      summary: Get user settings
+      description: Retrieve user preferences and configuration
+      responses:
+        '200':
+          description: User settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: object
+                  theme:
+                    type: string
+                  language:
+                    type: string
+    post:
+      tags:
+        - Settings
+      summary: Update user settings
+      description: Save user preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notifications:
+                  type: object
+                theme:
+                  type: string
+                language:
+                  type: string
+      responses:
+        '200':
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+  /api/data-service/health:
+    get:
+      tags:
+        - Data Service
+      summary: Data service health
+      description: Check Binance data service and queue health
+      responses:
+        '200':
+          description: Data service health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  binance:
+                    type: object
+                  queue:
+                    type: object
+                  circuitBreaker:
+                    type: object
+
+  /api/queue/metrics:
+    get:
+      tags:
+        - Data Service
+      summary: Queue metrics
+      description: Get message queue performance metrics
+      responses:
+        '200':
+          description: Queue metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pending:
+                    type: integer
+                  processed:
+                    type: integer
+                  failed:
+                    type: integer
+
+  /api/security/audit:
+    get:
+      tags:
+        - Health
+      summary: Security audit log
+      description: Recent security events and audit trail
+      responses:
+        '200':
+          description: Audit log entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      type: object
+
+components:
+  schemas:
+    Signal:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Strategy name
+          example: "Conservative Buy Signal"
+        signal:
+          type: string
+          enum: [BUY, SELL, WAIT, NEUTRAL]
+          description: Trading signal type
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: Signal confidence percentage
+          example: 85
+        reason:
+          type: string
+          description: Human-readable reason for the signal
+          example: "9/9 conditions met: Volume spike, RSI oversold, support bounce"
+        targets:
+          type: array
+          items:
+            type: number
+          description: Take-profit targets
+          example: [50000, 52000, 55000]
+        stopLoss:
+          type: number
+          description: Stop-loss price
+          example: 48000
+        timeframe:
+          type: string
+          description: Recommended timeframe
+          example: "4H"
+        indicators:
+          type: object
+          description: Technical indicator values
+          additionalProperties: true
+      required:
+        - name
+        - signal
+        - confidence
+
+    UnifiedSignal:
+      type: object
+      properties:
+        symbol:
+          type: string
+          example: "BTCUSDT"
+        finalDecision:
+          type: string
+          enum: [BUY, WAIT]
+          description: Final unified decision
+        overallConfidence:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: Overall confidence level
+        buyPercentage:
+          type: number
+          description: Percentage of strategies voting BUY
+          example: 75
+        waitPercentage:
+          type: number
+          description: Percentage of strategies voting WAIT
+          example: 25
+        strategyBreakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              signal:
+                type: string
+              confidence:
+                type: number
+              weight:
+                type: number
+        topRecommendations:
+          type: array
+          items:
+            type: string
+          description: Top 3 strategy recommendations
+        riskAssessment:
+          type: object
+          properties:
+            level:
+              type: string
+              enum: [LOW, MEDIUM, HIGH]
+            factors:
+              type: array
+              items:
+                type: string
+        aggregatedTargets:
+          type: array
+          items:
+            type: number
+          description: Average targets from BUY signals
+        aggregatedStopLoss:
+          type: number
+          description: Conservative stop-loss from BUY signals
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        timestamp:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Optional API key for authenticated requests
+
+security:
+  - ApiKeyAuth: []

@@ -1,0 +1,2223 @@
+'use client';
+
+import { useEffect, useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import type { ApexOptions } from 'apexcharts';
+import { calculateRSI, calculateMFI, calculateBollingerBands, calculateMACD, calculateEMA } from '@/lib/indicators';
+import { detectSupportResistance, calculateFibonacci, detectOrderBlocks, detectFairValueGaps } from '@/lib/chart-analysis';
+import { detectLongSignal, type LongSignal } from '@/lib/signal-detection';
+import { calculateCVD, calculateVolumeProfile, analyzeCVDTrend, type CVDData, type VolumeProfileData } from '@/lib/indicators/cvd';
+import { calculateVWAP, analyzeVWAP, detectVWAPPullback, type VWAPData, type VWAPAnalysis } from '@/lib/indicators/vwap';
+
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+
+interface ApexCandlestickChartProps {
+  symbol: string;
+  interval: string;
+  marketType?: 'crypto' | 'traditional';
+}
+
+interface KlineData {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+export default function ApexCandlestickChart({
+  symbol,
+  interval,
+  marketType = 'crypto'
+}: ApexCandlestickChartProps) {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [klines, setKlines] = useState<KlineData[]>([]);
+  const [candleData, setCandleData] = useState<any[]>([]);
+  const [volumeData, setVolumeData] = useState<any[]>([]);
+  const [rsiData, setRsiData] = useState<any[]>([]);
+  const [mfiData, setMfiData] = useState<any[]>([]);
+  const [supportResistance, setSupportResistance] = useState<any[]>([]);
+  const [fibonacci, setFibonacci] = useState<any>(null);
+  const [orderBlocks, setOrderBlocks] = useState<any[]>([]);
+  const [fvgs, setFvgs] = useState<any[]>([]);
+  const [bollingerBands, setBollingerBands] = useState<any[]>([]);
+  const [ma7, setMa7] = useState<any[]>([]);
+  const [ma25, setMa25] = useState<any[]>([]);
+  const [ma99, setMa99] = useState<any[]>([]);
+  const [longSignal, setLongSignal] = useState<LongSignal | null>(null);
+
+  // 🆕 CVD & Volume Profile states
+  const [cvdData, setCvdData] = useState<CVDData[]>([]);
+  const [volumeProfile, setVolumeProfile] = useState<VolumeProfileData | null>(null);
+  const [cvdTrend, setCvdTrend] = useState<any>(null);
+
+  // 🆕 VWAP states
+  const [vwapData, setVwapData] = useState<VWAPData[]>([]);
+  const [vwapAnalysis, setVwapAnalysis] = useState<VWAPAnalysis | null>(null);
+  const [vwapPullback, setVwapPullback] = useState<any>(null);
+
+  // Indicator visibility toggles
+  const [showRSI, setShowRSI] = useState(true);
+  const [showCVD, setShowCVD] = useState(true); // 🆕 CVD toggle
+  const [showVolumeProfile, setShowVolumeProfile] = useState(true); // 🆕 Volume Profile toggle
+  const [showVWAP, setShowVWAP] = useState(true); // 🆕 VWAP toggle
+  const [showMFI, setShowMFI] = useState(true); // 🆕 MFI default AÇIK
+  const [showSupportResistance, setShowSupportResistance] = useState(true);
+  const [showFibonacci, setShowFibonacci] = useState(false);
+  const [showOrderBlocks, setShowOrderBlocks] = useState(true);
+  const [showFVG, setShowFVG] = useState(true);
+  const [showBollinger, setShowBollinger] = useState(true);
+  const [showMA7, setShowMA7] = useState(true);
+  const [showMA25, setShowMA25] = useState(true);
+  const [showMA99, setShowMA99] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const isCryptoSymbol = symbol.endsWith('USDT') || symbol.endsWith('BUSD');
+        const isTraditionalSymbol = !isCryptoSymbol;
+
+        if (marketType === 'traditional' && isCryptoSymbol) {
+          return;
+        }
+        if (marketType === 'crypto' && isTraditionalSymbol) {
+          return;
+        }
+
+        const endpoint = marketType === 'traditional'
+          ? `/api/charts/traditional-klines?symbol=${symbol}&interval=${interval}&limit=500`
+          : `/api/charts/klines?symbol=${symbol}&interval=${interval}&limit=500`;
+
+        const response = await fetch(endpoint);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success && result.data && result.data.klines) {
+          const fetchedKlines: KlineData[] = result.data.klines;
+          setKlines(fetchedKlines);
+
+          // Format for ApexCharts candlestick
+          const formattedCandles = fetchedKlines.map((k: KlineData) => ({
+            x: new Date(k.time * 1000),
+            y: [k.open, k.high, k.low, k.close]
+          }));
+
+          // Format volume data
+          const formattedVolume = fetchedKlines.map((k: KlineData) => ({
+            x: new Date(k.time * 1000),
+            y: k.volume
+          }));
+
+          setCandleData(formattedCandles);
+          setVolumeData(formattedVolume);
+
+          // Calculate technical indicators
+          const rsi = calculateRSI(fetchedKlines);
+          const mfi = calculateMFI(fetchedKlines);
+          const bb = calculateBollingerBands(fetchedKlines);
+
+          // Format RSI data
+          const formattedRSI = rsi.map(r => ({
+            x: new Date(r.time * 1000),
+            y: r.value
+          }));
+
+          // Format MFI data
+          const formattedMFI = mfi.map(m => ({
+            x: new Date(m.time * 1000),
+            y: m.value
+          }));
+
+          // Format Bollinger Bands
+          const formattedBB = bb.map(b => ({
+            x: new Date(b.time * 1000),
+            upper: b.upper,
+            middle: b.middle,
+            lower: b.lower
+          }));
+
+          setRsiData(formattedRSI);
+          setMfiData(formattedMFI);
+          setBollingerBands(formattedBB);
+
+          // Calculate Moving Averages (EMA 7, 25, 99)
+          const closePrices = fetchedKlines.map(k => k.close);
+          const ema7 = calculateEMA(closePrices, 7);
+          const ema25 = calculateEMA(closePrices, 25);
+          const ema99 = calculateEMA(closePrices, 99);
+
+          console.log('📊 MA Calculations:', {
+            closePrices: closePrices.length,
+            ema7Length: ema7.length,
+            ema25Length: ema25.length,
+            ema99Length: ema99.length
+          });
+
+          // Format MA data - EMA starts from period-1 index
+          const formattedMA7 = ema7.map((value, index) => ({
+            x: new Date(fetchedKlines[index + 6].time * 1000), // 7-1 = 6
+            y: value
+          }));
+
+          const formattedMA25 = ema25.map((value, index) => ({
+            x: new Date(fetchedKlines[index + 24].time * 1000), // 25-1 = 24
+            y: value
+          }));
+
+          const formattedMA99 = ema99.map((value, index) => ({
+            x: new Date(fetchedKlines[index + 98].time * 1000), // 99-1 = 98
+            y: value
+          }));
+
+          console.log('📊 Formatted MA:', {
+            ma7: formattedMA7.length,
+            ma25: formattedMA25.length,
+            ma99: formattedMA99.length
+          });
+
+          setMa7(formattedMA7);
+          setMa25(formattedMA25);
+          setMa99(formattedMA99);
+
+          // Detect LONG signals for 1h, 2h, 4h timeframes
+          if (['1h', '2h', '4h'].includes(interval)) {
+            const signal = detectLongSignal(
+              fetchedKlines,
+              formattedRSI,
+              formattedMFI,
+              formattedMA7,
+              formattedMA25,
+              formattedBB
+            );
+            setLongSignal(signal);
+
+            if (signal) {
+              console.log('🎯 LONG SİNYALİ ALGILANDI:', {
+                symbol,
+                interval,
+                confidence: signal.confidence + '%',
+                pattern: signal.candlePattern,
+                price: signal.price
+              });
+            }
+          } else {
+            setLongSignal(null); // Clear signal for other timeframes
+          }
+
+          // Calculate chart analysis features with timeframe-specific parameters
+          // Zaman dilimine göre lookback ve tolerance ayarları
+          const timeframeConfig = {
+            '1h': { lookback: 24, tolerance: 0.002 },
+            '2h': { lookback: 36, tolerance: 0.0025 },
+            '4h': { lookback: 48, tolerance: 0.003 },
+            '12h': { lookback: 60, tolerance: 0.004 },
+            '1d': { lookback: 90, tolerance: 0.005 },
+            '1w': { lookback: 120, tolerance: 0.008 },
+            '1M': { lookback: 180, tolerance: 0.01 }
+          };
+
+          const config = timeframeConfig[interval as keyof typeof timeframeConfig] || { lookback: 20, tolerance: 0.002 };
+          const sr = detectSupportResistance(fetchedKlines, config.lookback, config.tolerance);
+
+          // Calculate Fibonacci levels from RECENT price range (last 100-200 candles for visibility)
+          const fibLookback = Math.min(fetchedKlines.length, 200);
+          const recentCandles = fetchedKlines.slice(-fibLookback);
+          const highPrice = Math.max(...recentCandles.map(k => k.high));
+          const lowPrice = Math.min(...recentCandles.map(k => k.low));
+
+          // Determine trend direction based on recent price action
+          const firstPrice = recentCandles[0].close;
+          const lastPrice = recentCandles[recentCandles.length - 1].close;
+          const trendDirection = lastPrice > firstPrice ? 'uptrend' : 'downtrend';
+
+          const fib = calculateFibonacci(highPrice, lowPrice, trendDirection);
+
+          const ob = detectOrderBlocks(fetchedKlines);
+          const fvg = detectFairValueGaps(fetchedKlines);
+
+          console.log(`📊 S/R Analysis for ${interval}: ${sr.length} levels detected (lookback: ${config.lookback}, tolerance: ${config.tolerance * 100}%)`);
+          console.log(`📐 Fibonacci Levels (${trendDirection}): High=${highPrice.toFixed(2)}, Low=${lowPrice.toFixed(2)}, Levels=${fib.length}`);
+          fib.forEach((f, i) => {
+            if (i < 3) console.log(`   Fib ${f.label}: $${f.price.toFixed(2)}`);
+          });
+          console.log(`🔷 FVG Analysis: ${fvg.length} Fair Value Gaps detected`);
+          fvg.forEach((gap, i) => {
+            if (i < 3) console.log(`   ${gap.type === 'bullish' ? '↗ Bullish' : '↘ Bearish'} FVG: $${gap.low.toFixed(2)} - $${gap.high.toFixed(2)} (${gap.filled ? 'Filled' : 'Active'})`);
+          });
+          console.log(`📦 Order Blocks: ${ob.length} blocks detected`);
+
+          setSupportResistance(sr);
+          setFibonacci(fib);
+          setOrderBlocks(ob);
+          setFvgs(fvg);
+
+          // 🆕 CVD (Cumulative Volume Delta) Hesaplama
+          const cvd = calculateCVD(fetchedKlines);
+          const cvdAnalysis = analyzeCVDTrend(cvd, 14);
+          setCvdData(cvd);
+          setCvdTrend(cvdAnalysis);
+
+          console.log(`💹 CVD Analysis: Trend=${cvdAnalysis.trend}, Strength=${cvdAnalysis.strength.toFixed(0)}%, Delta=${cvdAnalysis.recentDelta.toFixed(2)}`);
+
+          // CVD Divergence tespiti varsa logla
+          const divergences = cvd.filter(c => c.divergence);
+          if (divergences.length > 0) {
+            const lastDivergence = divergences[divergences.length - 1];
+            console.log(`⚠️ CVD Divergence Detected: ${lastDivergence.divergence?.toUpperCase()} at ${new Date(lastDivergence.time * 1000).toLocaleString()}`);
+          }
+
+          // 🆕 Volume Profile Hesaplama
+          const vp = calculateVolumeProfile(fetchedKlines, 40); // 40 fiyat seviyesi
+          setVolumeProfile(vp);
+
+          console.log(`📊 Volume Profile: POC=$${vp.poc.toFixed(2)}, VAH=$${vp.valueAreaHigh.toFixed(2)}, VAL=$${vp.valueAreaLow.toFixed(2)}`);
+
+          // En yüksek hacimli 3 seviyeyi logla
+          const top3Levels = [...vp.levels].sort((a, b) => b.volume - a.volume).slice(0, 3);
+          console.log(`   Top Volume Levels:`);
+          top3Levels.forEach((level, i) => {
+            console.log(`   ${i + 1}. $${level.price.toFixed(2)}: ${level.volume.toFixed(0)} (${level.percentage.toFixed(1)}%)`);
+          });
+
+          // 🆕 VWAP Hesaplama (Kurumsal Trader #1 İndikatör!)
+          const vwap = calculateVWAP(fetchedKlines, 'day'); // Günlük VWAP
+          setVwapData(vwap);
+
+          if (vwap.length > 0) {
+            const currentPrice = fetchedKlines[fetchedKlines.length - 1].close;
+            const recentVolumes = fetchedKlines.slice(-14).map(k => k.volume);
+
+            // VWAP Analizi
+            const analysis = analyzeVWAP(currentPrice, vwap, recentVolumes);
+            setVwapAnalysis(analysis);
+
+            console.log(`📈 VWAP Analysis:`);
+            console.log(`   Current VWAP: $${analysis.currentVWAP.toFixed(2)}`);
+            console.log(`   Price Position: ${analysis.pricePosition.toUpperCase()} (${analysis.distanceFromVWAP.toFixed(2)}% away)`);
+            console.log(`   Band Position: ${analysis.bandPosition}`);
+            console.log(`   Signal: ${analysis.signal.toUpperCase()} | Volume: ${analysis.volumeStrength.toUpperCase()}`);
+
+            // VWAP Pullback Tespiti
+            const pullback = detectVWAPPullback(fetchedKlines, vwap, 5);
+            setVwapPullback(pullback);
+
+            if (pullback.detected) {
+              console.log(`🎯 VWAP Pullback Detected!`);
+              console.log(`   Type: ${pullback.type?.toUpperCase()} | Confidence: ${pullback.confidence.toFixed(0)}%`);
+              console.log(`   Distance from VWAP: ${pullback.distance.toFixed(3)}%`);
+            }
+          }
+
+          console.log(`✅ Loaded ${fetchedKlines.length} candles + indicators for ${symbol}`);
+        } else {
+          throw new Error(result.error || 'Failed to fetch data');
+        }
+      } catch (err) {
+        console.error('Error fetching chart data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load chart data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (symbol) {
+      fetchData();
+    }
+  }, [symbol, interval, marketType]);
+
+  // Build annotations reactively with useMemo
+  const annotations = useMemo(() => {
+    const annotationsData: any = {
+      yaxis: [],
+      xaxis: [],
+      points: []
+    };
+
+    // Support/Resistance levels - Only show top 3 to avoid overlap
+    if (showSupportResistance && supportResistance.length > 0) {
+      // Sort by strength and take top 3
+      const topSR = supportResistance
+        .filter((sr: any) => sr && sr.price && typeof sr.price === 'number' && !isNaN(sr.price))
+        .sort((a: any, b: any) => (b.strength || 0) - (a.strength || 0))
+        .slice(0, 3);
+
+      topSR.forEach((sr: any, index: number) => {
+        annotationsData.yaxis.push({
+          y: sr.price,
+          borderColor: sr.type === 'resistance' ? '#ef4444' : '#10b981',
+          strokeDashArray: 4,
+          label: {
+            text: `${sr.type === 'resistance' ? 'R' : 'S'}: $${sr.price.toFixed(2)}`,
+            offsetY: index * 25, // Offset each label to prevent overlap
+            style: {
+              color: '#fff',
+              background: sr.type === 'resistance' ? '#ef4444' : '#10b981',
+              fontSize: '11px',
+              fontWeight: '600'
+            }
+          }
+        });
+      });
+    }
+
+    // Fibonacci levels - ENHANCED VISIBILITY
+    if (showFibonacci && fibonacci && fibonacci.length > 0) {
+      // Professional Fibonacci colors with better contrast
+      const fibColors: Record<string, string> = {
+        '0%': '#8b5cf6',      // Purple
+        '23.6%': '#a855f7',   // Lighter Purple
+        '38.2%': '#c084fc',   // Light Purple
+        '50%': '#fbbf24',     // Golden (KEY LEVEL)
+        '61.8%': '#f97316',   // Orange (GOLDEN RATIO - KEY)
+        '78.6%': '#ef4444',   // Red
+        '100%': '#dc2626'     // Dark Red
+      };
+
+      fibonacci.forEach((fib: any, index: number) => {
+        if (fib && fib.price && typeof fib.price === 'number' && !isNaN(fib.price)) {
+          const color = fibColors[fib.label] || '#8b5cf6';
+          const isKeyLevel = fib.label === '50%' || fib.label === '61.8%'; // Golden ratio key levels
+
+          annotationsData.yaxis.push({
+            y: fib.price,
+            borderColor: color,
+            strokeDashArray: isKeyLevel ? 4 : 2, // Stronger dash for key levels
+            opacity: isKeyLevel ? 0.9 : 0.7, // Higher opacity for key levels
+            label: {
+              text: `Fib ${fib.label} ($${fib.price.toFixed(2)})`,
+              style: {
+                color: '#fff',
+                background: color,
+                fontSize: isKeyLevel ? '11px' : '10px',
+                fontWeight: isKeyLevel ? '700' : '600',
+                padding: {
+                  left: 8,
+                  right: 8,
+                  top: 3,
+                  bottom: 3
+                }
+              },
+              borderWidth: isKeyLevel ? 2 : 1,
+              borderColor: color
+            }
+          });
+        }
+      });
+    }
+
+    // 🆕 Volume Profile - POC & Value Area Lines (Kompakt + Çakışma Önleme)
+    if (showVolumeProfile && volumeProfile) {
+      // POC (Point of Control) - En yüksek hacim fiyatı (KALIN MOR ÇİZGİ)
+      annotationsData.yaxis.push({
+        y: volumeProfile.poc,
+        borderColor: '#8b5cf6',
+        strokeDashArray: 0,
+        borderWidth: 2.5,
+        opacity: 0.8,
+        label: {
+          text: `POC ${volumeProfile.poc.toFixed(0)}`,
+          position: 'right',
+          offsetX: -5,
+          offsetY: 0,
+          style: {
+            color: '#fff',
+            background: '#8b5cf6',
+            fontSize: '9px',
+            fontWeight: '700',
+            padding: {
+              left: 6,
+              right: 6,
+              top: 3,
+              bottom: 3
+            }
+          },
+          borderWidth: 0,
+          borderRadius: 4
+        }
+      });
+
+      // Value Area High (VAH) - Label yok, sadece çizgi
+      annotationsData.yaxis.push({
+        y: volumeProfile.valueAreaHigh,
+        borderColor: '#a78bfa',
+        strokeDashArray: 4,
+        borderWidth: 1,
+        opacity: 0.5
+      });
+
+      // Value Area Low (VAL) - Label yok, sadece çizgi
+      annotationsData.yaxis.push({
+        y: volumeProfile.valueAreaLow,
+        borderColor: '#a78bfa',
+        strokeDashArray: 4,
+        borderWidth: 1,
+        opacity: 0.5
+      });
+    }
+
+    // Order Blocks
+    if (showOrderBlocks && orderBlocks.length > 0) {
+      orderBlocks.forEach((ob: any) => {
+        if (ob && ob.time && ob.endTime) {
+          annotationsData.xaxis.push({
+            x: new Date(ob.time * 1000).getTime(),
+            x2: new Date(ob.endTime * 1000).getTime(),
+            fillColor: ob.type === 'bullish' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+            borderColor: ob.type === 'bullish' ? '#10b981' : '#ef4444',
+            label: {
+              text: `${ob.type === 'bullish' ? '🟢' : '🔴'} OB`,
+              style: {
+                color: '#fff',
+                background: ob.type === 'bullish' ? '#10b981' : '#ef4444',
+                fontSize: '10px'
+              }
+            }
+          });
+        }
+      });
+    }
+
+    // Fair Value Gaps
+    // 🔷 FVG (Fair Value Gap) - Fiyat Dengesizlikleri
+    if (showFVG && fvgs.length > 0) {
+      fvgs.forEach((fvg: any) => {
+        if (fvg && fvg.startTime && !fvg.filled) {
+          // FVG dikdörtgen alanı (high-low arası)
+          annotationsData.yaxis.push({
+            y: fvg.low,
+            y2: fvg.high,
+            fillColor: fvg.type === 'bullish' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+            borderColor: fvg.type === 'bullish' ? '#22c55e' : '#ef4444',
+            opacity: 0.4,
+            strokeDashArray: 0,
+            label: {
+              text: `${fvg.type === 'bullish' ? '↗' : '↘'} FVG`,
+              position: 'left',
+              offsetX: 5,
+              style: {
+                color: '#fff',
+                background: fvg.type === 'bullish' ? '#22c55e' : '#ef4444',
+                fontSize: '9px',
+                fontWeight: '600',
+                padding: {
+                  left: 6,
+                  right: 6,
+                  top: 2,
+                  bottom: 2
+                }
+              }
+            }
+          });
+        }
+      });
+    }
+
+    // LONG Signal Point Annotation
+    if (longSignal && longSignal.detected) {
+      annotationsData.points.push({
+        x: new Date(longSignal.timestamp * 1000).getTime(),
+        y: longSignal.price,
+        marker: {
+          size: 8,
+          fillColor: '#22c55e',
+          strokeColor: '#fff',
+          strokeWidth: 3,
+          shape: 'circle'
+        },
+        label: {
+          borderColor: '#22c55e',
+          offsetY: -10,
+          style: {
+            color: '#fff',
+            background: '#22c55e',
+            fontSize: '12px',
+            fontWeight: '700',
+            padding: {
+              left: 8,
+              right: 8,
+              top: 4,
+              bottom: 4
+            }
+          },
+          text: `🎯 LONG ${longSignal.confidence}%`
+        }
+      });
+    }
+
+    return annotationsData;
+  }, [showSupportResistance, showFibonacci, showOrderBlocks, showFVG, showVolumeProfile, supportResistance, fibonacci, orderBlocks, fvgs, volumeProfile, longSignal]);
+
+  const candlestickOptions: ApexOptions = useMemo(() => {
+    // Sağdan boşluk için son X mumu göster
+    const visibleCandles = Math.min(candleData.length, 100); // Maksimum 100 mum göster
+    const startIndex = Math.max(0, candleData.length - visibleCandles);
+
+    return {
+      chart: {
+        type: 'candlestick',
+        height: 500,
+        background: 'transparent',
+      animations: {
+        enabled: false // Disable animations for better performance
+      },
+      toolbar: {
+        show: true,
+        offsetY: -5,
+        tools: {
+          download: true,
+          selection: true,
+          zoom: true,
+          zoomin: true,
+          zoomout: true,
+          pan: true,
+          reset: true,
+          customIcons: []
+        },
+        autoSelected: 'pan' // Default to pan mode like TradingView
+      },
+      zoom: {
+        enabled: true,
+        type: 'x',
+        autoScaleYaxis: true
+      }
+    },
+    title: {
+      text: `${symbol} - ${interval}`,
+      align: 'left',
+      style: {
+        color: '#FFFFFF',
+        fontSize: '20px',
+        fontWeight: 700
+      }
+    },
+    annotations: annotations,
+    xaxis: {
+      type: 'datetime',
+      labels: {
+        style: {
+          colors: '#9CA3AF'
+        },
+        datetimeFormatter: {
+          year: 'yyyy',
+          month: "MMM 'yy",
+          day: 'dd MMM',
+          hour: 'HH:mm'
+        }
+      },
+      axisBorder: {
+        color: 'rgba(255, 255, 255, 0.2)'
+      },
+      axisTicks: {
+        color: 'rgba(255, 255, 255, 0.2)'
+      },
+      // Sağdan %15 boşluk bırak (TradingView benzeri)
+      min: candleData.length > 0 ? candleData[startIndex]?.x?.getTime() : undefined,
+      max: candleData.length > 0 && candleData[candleData.length - 1]?.x ?
+        candleData[candleData.length - 1].x.getTime() + (
+          // Zaman dilimi süresinin %20'si kadar sağdan boşluk
+          (interval === '1M' ? 2592000000 :
+           interval === '1w' ? 604800000 :
+           interval === '1d' ? 86400000 :
+           interval === '12h' ? 43200000 :
+           interval === '4h' ? 14400000 :
+           interval === '2h' ? 7200000 :
+           3600000) * 20 // 20 mum sağa boşluk
+        ) : undefined
+    },
+    yaxis: {
+      tooltip: {
+        enabled: true
+      },
+      labels: {
+        style: {
+          colors: '#9CA3AF'
+        },
+        formatter: (value) => `$${value.toFixed(2)}`
+      }
+    },
+    grid: {
+      borderColor: 'rgba(255, 255, 255, 0.05)',
+      strokeDashArray: 3
+    },
+    plotOptions: {
+      candlestick: {
+        colors: {
+          upward: '#10b981',
+          downward: '#ef4444'
+        },
+        wick: {
+          useFillColor: true
+        }
+      },
+      bar: {
+        columnWidth: '40%' // Mumlar arası çok daha fazla boşluk (TradingView benzeri)
+      }
+    },
+    stroke: {
+      width: 2,
+      colors: ['#059669', '#dc2626']
+    },
+    tooltip: {
+      theme: 'dark',
+      style: {
+        fontSize: '12px'
+      },
+      x: {
+        format: 'dd MMM yyyy HH:mm'
+      }
+    }
+  };
+  }, [symbol, interval, annotations, candleData]);
+
+  // Build series array dynamically with useMemo
+  const candleSeries = useMemo(() => {
+    const series: any[] = [{
+      name: 'Fiyat',
+      type: 'candlestick',
+      data: candleData
+    }];
+
+    // Add Moving Averages
+    if (showMA7 && ma7.length > 0) {
+      series.push({
+        name: 'MA 7',
+        type: 'line',
+        data: ma7,
+        color: '#22c55e',
+        strokeWidth: 2
+      });
+    }
+
+    if (showMA25 && ma25.length > 0) {
+      series.push({
+        name: 'MA 25',
+        type: 'line',
+        data: ma25,
+        color: '#f59e0b',
+        strokeWidth: 2
+      });
+    }
+
+    if (showMA99 && ma99.length > 0) {
+      series.push({
+        name: 'MA 99',
+        type: 'line',
+        data: ma99,
+        color: '#ef4444',
+        strokeWidth: 2
+      });
+    }
+
+    // Add Bollinger Bands
+    if (showBollinger && bollingerBands.length > 0) {
+      series.push({
+        name: 'BB Üst',
+        type: 'line',
+        data: bollingerBands.map(b => ({ x: b.x, y: b.upper })),
+        color: '#6366f1',
+        strokeWidth: 1.5
+      });
+      series.push({
+        name: 'BB Orta',
+        type: 'line',
+        data: bollingerBands.map(b => ({ x: b.x, y: b.middle })),
+        color: '#8b5cf6',
+        strokeWidth: 1
+      });
+      series.push({
+        name: 'BB Alt',
+        type: 'line',
+        data: bollingerBands.map(b => ({ x: b.x, y: b.lower })),
+        color: '#6366f1',
+        strokeWidth: 1.5
+      });
+    }
+
+    // 🆕 Add VWAP (Kurumsal Trader #1 İndikatör)
+    if (showVWAP && vwapData.length > 0) {
+      // VWAP Ana Çizgisi (Kalın, Turuncu)
+      series.push({
+        name: 'VWAP',
+        type: 'line',
+        data: vwapData.map(v => ({
+          x: new Date(v.time * 1000).getTime(),
+          y: v.vwap
+        })),
+        color: '#f97316', // Turuncu (kurumsal renk)
+        strokeWidth: 2.5
+      });
+
+      // +1σ Standart Sapma (Üst)
+      series.push({
+        name: 'VWAP +1σ',
+        type: 'line',
+        data: vwapData.map(v => ({
+          x: new Date(v.time * 1000).getTime(),
+          y: v.upperBand1
+        })),
+        color: '#fb923c',
+        strokeWidth: 1,
+        strokeDashArray: 3
+      });
+
+      // -1σ Standart Sapma (Alt)
+      series.push({
+        name: 'VWAP -1σ',
+        type: 'line',
+        data: vwapData.map(v => ({
+          x: new Date(v.time * 1000).getTime(),
+          y: v.lowerBand1
+        })),
+        color: '#fb923c',
+        strokeWidth: 1,
+        strokeDashArray: 3
+      });
+
+      // +2σ Standart Sapma (Aşırı Alım)
+      series.push({
+        name: 'VWAP +2σ',
+        type: 'line',
+        data: vwapData.map(v => ({
+          x: new Date(v.time * 1000).getTime(),
+          y: v.upperBand2
+        })),
+        color: '#fdba74',
+        strokeWidth: 0.8,
+        strokeDashArray: 5
+      });
+
+      // -2σ Standart Sapma (Aşırı Satım)
+      series.push({
+        name: 'VWAP -2σ',
+        type: 'line',
+        data: vwapData.map(v => ({
+          x: new Date(v.time * 1000).getTime(),
+          y: v.lowerBand2
+        })),
+        color: '#fdba74',
+        strokeWidth: 0.8,
+        strokeDashArray: 5
+      });
+    }
+
+    return series;
+  }, [candleData, showMA7, showMA25, showMA99, showBollinger, showVWAP, ma7, ma25, ma99, bollingerBands, vwapData]);
+
+  const rsiOptions: ApexOptions = useMemo(() => ({
+    chart: {
+      type: 'line',
+      height: 120,
+      background: 'transparent',
+      animations: {
+        enabled: false
+      },
+      toolbar: {
+        show: false
+      }
+    },
+    colors: ['#8b5cf6'],
+    stroke: {
+      width: 2,
+      curve: 'smooth'
+    },
+    xaxis: {
+      type: 'datetime',
+      labels: {
+        show: false
+      }
+    },
+    yaxis: {
+      min: 0,
+      max: 100,
+      labels: {
+        style: {
+          colors: '#9CA3AF',
+          fontSize: '11px'
+        },
+        formatter: (value) => value.toFixed(0) // No decimals
+      },
+      tickAmount: 4
+    },
+    grid: {
+      borderColor: 'rgba(255, 255, 255, 0.05)'
+    },
+    annotations: {
+      yaxis: [
+        {
+          y: 70,
+          borderColor: '#ef4444',
+          strokeDashArray: 2,
+          opacity: 0.5,
+          label: {
+            text: 'Aşırı Alım',
+            position: 'left',
+            offsetX: 5,
+            style: {
+              color: '#fff',
+              background: '#ef4444',
+              fontSize: '9px',
+              padding: {
+                left: 6,
+                right: 6,
+                top: 2,
+                bottom: 2
+              }
+            }
+          }
+        },
+        {
+          y: 30,
+          borderColor: '#10b981',
+          strokeDashArray: 2,
+          opacity: 0.5,
+          label: {
+            text: 'Aşırı Satım',
+            position: 'left',
+            offsetX: 5,
+            style: {
+              color: '#fff',
+              background: '#10b981',
+              fontSize: '9px',
+              padding: {
+                left: 6,
+                right: 6,
+                top: 2,
+                bottom: 2
+              }
+            }
+          }
+        }
+      ]
+    },
+    tooltip: {
+      theme: 'dark',
+      x: {
+        format: 'dd MMM yyyy HH:mm'
+      }
+    }
+  }), []);
+
+  const mfiOptions: ApexOptions = useMemo(() => ({
+    chart: {
+      type: 'line',
+      height: 120,
+      background: 'transparent',
+      animations: {
+        enabled: false
+      },
+      toolbar: {
+        show: false
+      }
+    },
+    colors: ['#f59e0b'],
+    stroke: {
+      width: 2,
+      curve: 'smooth'
+    },
+    xaxis: {
+      type: 'datetime',
+      labels: {
+        show: false
+      }
+    },
+    yaxis: {
+      min: 0,
+      max: 100,
+      labels: {
+        style: {
+          colors: '#9CA3AF',
+          fontSize: '11px'
+        },
+        formatter: (value) => value.toFixed(0) // No decimals
+      },
+      tickAmount: 4
+    },
+    grid: {
+      borderColor: 'rgba(255, 255, 255, 0.05)'
+    },
+    annotations: {
+      yaxis: [
+        {
+          y: 80,
+          borderColor: '#ef4444',
+          strokeDashArray: 2,
+          opacity: 0.5,
+          label: {
+            text: 'Aşırı Alım',
+            position: 'left',
+            offsetX: 5,
+            style: {
+              color: '#fff',
+              background: '#ef4444',
+              fontSize: '9px',
+              padding: {
+                left: 6,
+                right: 6,
+                top: 2,
+                bottom: 2
+              }
+            }
+          }
+        },
+        {
+          y: 20,
+          borderColor: '#10b981',
+          strokeDashArray: 2,
+          opacity: 0.5,
+          label: {
+            text: 'Aşırı Satım',
+            position: 'left',
+            offsetX: 5,
+            style: {
+              color: '#fff',
+              background: '#10b981',
+              fontSize: '9px',
+              padding: {
+                left: 6,
+                right: 6,
+                top: 2,
+                bottom: 2
+              }
+            }
+          }
+        }
+      ]
+    },
+    tooltip: {
+      theme: 'dark',
+      x: {
+        format: 'dd MMM yyyy HH:mm'
+      }
+    }
+  }), []);
+
+  const volumeOptions: ApexOptions = useMemo(() => ({
+    chart: {
+      type: 'bar',
+      height: 100,
+      background: 'transparent',
+      animations: {
+        enabled: false
+      },
+      toolbar: {
+        show: false
+      },
+      zoom: {
+        enabled: false
+      }
+    },
+    plotOptions: {
+      bar: {
+        colors: {
+          ranges: [{
+            from: 0,
+            to: Number.MAX_VALUE,
+            color: '#26a69a'
+          }]
+        },
+        columnWidth: '80%'
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    xaxis: {
+      type: 'datetime',
+      labels: {
+        show: false
+      },
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
+      }
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#9CA3AF'
+        },
+        formatter: (value) => value >= 1000000
+          ? `${(value / 1000000).toFixed(1)}M`
+          : value >= 1000
+            ? `${(value / 1000).toFixed(1)}K`
+            : value.toFixed(0)
+      }
+    },
+    grid: {
+      borderColor: 'rgba(255, 255, 255, 0.05)',
+      strokeDashArray: 3
+    },
+    tooltip: {
+      theme: 'dark',
+      x: {
+        format: 'dd MMM yyyy HH:mm'
+      },
+      y: {
+        formatter: (value) => value.toFixed(0)
+      }
+    }
+  }), []);
+
+  if (loading) {
+    return (
+      <div style={{
+        width: '100%',
+        height: '600px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(0, 0, 0, 0.3)',
+        borderRadius: '12px',
+        color: '#fff'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid rgba(16, 185, 129, 0.3)',
+            borderTop: '4px solid #10b981',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 12px'
+          }} />
+          <div>Premium grafik yükleniyor...</div>
+        </div>
+        <style jsx>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{
+        width: '100%',
+        height: '600px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(239, 68, 68, 0.1)',
+        borderRadius: '12px',
+        border: '1px solid rgba(239, 68, 68, 0.3)',
+        color: '#ef4444'
+      }}>
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <div style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>
+            ⚠️ Grafik Hatası
+          </div>
+          <div style={{ fontSize: '14px', opacity: 0.8 }}>{error}</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      background: 'linear-gradient(180deg, #0a0a0a 0%, #111111 100%)',
+      borderRadius: '16px',
+      padding: '0',
+      border: '1px solid rgba(255, 255, 255, 0.08)',
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+      overflow: 'hidden'
+    }}>
+      {/* Premium Header with Title and Indicators */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+        padding: '20px 24px'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '16px'
+        }}>
+          <div>
+            <h2 style={{
+              margin: 0,
+              fontSize: '24px',
+              fontWeight: '700',
+              background: 'linear-gradient(135deg, #10b981 0%, #8b5cf6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '-0.5px'
+            }}>
+              {symbol}
+            </h2>
+            <p style={{
+              margin: '4px 0 0 0',
+              fontSize: '13px',
+              color: 'rgba(255, 255, 255, 0.5)',
+              fontWeight: '500'
+            }}>
+              {interval.toUpperCase()} • Professional Chart Analysis
+            </p>
+          </div>
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            alignItems: 'center'
+          }}>
+            <div style={{
+              padding: '8px 16px',
+              background: 'rgba(16, 185, 129, 0.1)',
+              borderRadius: '8px',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
+              fontSize: '12px',
+              color: '#10b981',
+              fontWeight: '600'
+            }}>
+              ✓ LIVE
+            </div>
+          </div>
+        </div>
+
+        {/* Indicator Toggle Bar */}
+        <div style={{
+          display: 'flex',
+          gap: '6px',
+          flexWrap: 'wrap'
+        }}>
+        <button
+          onClick={() => setShowSupportResistance(!showSupportResistance)}
+          style={{
+            padding: '8px 14px',
+            borderRadius: '8px',
+            border: showSupportResistance ? '1.5px solid #10b981' : '1.5px solid rgba(255, 255, 255, 0.1)',
+            background: showSupportResistance
+              ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%)'
+              : 'rgba(255, 255, 255, 0.05)',
+            color: showSupportResistance ? '#10b981' : 'rgba(255, 255, 255, 0.7)',
+            fontSize: '11px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            backdropFilter: 'blur(10px)'
+          }}
+        >
+          📊 Destek/Direnç
+        </button>
+        <button
+          onClick={() => setShowOrderBlocks(!showOrderBlocks)}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: showOrderBlocks ? '#3b82f6' : 'rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          Order Blocks
+        </button>
+        <button
+          onClick={() => setShowFVG(!showFVG)}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: showFVG ? '#fb923c' : 'rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          FVG/Imbalance
+        </button>
+        <button
+          onClick={() => setShowFibonacci(!showFibonacci)}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: showFibonacci ? '#8b5cf6' : 'rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          Fibonacci
+        </button>
+        <button
+          onClick={() => setShowBollinger(!showBollinger)}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: showBollinger ? '#6366f1' : 'rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          Bollinger Bands
+        </button>
+        <button
+          onClick={() => setShowRSI(!showRSI)}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: showRSI ? '#8b5cf6' : 'rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          RSI (14)
+        </button>
+        <button
+          onClick={() => setShowMFI(!showMFI)}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: showMFI ? '#f59e0b' : 'rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          MFI (14)
+        </button>
+        <button
+          onClick={() => setShowMA7(!showMA7)}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: showMA7 ? '#22c55e' : 'rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          MA 7
+        </button>
+        <button
+          onClick={() => setShowMA25(!showMA25)}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: showMA25 ? '#f59e0b' : 'rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          MA 25
+        </button>
+        <button
+          onClick={() => setShowMA99(!showMA99)}
+          style={{
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            background: showMA99 ? '#ef4444' : 'rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          MA 99
+        </button>
+
+        {/* 🆕 CVD Button - PREMIUM Kurumsal Trader İndikatörü */}
+        <button
+          onClick={() => setShowCVD(!showCVD)}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = showCVD
+              ? '0 8px 24px rgba(59, 130, 246, 0.4)'
+              : '0 4px 12px rgba(255, 255, 255, 0.15)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = showCVD
+              ? '0 4px 16px rgba(59, 130, 246, 0.3)'
+              : 'none';
+          }}
+          style={{
+            padding: '10px 16px',
+            borderRadius: '10px',
+            border: showCVD
+              ? '2px solid #3b82f6'
+              : '1.5px solid rgba(255, 255, 255, 0.15)',
+            background: showCVD
+              ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.15) 50%, rgba(59, 130, 246, 0.25) 100%)'
+              : 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)',
+            color: showCVD ? '#60a5fa' : 'rgba(255, 255, 255, 0.75)',
+            fontSize: '12px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: showCVD
+              ? '0 4px 16px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+              : 'inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          <span style={{
+            fontSize: '16px',
+            filter: showCVD ? 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.6))' : 'none',
+            transition: 'filter 0.3s ease'
+          }}>💹</span>
+          <span style={{ letterSpacing: '0.3px' }}>CVD</span>
+          {cvdTrend && showCVD && (
+            <span style={{
+              fontSize: '10px',
+              opacity: 0.9,
+              padding: '2px 6px',
+              background: cvdTrend.trend === 'bullish'
+                ? 'rgba(16, 185, 129, 0.2)'
+                : cvdTrend.trend === 'bearish'
+                ? 'rgba(239, 68, 68, 0.2)'
+                : 'rgba(156, 163, 175, 0.2)',
+              borderRadius: '4px',
+              fontWeight: '700'
+            }}>
+              {cvdTrend.trend === 'bullish' ? '↗' : cvdTrend.trend === 'bearish' ? '↘' : '→'}
+            </span>
+          )}
+        </button>
+
+        {/* 🆕 Volume Profile Button - PREMIUM POC & Value Area */}
+        <button
+          onClick={() => setShowVolumeProfile(!showVolumeProfile)}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = showVolumeProfile
+              ? '0 8px 24px rgba(139, 92, 246, 0.4)'
+              : '0 4px 12px rgba(255, 255, 255, 0.15)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = showVolumeProfile
+              ? '0 4px 16px rgba(139, 92, 246, 0.3)'
+              : 'none';
+          }}
+          style={{
+            padding: '10px 16px',
+            borderRadius: '10px',
+            border: showVolumeProfile
+              ? '2px solid #8b5cf6'
+              : '1.5px solid rgba(255, 255, 255, 0.15)',
+            background: showVolumeProfile
+              ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(124, 58, 237, 0.15) 50%, rgba(139, 92, 246, 0.25) 100%)'
+              : 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)',
+            color: showVolumeProfile ? '#a78bfa' : 'rgba(255, 255, 255, 0.75)',
+            fontSize: '12px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: showVolumeProfile
+              ? '0 4px 16px rgba(139, 92, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+              : 'inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          <span style={{
+            fontSize: '16px',
+            filter: showVolumeProfile ? 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.6))' : 'none',
+            transition: 'filter 0.3s ease'
+          }}>📊</span>
+          <span style={{ letterSpacing: '0.3px' }}>Volume Profile</span>
+          {volumeProfile && showVolumeProfile && (
+            <span style={{
+              fontSize: '9px',
+              opacity: 0.9,
+              padding: '2px 6px',
+              background: 'rgba(139, 92, 246, 0.25)',
+              borderRadius: '4px',
+              fontWeight: '700',
+              color: '#c4b5fd'
+            }}>
+              POC
+            </span>
+          )}
+        </button>
+
+        {/* 🆕 VWAP Button - PREMIUM Kurumsal #1 İndikatör! */}
+        <button
+          onClick={() => setShowVWAP(!showVWAP)}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = showVWAP
+              ? '0 8px 24px rgba(249, 115, 22, 0.4)'
+              : '0 4px 12px rgba(255, 255, 255, 0.15)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = showVWAP
+              ? '0 4px 16px rgba(249, 115, 22, 0.3)'
+              : 'none';
+          }}
+          style={{
+            padding: '10px 16px',
+            borderRadius: '10px',
+            border: showVWAP
+              ? '2px solid #f97316'
+              : '1.5px solid rgba(255, 255, 255, 0.15)',
+            background: showVWAP
+              ? 'linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(234, 88, 12, 0.15) 50%, rgba(249, 115, 22, 0.25) 100%)'
+              : 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)',
+            color: showVWAP ? '#fb923c' : 'rgba(255, 255, 255, 0.75)',
+            fontSize: '12px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: showVWAP
+              ? '0 4px 16px rgba(249, 115, 22, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+              : 'inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          <span style={{
+            fontSize: '16px',
+            filter: showVWAP ? 'drop-shadow(0 0 8px rgba(249, 115, 22, 0.6))' : 'none',
+            transition: 'filter 0.3s ease'
+          }}>📈</span>
+          <span style={{ letterSpacing: '0.3px' }}>VWAP</span>
+          {vwapAnalysis && showVWAP && (
+            <span style={{
+              fontSize: '9px',
+              opacity: 0.9,
+              padding: '2px 6px',
+              background: vwapAnalysis.signal === 'bullish'
+                ? 'rgba(16, 185, 129, 0.25)'
+                : vwapAnalysis.signal === 'bearish'
+                ? 'rgba(239, 68, 68, 0.25)'
+                : 'rgba(156, 163, 175, 0.25)',
+              borderRadius: '4px',
+              fontWeight: '700',
+              color: vwapAnalysis.signal === 'bullish'
+                ? '#10b981'
+                : vwapAnalysis.signal === 'bearish'
+                ? '#ef4444'
+                : '#9ca3af'
+            }}>
+              {vwapAnalysis.pricePosition === 'above' ? '↗' : vwapAnalysis.pricePosition === 'below' ? '↘' : '→'}
+            </span>
+          )}
+        </button>
+      </div>
+
+      </div>
+
+      {/* Main Chart Area - TradingView Style */}
+      <div style={{ padding: '24px', paddingTop: '16px' }}>
+        {/* Main Candlestick Chart */}
+        <div style={{
+          background: 'rgba(0, 0, 0, 0.3)',
+          borderRadius: '12px',
+          padding: '16px',
+          marginBottom: '16px',
+          border: '1px solid rgba(255, 255, 255, 0.05)'
+        }}>
+          <Chart
+            options={candlestickOptions}
+            series={candleSeries}
+            type="candlestick"
+            height={550}
+            key={`chart-${symbol}-${interval}-${showSupportResistance}-${showFibonacci}-${showOrderBlocks}-${showFVG}-${showBollinger}-${showMA7}-${showMA25}-${showMA99}-${JSON.stringify(supportResistance.slice(0,2))}-${JSON.stringify(fibonacci?.slice(0,2))}-${JSON.stringify(orderBlocks.slice(0,2))}-${JSON.stringify(fvgs.slice(0,2))}-${longSignal?.confidence || 0}`}
+          />
+        </div>
+
+        {/* Indicator Panels - Side by Side */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: showRSI && showMFI ? '1fr 1fr' : '1fr',
+          gap: '16px',
+          marginBottom: '16px'
+        }}>
+          {/* RSI Indicator */}
+          {showRSI && rsiData.length > 0 && (
+            <div style={{
+              background: 'rgba(139, 92, 246, 0.05)',
+              borderRadius: '12px',
+              padding: '16px',
+              border: '1px solid rgba(139, 92, 246, 0.2)'
+            }}>
+              <div style={{
+                fontSize: '12px',
+                color: '#8b5cf6',
+                marginBottom: '12px',
+                fontWeight: '600',
+                letterSpacing: '0.5px'
+              }}>
+                📈 RSI (14) • Relative Strength Index
+              </div>
+              <Chart
+                options={rsiOptions}
+                series={[{
+                  name: 'RSI',
+                  data: rsiData
+                }]}
+                type="line"
+                height={140}
+              />
+            </div>
+          )}
+
+          {/* MFI Indicator */}
+          {showMFI && mfiData.length > 0 && (
+            <div style={{
+              background: 'rgba(245, 158, 11, 0.05)',
+              borderRadius: '12px',
+              padding: '16px',
+              border: '1px solid rgba(245, 158, 11, 0.2)'
+            }}>
+              <div style={{
+                fontSize: '12px',
+                color: '#f59e0b',
+                marginBottom: '12px',
+                fontWeight: '600',
+                letterSpacing: '0.5px'
+              }}>
+                💰 MFI (14) • Money Flow Index
+              </div>
+              <Chart
+                options={mfiOptions}
+                series={[{
+                  name: 'MFI',
+                  data: mfiData
+                }]}
+                type="line"
+                height={140}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* 🆕 CVD (Cumulative Volume Delta) - Kurumsal Trader İndikatörü */}
+        {showCVD && cvdData.length > 0 && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)',
+            borderRadius: '12px',
+            padding: '20px',
+            border: '1.5px solid rgba(59, 130, 246, 0.3)',
+            boxShadow: '0 4px 20px rgba(59, 130, 246, 0.15)',
+            marginTop: '16px'
+          }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '16px'
+              }}>
+                <div style={{
+                  fontSize: '13px',
+                  color: '#3b82f6',
+                  fontWeight: '700',
+                  letterSpacing: '0.5px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <span style={{ fontSize: '16px' }}>💹</span>
+                  CVD • Cumulative Volume Delta
+                </div>
+                {cvdTrend && (
+                  <div style={{
+                    display: 'flex',
+                    gap: '12px',
+                    alignItems: 'center'
+                  }}>
+                    <div style={{
+                      padding: '4px 10px',
+                      background: cvdTrend.trend === 'bullish'
+                        ? 'rgba(16, 185, 129, 0.2)'
+                        : cvdTrend.trend === 'bearish'
+                        ? 'rgba(239, 68, 68, 0.2)'
+                        : 'rgba(156, 163, 175, 0.2)',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      color: cvdTrend.trend === 'bullish'
+                        ? '#10b981'
+                        : cvdTrend.trend === 'bearish'
+                        ? '#ef4444'
+                        : '#9ca3af'
+                    }}>
+                      {cvdTrend.trend === 'bullish' ? '📈 BULLISH' : cvdTrend.trend === 'bearish' ? '📉 BEARISH' : '➡️ NEUTRAL'}
+                    </div>
+                    <div style={{
+                      fontSize: '11px',
+                      color: 'rgba(255, 255, 255, 0.7)'
+                    }}>
+                      Güç: {cvdTrend.strength.toFixed(0)}%
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Chart
+                options={{
+                  chart: {
+                    type: 'area',
+                    height: 160,
+                    background: 'transparent',
+                    animations: { enabled: false },
+                    toolbar: { show: false }
+                  },
+                  colors: ['#3b82f6'],
+                  stroke: {
+                    width: 2,
+                    curve: 'smooth'
+                  },
+                  fill: {
+                    type: 'gradient',
+                    gradient: {
+                      shadeIntensity: 1,
+                      opacityFrom: 0.4,
+                      opacityTo: 0.1,
+                      stops: [0, 100]
+                    }
+                  },
+                  dataLabels: {
+                    enabled: false
+                  },
+                  xaxis: {
+                    type: 'datetime',
+                    labels: { show: false }
+                  },
+                  yaxis: {
+                    labels: {
+                      style: {
+                        colors: '#9CA3AF',
+                        fontSize: '10px'
+                      },
+                      formatter: (value) => {
+                        // Kısa format: K (bin), M (milyon)
+                        if (Math.abs(value) >= 1000000) {
+                          return (value / 1000000).toFixed(1) + 'M';
+                        } else if (Math.abs(value) >= 1000) {
+                          return (value / 1000).toFixed(0) + 'K';
+                        }
+                        return value.toFixed(0);
+                      }
+                    }
+                  },
+                  grid: {
+                    borderColor: 'rgba(255, 255, 255, 0.05)',
+                    strokeDashArray: 3
+                  },
+                  tooltip: {
+                    theme: 'dark',
+                    x: {
+                      format: 'dd MMM HH:mm'
+                    },
+                    y: {
+                      formatter: (value) => {
+                        return 'Delta: ' + value.toLocaleString('tr-TR', {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0
+                        });
+                      }
+                    },
+                    style: {
+                      fontSize: '12px'
+                    }
+                  }
+                }}
+                series={[{
+                  name: 'Cumulative Delta',
+                  data: cvdData.map(d => ({
+                    x: new Date(d.time * 1000).getTime(),
+                    y: d.cumulativeDelta
+                  }))
+                }]}
+                type="area"
+                height={160}
+              />
+
+              {/* CVD Divergence Uyarısı */}
+              {cvdData.filter(c => c.divergence).length > 0 && (
+                <div style={{
+                  marginTop: '12px',
+                  padding: '10px 12px',
+                  background: 'rgba(251, 191, 36, 0.1)',
+                  border: '1px solid rgba(251, 191, 36, 0.3)',
+                  borderRadius: '8px',
+                  fontSize: '11px',
+                  color: '#fbbf24',
+                  fontWeight: '600'
+                }}>
+                  ⚠️ Divergence Tespit Edildi! Fiyat ve CVD uyuşmazlığı var.
+                </div>
+              )}
+
+              <div style={{
+                marginTop: '12px',
+                fontSize: '10px',
+                color: 'rgba(255, 255, 255, 0.5)',
+                lineHeight: '1.5'
+              }}>
+                💡 <strong>CVD Nedir?</strong> Alıcı-Satıcı baskısının kümülatif ölçümü. Pozitif CVD = Alıcılar güçlü, Negatif CVD = Satıcılar güçlü. Fiyat ile CVD uyuşmazlığı (divergence) trend dönüşü sinyali verebilir.
+              </div>
+            </div>
+          )}
+
+          {/* 🆕 Volume Profile & POC Detay Paneli */}
+          {showVolumeProfile && volumeProfile && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%)',
+              borderRadius: '12px',
+              padding: '20px',
+              border: '1.5px solid rgba(139, 92, 246, 0.3)',
+              boxShadow: '0 4px 20px rgba(139, 92, 246, 0.15)',
+              marginTop: '16px'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '16px'
+              }}>
+                <div style={{
+                  fontSize: '13px',
+                  color: '#8b5cf6',
+                  fontWeight: '700',
+                  letterSpacing: '0.5px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <span style={{ fontSize: '16px' }}>📊</span>
+                  Volume Profile & POC
+                </div>
+              </div>
+
+              {/* Ana Metrikler Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '12px',
+                marginBottom: '16px'
+              }}>
+                {/* POC - Point of Control */}
+                <div style={{
+                  background: 'rgba(139, 92, 246, 0.15)',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  border: '1px solid rgba(139, 92, 246, 0.3)'
+                }}>
+                  <div style={{
+                    fontSize: '9px',
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    marginBottom: '4px',
+                    fontWeight: '600'
+                  }}>
+                    POC (Point of Control)
+                  </div>
+                  <div style={{
+                    fontSize: '16px',
+                    color: '#a78bfa',
+                    fontWeight: '700'
+                  }}>
+                    ${volumeProfile.poc.toFixed(2)}
+                  </div>
+                  <div style={{
+                    fontSize: '8px',
+                    color: 'rgba(255, 255, 255, 0.4)',
+                    marginTop: '4px'
+                  }}>
+                    En yüksek hacim seviyesi
+                  </div>
+                </div>
+
+                {/* VAH - Value Area High */}
+                <div style={{
+                  background: 'rgba(167, 139, 250, 0.1)',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  border: '1px solid rgba(167, 139, 250, 0.2)'
+                }}>
+                  <div style={{
+                    fontSize: '9px',
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    marginBottom: '4px',
+                    fontWeight: '600'
+                  }}>
+                    VAH (Value Area High)
+                  </div>
+                  <div style={{
+                    fontSize: '16px',
+                    color: '#c4b5fd',
+                    fontWeight: '700'
+                  }}>
+                    ${volumeProfile.valueAreaHigh.toFixed(2)}
+                  </div>
+                  <div style={{
+                    fontSize: '8px',
+                    color: 'rgba(255, 255, 255, 0.4)',
+                    marginTop: '4px'
+                  }}>
+                    %70 hacim - üst sınır
+                  </div>
+                </div>
+
+                {/* VAL - Value Area Low */}
+                <div style={{
+                  background: 'rgba(167, 139, 250, 0.1)',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  border: '1px solid rgba(167, 139, 250, 0.2)'
+                }}>
+                  <div style={{
+                    fontSize: '9px',
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    marginBottom: '4px',
+                    fontWeight: '600'
+                  }}>
+                    VAL (Value Area Low)
+                  </div>
+                  <div style={{
+                    fontSize: '16px',
+                    color: '#c4b5fd',
+                    fontWeight: '700'
+                  }}>
+                    ${volumeProfile.valueAreaLow.toFixed(2)}
+                  </div>
+                  <div style={{
+                    fontSize: '8px',
+                    color: 'rgba(255, 255, 255, 0.4)',
+                    marginTop: '4px'
+                  }}>
+                    %70 hacim - alt sınır
+                  </div>
+                </div>
+              </div>
+
+              {/* Value Area Bilgisi */}
+              <div style={{
+                background: 'rgba(139, 92, 246, 0.08)',
+                borderRadius: '8px',
+                padding: '12px',
+                marginBottom: '12px',
+                border: '1px dashed rgba(139, 92, 246, 0.2)'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <div style={{
+                      fontSize: '10px',
+                      color: 'rgba(255, 255, 255, 0.6)',
+                      marginBottom: '4px'
+                    }}>
+                      Value Area Genişliği
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#a78bfa',
+                      fontWeight: '700'
+                    }}>
+                      ${(volumeProfile.valueAreaHigh - volumeProfile.valueAreaLow).toFixed(2)}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{
+                      fontSize: '10px',
+                      color: 'rgba(255, 255, 255, 0.6)',
+                      marginBottom: '4px'
+                    }}>
+                      Toplam Hacim
+                    </div>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#a78bfa',
+                      fontWeight: '700'
+                    }}>
+                      {volumeProfile.totalVolume >= 1000000
+                        ? (volumeProfile.totalVolume / 1000000).toFixed(2) + 'M'
+                        : volumeProfile.totalVolume >= 1000
+                        ? (volumeProfile.totalVolume / 1000).toFixed(0) + 'K'
+                        : volumeProfile.totalVolume.toFixed(0)
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* En Yüksek Hacimli 3 Seviye */}
+              <div style={{
+                marginTop: '12px'
+              }}>
+                <div style={{
+                  fontSize: '10px',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  marginBottom: '8px',
+                  fontWeight: '600'
+                }}>
+                  📈 En Yüksek Hacimli Fiyat Seviyeleri
+                </div>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px'
+                }}>
+                  {[...volumeProfile.levels]
+                    .sort((a, b) => b.volume - a.volume)
+                    .slice(0, 3)
+                    .map((level, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '8px 10px',
+                          background: index === 0
+                            ? 'rgba(139, 92, 246, 0.15)'
+                            : 'rgba(139, 92, 246, 0.05)',
+                          borderRadius: '6px',
+                          border: index === 0
+                            ? '1px solid rgba(139, 92, 246, 0.3)'
+                            : '1px solid rgba(139, 92, 246, 0.1)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{
+                            fontSize: '12px',
+                            fontWeight: '700',
+                            color: index === 0 ? '#8b5cf6' : 'rgba(255, 255, 255, 0.5)'
+                          }}>
+                            {index + 1}.
+                          </span>
+                          <span style={{
+                            fontSize: '11px',
+                            color: index === 0 ? '#a78bfa' : 'rgba(255, 255, 255, 0.7)',
+                            fontWeight: '600'
+                          }}>
+                            ${level.price.toFixed(2)}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{
+                            width: `${level.percentage * 2}px`,
+                            height: '4px',
+                            background: `linear-gradient(90deg, #8b5cf6 0%, #a78bfa ${level.percentage}%)`,
+                            borderRadius: '2px'
+                          }} />
+                          <span style={{
+                            fontSize: '9px',
+                            color: 'rgba(255, 255, 255, 0.5)',
+                            fontWeight: '600'
+                          }}>
+                            {level.percentage.toFixed(1)}%
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+
+              {/* Açıklama */}
+              <div style={{
+                marginTop: '16px',
+                fontSize: '10px',
+                color: 'rgba(255, 255, 255, 0.5)',
+                lineHeight: '1.5',
+                paddingTop: '12px',
+                borderTop: '1px solid rgba(139, 92, 246, 0.15)'
+              }}>
+                💡 <strong>Volume Profile Nedir?</strong> Fiyat seviyelerine göre hacim dağılımını gösterir. POC en çok işlem gören fiyattır. Value Area toplam hacmin %70'inin bulunduğu alandır. POC destek/direnç görevi görür.
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* LONG Signal Explanation Panel */}
+        {longSignal && longSignal.detected && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
+            borderRadius: '16px',
+            padding: '24px',
+            border: '2px solid rgba(34, 197, 94, 0.3)',
+            boxShadow: '0 8px 32px rgba(34, 197, 94, 0.2)',
+            marginTop: '24px'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '20px',
+              paddingBottom: '16px',
+              borderBottom: '1px solid rgba(34, 197, 94, 0.2)'
+            }}>
+              <div style={{
+                fontSize: '32px',
+                animation: 'pulse 2s ease-in-out infinite'
+              }}>
+                🎯
+              </div>
+              <div>
+                <div style={{
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  color: '#22c55e',
+                  marginBottom: '4px'
+                }}>
+                  LONG SİNYALİ ALGILANDI
+                </div>
+                <div style={{
+                  fontSize: '14px',
+                  color: 'rgba(255, 255, 255, 0.7)'
+                }}>
+                  Güven Skoru: <span style={{ color: '#22c55e', fontWeight: '700' }}>{longSignal.confidence}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '16px',
+              marginBottom: '20px'
+            }}>
+              {/* Candle Pattern */}
+              {longSignal.candlePattern && (
+                <div style={{
+                  background: 'rgba(34, 197, 94, 0.1)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  border: '1px solid rgba(34, 197, 94, 0.2)'
+                }}>
+                  <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '8px' }}>
+                    Mum Formasyonu
+                  </div>
+                  <div style={{ fontSize: '16px', color: '#22c55e', fontWeight: '600' }}>
+                    {longSignal.candlePattern}
+                  </div>
+                </div>
+              )}
+
+              {/* Price */}
+              <div style={{
+                background: 'rgba(34, 197, 94, 0.1)',
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid rgba(34, 197, 94, 0.2)'
+              }}>
+                <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '8px' }}>
+                  Sinyal Fiyatı
+                </div>
+                <div style={{ fontSize: '16px', color: '#22c55e', fontWeight: '600' }}>
+                  ${longSignal.price.toFixed(4)}
+                </div>
+              </div>
+            </div>
+
+            {/* Indicators */}
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.3)',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '20px'
+            }}>
+              <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '12px', fontWeight: '600' }}>
+                İndikatör Onayları:
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)' }}>
+                <div>📊 RSI: {longSignal.indicators.rsi.value.toFixed(0)} - {longSignal.indicators.rsi.signal}</div>
+                <div>💰 MFI: {longSignal.indicators.mfi.value.toFixed(0)} - {longSignal.indicators.mfi.signal}</div>
+                {longSignal.indicators.ma.signal && <div>📈 MA: {longSignal.indicators.ma.signal}</div>}
+                {longSignal.indicators.bollinger.signal && <div>📉 Bollinger: {longSignal.indicators.bollinger.signal}</div>}
+              </div>
+            </div>
+
+            {/* Risk Management */}
+            <div style={{
+              background: 'rgba(239, 68, 68, 0.1)',
+              borderRadius: '12px',
+              padding: '16px',
+              border: '1px solid rgba(239, 68, 68, 0.2)'
+            }}>
+              <div style={{ fontSize: '13px', color: '#ef4444', marginBottom: '12px', fontWeight: '600' }}>
+                ⚠️ Risk Yönetimi:
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)' }}>
+                <div>
+                  <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>Stop-Loss:</span>{' '}
+                  <span style={{ color: '#ef4444', fontWeight: '600' }}>${(longSignal.price * 0.98).toFixed(4)}</span>{' '}
+                  <span style={{ color: 'rgba(255, 255, 255, 0.5)' }}>(-2%)</span>
+                </div>
+                <div>
+                  <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>Take-Profit:</span>{' '}
+                  <span style={{ color: '#22c55e', fontWeight: '600' }}>${(longSignal.price * 1.05).toFixed(4)}</span>{' '}
+                  <span style={{ color: 'rgba(255, 255, 255, 0.5)' }}>(+5%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Volume Chart */}
+        <div style={{
+          background: 'rgba(38, 166, 154, 0.05)',
+          borderRadius: '12px',
+          padding: '16px',
+          border: '1px solid rgba(38, 166, 154, 0.2)'
+        }}>
+          <div style={{
+            fontSize: '12px',
+            color: '#26a69a',
+            marginBottom: '12px',
+            fontWeight: '600',
+            letterSpacing: '0.5px'
+          }}>
+            📊 Volume • Trading Activity
+          </div>
+          <Chart
+            options={volumeOptions}
+            series={[{
+              name: 'Hacim',
+              data: volumeData
+            }]}
+            type="bar"
+            height={120}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

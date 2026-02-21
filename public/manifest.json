@@ -1,0 +1,123 @@
+{
+  "name": "Ailydian Signal - AI Kripto Trading Platformu",
+  "short_name": "Ailydian Signal",
+  "description": "617 kripto para için gerçek zamanlı AI trading sinyalleri. 18+ strateji, whale takibi ve profesyonel piyasa analizi.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#8B5A3C",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["finance", "productivity", "business"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Market Scanner",
+      "short_name": "Scanner",
+      "description": "Tüm 617 kripto parayı tara",
+      "url": "/market-scanner",
+      "icons": [
+        {
+          "src": "/icons/shortcut-scanner.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Trading Signals",
+      "short_name": "Signals",
+      "description": "Al/Sat sinyallerini görüntüle",
+      "url": "/trading-signals",
+      "icons": [
+        {
+          "src": "/icons/shortcut-signals.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Muhafazakâr Alım",
+      "short_name": "Konservatif",
+      "description": "5 koşul sağlayan güvenli sinyaller",
+      "url": "/conservative-signals",
+      "icons": [
+        {
+          "src": "/icons/shortcut-conservative.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-home.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Ailydian Signal Dashboard - 617 Kripto Para Analizi"
+    },
+    {
+      "src": "/screenshots/mobile-home.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ailydian Signal Mobil - Gerçek Zamanlı Trading Sinyalleri"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "lang": "tr-TR",
+  "dir": "ltr"
+}

@@ -1,0 +1,393 @@
+name: 🚀 Canary Deployment
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      rollout_percentage:
+        description: 'Canary rollout percentage'
+        required: false
+        default: '10'
+        type: choice
+        options:
+          - '5'
+          - '10'
+          - '25'
+          - '50'
+      force_deploy:
+        description: 'Force deployment (skip health checks)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '18'
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  OPS_WEBHOOK_URL: ${{ secrets.OPS_WEBHOOK_URL }}
+
+jobs:
+  # Pre-deployment checks
+  pre-deploy:
+    name: 🔍 Pre-deployment Checks
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.checks.outputs.should_deploy }}
+      rollout_percentage: ${{ steps.checks.outputs.rollout_percentage }}
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Run security audit
+        run: pnpm audit --audit-level moderate
+
+      - name: 🧪 Run test suite
+        run: pnpm test -- --coverage
+
+      - name: 🔍 Run linting
+        run: pnpm lint
+
+      - name: 🔍 Type checking
+        run: pnpm typecheck
+
+      - name: 🏗️ Build application
+        run: pnpm build
+
+      - name: 📊 Evaluate deployment readiness
+        id: checks
+        run: |
+          # Check if this is a force deployment
+          FORCE_DEPLOY="${{ github.event.inputs.force_deploy || 'false' }}"
+          
+          # Get rollout percentage
+          ROLLOUT_PERCENTAGE="${{ github.event.inputs.rollout_percentage || '10' }}"
+          
+          # Check for recent deployments (prevent deployment storms)
+          RECENT_DEPLOYMENTS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs?event=push&status=success&per_page=5" | \
+            jq '.workflow_runs | map(select(.created_at > (now - 1800 | strftime("%Y-%m-%dT%H:%M:%SZ")))) | length')
+          
+          # Check business hours for high-risk deployments
+          CURRENT_HOUR=$(date -u +%H)
+          BUSINESS_HOURS="true"
+          if [[ "$ROLLOUT_PERCENTAGE" > "25" ]] && (( CURRENT_HOUR < 9 || CURRENT_HOUR >= 17 )); then
+            BUSINESS_HOURS="false"
+          fi
+          
+          SHOULD_DEPLOY="true"
+          if [[ "$FORCE_DEPLOY" == "true" ]]; then
+            echo "🚀 Force deployment enabled"
+          elif [[ "$RECENT_DEPLOYMENTS" > "2" ]]; then
+            SHOULD_DEPLOY="false"
+            echo "❌ Too many recent deployments ($RECENT_DEPLOYMENTS)"
+          elif [[ "$BUSINESS_HOURS" == "false" ]]; then
+            SHOULD_DEPLOY="false"
+            echo "❌ High-risk deployment outside business hours"
+          fi
+          
+          echo "should_deploy=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
+          echo "rollout_percentage=$ROLLOUT_PERCENTAGE" >> $GITHUB_OUTPUT
+          
+          echo "📊 Deployment Check Results:"
+          echo "  Should Deploy: $SHOULD_DEPLOY"
+          echo "  Rollout Percentage: $ROLLOUT_PERCENTAGE%"
+          echo "  Recent Deployments: $RECENT_DEPLOYMENTS"
+          echo "  Business Hours: $BUSINESS_HOURS"
+
+  # Deploy to canary environment
+  deploy-canary:
+    name: 🕊️ Deploy Canary
+    runs-on: ubuntu-latest
+    needs: pre-deploy
+    if: needs.pre-deploy.outputs.should_deploy == 'true'
+    environment:
+      name: canary
+      url: https://sardag-emrah-canary.vercel.app
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build application
+        run: pnpm build
+
+      - name: 📥 Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: 🕊️ Deploy to canary
+        run: |
+          vercel --name sardag-emrah-canary --confirm --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: ⏳ Wait for deployment
+        run: sleep 30
+
+  # Health checks on canary
+  health-check:
+    name: 🏥 Canary Health Check
+    runs-on: ubuntu-latest
+    needs: deploy-canary
+    outputs:
+      health_status: ${{ steps.health.outputs.status }}
+      error_message: ${{ steps.health.outputs.error }}
+    steps:
+      - name: 🏥 Check canary health
+        id: health
+        run: |
+          CANARY_URL="https://sardag-emrah-canary.vercel.app"
+          MAX_RETRIES=5
+          RETRY_DELAY=10
+          HEALTH_STATUS="unhealthy"
+          ERROR_MESSAGE=""
+          
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo "🏥 Health check attempt $i/$MAX_RETRIES"
+            
+            # Check main health endpoint
+            if curl -f -s "$CANARY_URL/api/health" > /dev/null; then
+              echo "✅ Main health endpoint OK"
+              
+              # Check critical endpoints
+              ENDPOINTS=("/api/market/overview" "/api/symbols" "/api/futures-all")
+              ALL_HEALTHY=true
+              
+              for endpoint in "${ENDPOINTS[@]}"; do
+                if ! curl -f -s "$CANARY_URL$endpoint" > /dev/null; then
+                  echo "❌ Endpoint $endpoint failed"
+                  ALL_HEALTHY=false
+                  break
+                fi
+              done
+              
+              if $ALL_HEALTHY; then
+                HEALTH_STATUS="healthy"
+                echo "✅ All endpoints healthy"
+                break
+              fi
+            else
+              echo "❌ Main health endpoint failed"
+            fi
+            
+            if [[ $i -lt $MAX_RETRIES ]]; then
+              echo "⏳ Waiting $RETRY_DELAY seconds before retry..."
+              sleep $RETRY_DELAY
+            fi
+          done
+          
+          if [[ "$HEALTH_STATUS" != "healthy" ]]; then
+            ERROR_MESSAGE="Canary deployment failed health checks after $MAX_RETRIES attempts"
+          fi
+          
+          echo "status=$HEALTH_STATUS" >> $GITHUB_OUTPUT
+          echo "error=$ERROR_MESSAGE" >> $GITHUB_OUTPUT
+
+  # Gradual rollout
+  rollout:
+    name: 📈 Gradual Rollout
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, health-check]
+    if: needs.health-check.outputs.health_status == 'healthy'
+    environment:
+      name: production
+      url: https://sardag-emrah.vercel.app
+    steps:
+      - name: 📈 Execute gradual rollout
+        run: |
+          ROLLOUT_PERCENTAGE="${{ needs.pre-deploy.outputs.rollout_percentage }}"
+          CANARY_URL="https://sardag-emrah-canary.vercel.app"
+          PROD_URL="https://sardag-emrah.vercel.app"
+          
+          echo "🚀 Starting gradual rollout to $ROLLOUT_PERCENTAGE% traffic"
+          
+          # In a real implementation, this would configure load balancer or CDN
+          # For Vercel, we'll simulate the rollout process
+          
+          STEPS=5
+          STEP_PERCENTAGE=$((ROLLOUT_PERCENTAGE / STEPS))
+          
+          for step in $(seq 1 $STEPS); do
+            CURRENT_PERCENTAGE=$((step * STEP_PERCENTAGE))
+            
+            if [[ $CURRENT_PERCENTAGE -gt $ROLLOUT_PERCENTAGE ]]; then
+              CURRENT_PERCENTAGE=$ROLLOUT_PERCENTAGE
+            fi
+            
+            echo "📈 Rolling out to $CURRENT_PERCENTAGE% traffic (step $step/$STEPS)"
+            
+            # Simulate traffic routing configuration
+            # In real implementation, this would update Vercel/Cloudflare settings
+            
+            # Health check after each step
+            sleep 30
+            
+            if ! curl -f -s "$CANARY_URL/api/health" > /dev/null; then
+              echo "❌ Health check failed at $CURRENT_PERCENTAGE% rollout"
+              echo "::error::Canary health failed during rollout - triggering rollback"
+              exit 1
+            fi
+            
+            echo "✅ Health check passed at $CURRENT_PERCENTAGE% rollout"
+          done
+          
+          echo "🎉 Rollout completed successfully to $ROLLOUT_PERCENTAGE% traffic"
+
+  # Promote to production (if full rollout)
+  promote:
+    name: 🚀 Promote to Production
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, health-check, rollout]
+    if: needs.pre-deploy.outputs.rollout_percentage == '100'
+    environment:
+      name: production
+      url: https://sardag-emrah.vercel.app
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build application
+        run: pnpm build
+
+      - name: 📥 Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: 🚀 Deploy to production
+        run: |
+          vercel --prod --confirm --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: 🎉 Notify success
+        run: |
+          if [[ -n "$OPS_WEBHOOK_URL" ]]; then
+            curl -X POST "$OPS_WEBHOOK_URL" \
+              -H 'Content-type: application/json' \
+              --data "{\"text\":\"🎉 **Canary Deployment Successful**\n\n*Repository*: ${{ github.repository }}\n*Commit*: ${{ github.sha }}\n*Rollout*: 100%\n*URL*: https://sardag-emrah.vercel.app\"}"
+          fi
+
+  # Rollback on failure
+  rollback:
+    name: 🔄 Rollback
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, health-check]
+    if: failure() && needs.health-check.outputs.health_status != 'healthy'
+    environment:
+      name: production
+      url: https://sardag-emrah.vercel.app
+    steps:
+      - name: 🔄 Execute rollback
+        run: |
+          echo "🔄 Rolling back due to canary health check failure"
+          echo "Error: ${{ needs.health-check.outputs.error_message }}"
+          
+          # In a real implementation, this would:
+          # 1. Switch traffic back to previous stable version
+          # 2. Scale down canary deployment
+          # 3. Clean up resources
+          
+          # For Vercel, we would redeploy the previous successful commit
+          PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
+          echo "Rolling back to commit: $PREVIOUS_COMMIT"
+          
+          # Reset to previous commit and redeploy
+          git reset --hard $PREVIOUS_COMMIT
+          
+          # Redeploy previous version
+          vercel --prod --confirm --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: 🚨 Notify rollback
+        run: |
+          if [[ -n "$OPS_WEBHOOK_URL" ]]; then
+            curl -X POST "$OPS_WEBHOOK_URL" \
+              -H 'Content-type: application/json' \
+              --data "{\"text\":\"🚨 **Canary Rollback Triggered**\n\n*Repository*: ${{ github.repository }}\n*Commit*: ${{ github.sha }}\n*Reason*: ${{ needs.health-check.outputs.error_message }}\n*Action*: Automatic rollback to previous stable version\"}"
+          fi
+
+  # Cleanup
+  cleanup:
+    name: 🧹 Cleanup
+    runs-on: ubuntu-latest
+    needs: [pre-deploy, health-check, rollout, promote]
+    if: always()
+    steps:
+      - name: 🧹 Cleanup canary resources
+        run: |
+          echo "🧹 Cleaning up canary deployment resources"
+          
+          # In a real implementation, this would:
+          # 1. Remove canary deployment if not full rollout
+          # 2. Clean up temporary resources
+          # 3. Archive logs and metrics
+          
+          if [[ "${{ needs.pre-deploy.outputs.rollout_percentage }}" != "100" ]]; then
+            echo "Removing canary deployment (partial rollout)"
+            # vercel remove sardag-emrah-canary --token ${{ secrets.VERCEL_TOKEN }}
+          else
+            echo "Canary promoted to production - no cleanup needed"
+          fi
+
+      - name: 📊 Generate deployment report
+        run: |
+          echo "📊 Deployment Summary:"
+          echo "  Repository: ${{ github.repository }}"
+          echo "  Commit: ${{ github.sha }}"
+          echo "  Rollout Percentage: ${{ needs.pre-deploy.outputs.rollout_percentage }}%"
+          echo "  Health Status: ${{ needs.health-check.outputs.health_status }}"
+          echo "  Started: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          
+          # Create deployment report
+          cat << EOF > deployment-report.md
+          # Canary Deployment Report
+          
+          **Repository**: ${{ github.repository }}
+          **Commit**: ${{ github.sha }}
+          **Rollout Percentage**: ${{ needs.pre-deploy.outputs.rollout_percentage }}%
+          **Health Status**: ${{ needs.health-check.outputs.health_status }}
+          **Started**: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+          
+          ## Results
+          EOF
+          
+          # Upload report as artifact
+          echo "deployment_report=deployment-report.md" >> $GITHUB_ENV
+
+      - name: 📤 Upload deployment report
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-report-${{ github.run_number }}
+          path: deployment-report.md
+          retention-days: 30

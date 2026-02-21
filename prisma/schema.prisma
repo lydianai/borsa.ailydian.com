@@ -1,0 +1,851 @@
+// ============================================
+// AILYDIAN SIGNAL - DATABASE SCHEMA
+// ============================================
+// Prisma ORM Schema for production-grade trading signal platform
+//
+// White-hat compliance: All data models designed for educational
+// and analytical purposes only
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  username      String   @unique
+  passwordHash  String
+
+  // Email Verification
+  emailVerified       Boolean   @default(false)
+  emailVerificationToken String? @unique
+  emailVerificationExpires DateTime?
+
+  // Admin Approval
+  isApproved          Boolean   @default(false)
+  approvedBy          String?
+  approvedAt          DateTime?
+  adminNotes          String?
+
+  // Role-Based Access Control
+  role                String    @default("user") // admin, user, developer
+  isAdmin             Boolean   @default(false)
+
+  // Payment Status
+  hasActivePayment    Boolean   @default(false)
+  paymentVerifiedAt   DateTime?
+
+  // 2FA
+  totpSecret    String?
+  totpEnabled   Boolean  @default(false)
+  backupCodes   String[]
+
+  // Subscription (SaaS)
+  stripeCustomerId    String?  @unique
+  subscriptionTier    String   @default("free") // free, starter, pro, enterprise
+  subscriptionStatus  String   @default("inactive") // inactive, active, past_due, canceled, trialing
+  trialEndsAt         DateTime?
+  currentPeriodEnd    DateTime?
+
+  // Profile
+  timezone      String   @default("Europe/Istanbul")
+  language      String   @default("tr")
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relations
+  watchlists    Watchlist[]
+  alerts        Alert[]
+  settings      UserSettings?
+  sessions      Session[]
+  apiKeys       ApiKey[]
+  subscription  Subscription?
+  usageRecords  UsageRecord[]
+  signalProviderProfile SignalProvider?
+  copyFollowing CopyFollower[]
+  publishedSignals PublishedSignal[]
+  tradingBots   TradingBot[]
+  exchangeAPIs  ExchangeAPI[]
+
+  @@index([email])
+  @@index([username])
+  @@index([subscriptionTier])
+  @@index([subscriptionStatus])
+  @@index([emailVerified])
+  @@index([isApproved])
+  @@index([isAdmin])
+  @@index([hasActivePayment])
+  @@map("users")
+}
+
+model AdminNotification {
+  id          String   @id @default(cuid())
+  type        String   // new_user_registration, payment_received, api_request
+  title       String
+  message     String
+  userId      String?  // Related user if applicable
+  userEmail   String?
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+  actionUrl   String?  // URL to approval/management page
+  metadata    Json?    // Additional data
+  createdAt   DateTime @default(now())
+
+  @@index([isRead])
+  @@index([createdAt])
+  @@index([type])
+  @@map("admin_notifications")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  expiresAt    DateTime
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model ApiKey {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  key          String   @unique
+  secret       String
+  permissions  String[] // ['read', 'trade', 'admin']
+  lastUsedAt   DateTime?
+  expiresAt    DateTime?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([key])
+  @@map("api_keys")
+}
+
+// ============================================
+// SIGNALS & STRATEGIES
+// ============================================
+
+model Signal {
+  id            String   @id @default(cuid())
+  symbol        String
+  type          String   // BUY, SELL
+  strategy      String   // conservative, breakout, quantum, etc.
+  confidence    Float
+  price         Float
+  targetPrice   Float?
+  stopLoss      Float?
+
+  // Metadata
+  timeframe     String?
+  leverage      Int?
+  riskReward    Float?
+  indicators    Json?    // Technical indicators used
+  reason        String?  // Human-readable explanation
+
+  // Status
+  status        String   @default("ACTIVE") // ACTIVE, TRIGGERED, EXPIRED, CANCELLED
+  triggeredAt   DateTime?
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  expiresAt     DateTime?
+
+  @@index([symbol, createdAt])
+  @@index([strategy, confidence])
+  @@index([status])
+  @@index([createdAt])
+  @@map("signals")
+}
+
+model StrategyPerformance {
+  id              String   @id @default(cuid())
+  strategy        String
+  symbol          String
+
+  // Performance metrics
+  totalSignals    Int      @default(0)
+  successfulSignals Int    @default(0)
+  failedSignals   Int      @default(0)
+  successRate     Float    @default(0)
+  avgProfit       Float    @default(0)
+  avgLoss         Float    @default(0)
+  maxDrawdown     Float    @default(0)
+  sharpeRatio     Float?
+
+  // Timestamps
+  lastUpdated     DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  @@unique([strategy, symbol])
+  @@index([strategy])
+  @@index([successRate])
+  @@map("strategy_performance")
+}
+
+// ============================================
+// WATCHLISTS & ALERTS
+// ============================================
+
+model Watchlist {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  symbols      String[]
+  description  String?
+  isPublic     Boolean  @default(false)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("watchlists")
+}
+
+model Alert {
+  id           String   @id @default(cuid())
+  userId       String
+  symbol       String
+  type         String   // PRICE, RSI, VOLUME, CUSTOM
+
+  // Condition
+  operator     String   // '>', '<', '>=', '<=', '=='
+  value        Float
+  indicator    String?  // For technical indicator alerts
+
+  // Settings
+  message      String?
+  enabled      Boolean  @default(true)
+  triggered    Boolean  @default(false)
+  triggeredAt  DateTime?
+
+  // Notifications
+  notifyPush   Boolean  @default(true)
+  notifyTelegram Boolean @default(false)
+  notifyEmail  Boolean  @default(false)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([symbol])
+  @@index([enabled, triggered])
+  @@map("alerts")
+}
+
+// ============================================
+// BOT MANAGEMENT
+// ============================================
+
+model TradingBot {
+  id              String   @id @default(cuid())
+  userId          String
+  exchangeId      String?  // Connected exchange API
+  name            String
+  strategy        String
+  symbol          String
+
+  // Configuration
+  leverage        Int      @default(1)
+  stopLoss        Float    // Percentage
+  takeProfit      Float    // Percentage
+  trailingStop    Float?   // Percentage
+  maxPositionSize Float    // USD
+  riskPercentage  Float    @default(2) // % of capital per trade
+
+  // Status
+  status          String   @default("STOPPED") // RUNNING, STOPPED, PAUSED, ERROR
+  enabled         Boolean  @default(false)
+
+  // Performance
+  totalTrades     Int      @default(0)
+  successfulTrades Int     @default(0)
+  currentPnL      Float    @default(0)
+  totalPnL        Float    @default(0)
+
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  lastTradeAt     DateTime?
+  startedAt       DateTime?
+  stoppedAt       DateTime?
+
+  // Relations
+  user            User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchange        ExchangeAPI? @relation(fields: [exchangeId], references: [id])
+  trades          BotTrade[]
+
+  @@index([userId])
+  @@index([exchangeId])
+  @@index([status])
+  @@index([strategy])
+  @@map("trading_bots")
+}
+
+model BotTrade {
+  id           String   @id @default(cuid())
+  botId        String
+  symbol       String
+  side         String   // BUY, SELL
+
+  // Entry
+  entryPrice   Float
+  entryQty     Float
+  entryTime    DateTime
+
+  // Exit
+  exitPrice    Float?
+  exitQty      Float?
+  exitTime     DateTime?
+
+  // Results
+  pnl          Float?
+  pnlPercent   Float?
+  status       String   @default("OPEN") // OPEN, CLOSED, CANCELLED
+
+  // Metadata
+  leverage     Int?
+  fees         Float?
+  reason       String?  // Why trade was taken/closed
+
+  createdAt    DateTime @default(now())
+
+  bot          TradingBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@index([botId])
+  @@index([symbol])
+  @@index([status])
+  @@index([entryTime])
+  @@map("bot_trades")
+}
+
+// ============================================
+// EXCHANGE API INTEGRATION
+// ============================================
+
+model ExchangeAPI {
+  id                  String   @id @default(cuid())
+  userId              String
+  exchange            String   // okx, bybit, coinbase, kraken, btcturk
+  name                String   // User-friendly name (e.g., "My OKX Account")
+
+  // Encrypted Credentials (AES-256-GCM)
+  // CRITICAL: API keys are encrypted at rest, NEVER store in plain text
+  encryptedApiKey     String   @db.Text
+  encryptedApiSecret  String   @db.Text
+  encryptedPassphrase String?  @db.Text // For OKX and some others
+  encryptionIV        String   // Initialization vector for AES-256-GCM
+
+  // Connection Status
+  isActive            Boolean  @default(false)
+  isConnected         Boolean  @default(false)
+  lastTestedAt        DateTime?
+  connectionError     String?
+  lastBalanceCheck    DateTime?
+
+  // Security & Permissions
+  // CRITICAL: Platform validates NO withdrawal permissions exist
+  ipWhitelist         String[] // User's whitelisted IPs (informational)
+  hasWithdrawPerm     Boolean  @default(false) // MUST be false - auto-checked
+  hasSpotTrading      Boolean  @default(false)
+  hasFuturesTrading   Boolean  @default(false)
+  permissions         String[] // Verified permissions from exchange
+
+  // Legal & Compliance
+  // White-hat compliance: User accepts ALL responsibility
+  termsAcceptedAt     DateTime?
+  disclaimerAccepted  Boolean  @default(false)
+  userResponsibility  Boolean  @default(false) // User confirms they own API keys
+
+  // Rate Limiting (per exchange limits)
+  requestCount        Int      @default(0)
+  lastRequestAt       DateTime?
+  dailyRequestCount   Int      @default(0)
+  lastDailyReset      DateTime @default(now())
+
+  // Exchange-specific limits
+  // OKX: 20 req/2sec, Bybit: 120 req/min, Coinbase: 30 req/sec
+  // Kraken: Tier-based, BTCTurk: 100 req/min
+  maxRequestsPerMin   Int      @default(60)
+
+  // Error Tracking
+  consecutiveErrors   Int      @default(0)
+  lastErrorMessage    String?
+  lastErrorAt         DateTime?
+
+  // Metadata
+  exchangeAccountId   String?  // Exchange-provided account ID
+  exchangeAccountType String?  // spot, margin, futures
+  testnet             Boolean  @default(false) // Using testnet?
+
+  // Timestamps
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tradingBots         TradingBot[]
+
+  @@unique([userId, exchange, name]) // Unique per user per exchange per name
+  @@index([userId])
+  @@index([exchange])
+  @@index([isActive])
+  @@index([isConnected])
+  @@index([hasWithdrawPerm]) // Quick audit check
+  @@map("exchange_apis")
+}
+
+// ============================================
+// USER SETTINGS
+// ============================================
+
+model UserSettings {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+
+  // UI Preferences
+  theme             String   @default("dark")
+  defaultTimeframe  String   @default("1h")
+  chartType         String   @default("candlestick")
+
+  // Notifications
+  notificationsEnabled Boolean @default(true)
+  notifyPush        Boolean  @default(true)
+  notifyTelegram    Boolean  @default(false)
+  notifyEmail       Boolean  @default(false)
+
+  // Filters
+  minConfidence     Float    @default(70)
+  preferredStrategies String[]
+  blockedSymbols    String[]
+
+  // Risk Management
+  maxLeverage       Int      @default(5)
+  maxPositionSize   Float    @default(1000)
+  autoTradingEnabled Boolean @default(false)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+// ============================================
+// PUSH NOTIFICATIONS
+// ============================================
+
+model PushSubscription {
+  id           String   @id @default(cuid())
+  endpoint     String   @unique
+  p256dh       String
+  auth         String
+
+  // Metadata
+  userId       String?
+  deviceType   String?  // web, mobile
+  userAgent    String?
+
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  lastUsedAt   DateTime?
+
+  @@index([userId])
+  @@index([isActive])
+  @@map("push_subscriptions")
+}
+
+// ============================================
+// MARKET DATA CACHE (Optional)
+// ============================================
+
+model MarketDataCache {
+  id           String   @id @default(cuid())
+  symbol       String
+  timeframe    String
+
+  // OHLCV Data
+  open         Float
+  high         Float
+  low          Float
+  close        Float
+  volume       Float
+
+  // Timestamp
+  timestamp    DateTime
+  createdAt    DateTime @default(now())
+
+  @@unique([symbol, timeframe, timestamp])
+  @@index([symbol, timeframe])
+  @@index([timestamp])
+  @@map("market_data_cache")
+}
+
+// ============================================
+// AUDIT LOG (Security & Compliance)
+// ============================================
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  action       String   // LOGIN, LOGOUT, TRADE, SETTING_CHANGE, etc.
+  resource     String?  // Resource affected
+  resourceId   String?
+
+  // Request details
+  ipAddress    String?
+  userAgent    String?
+
+  // Metadata
+  metadata     Json?
+  success      Boolean  @default(true)
+  errorMessage String?
+
+  timestamp    DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
+
+// ============================================
+// SUBSCRIPTION & BILLING (SaaS)
+// ============================================
+
+model Subscription {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+
+  // Stripe
+  stripeSubscriptionId  String?  @unique
+  stripePriceId         String?
+  stripeCustomerId      String?
+
+  // Plan details
+  plan                  String   // free, starter, pro, enterprise
+  status                String   // active, canceled, past_due, trialing, incomplete
+
+  // Billing cycle
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  cancelAtPeriodEnd     Boolean  @default(false)
+  canceledAt            DateTime?
+  trialStart            DateTime?
+  trialEnd              DateTime?
+
+  // Pricing
+  amount                Float?   // Monthly amount in cents
+  currency              String   @default("usd")
+
+  // Metadata
+  metadata              Json?
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([plan])
+  @@index([currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+model UsageRecord {
+  id                String   @id @default(cuid())
+  userId            String
+
+  // Usage type
+  resource          String   // api_call, signal, ai_query, bot_execution
+  endpoint          String?  // API endpoint
+
+  // Metrics
+  quantity          Int      @default(1)
+  cost              Float?   // Cost in credits
+
+  // Metadata
+  metadata          Json?
+
+  timestamp         DateTime @default(now())
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, timestamp])
+  @@index([resource])
+  @@index([timestamp])
+  @@map("usage_records")
+}
+
+// ============================================
+// COPY TRADING MARKETPLACE
+// ============================================
+
+model SignalProvider {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+
+  // Profile
+  displayName       String
+  bio               String?
+  avatar            String?
+  verified          Boolean  @default(false)
+
+  // Subscription pricing
+  monthlyPrice      Float    @default(0) // USD per month for followers
+  commissionRate    Float    @default(70) // % of revenue (platform takes 30%)
+
+  // Performance metrics
+  totalFollowers    Int      @default(0)
+  totalSignals      Int      @default(0)
+  successfulSignals Int      @default(0)
+  winRate           Float    @default(0)
+  avgReturn         Float    @default(0)
+  totalReturn       Float    @default(0)
+  sharpeRatio       Float?
+  maxDrawdown       Float    @default(0)
+
+  // Status
+  isActive          Boolean  @default(true)
+  suspendedAt       DateTime?
+  suspensionReason  String?
+
+  // Timestamps
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  signals           PublishedSignal[]
+  followers         CopyFollower[]
+
+  @@index([userId])
+  @@index([winRate])
+  @@index([totalFollowers])
+  @@index([isActive])
+  @@map("signal_providers")
+}
+
+model PublishedSignal {
+  id                String   @id @default(cuid())
+  providerId        String
+  userId            String   // Provider's user ID for quick access
+
+  // Signal details
+  symbol            String
+  type              String   // BUY, SELL
+  strategy          String?
+  confidence        Float
+
+  // Entry/Exit
+  entryPrice        Float
+  targets           Float[]
+  stopLoss          Float?
+  leverage          Int?
+
+  // Status
+  status            String   @default("ACTIVE") // ACTIVE, CLOSED, EXPIRED
+  closedPrice       Float?
+  closedAt          DateTime?
+  result            String?  // HIT_TARGET, STOP_LOSS, MANUAL_CLOSE, EXPIRED
+  profitLoss        Float?   // % return
+
+  // Analytics
+  views             Int      @default(0)
+  copies            Int      @default(0)
+  likes             Int      @default(0)
+
+  // Explanation
+  analysis          String?  // Provider's analysis
+  notes             String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  expiresAt         DateTime?
+
+  provider          SignalProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([providerId])
+  @@index([symbol, createdAt])
+  @@index([status])
+  @@index([createdAt])
+  @@map("published_signals")
+}
+
+model CopyFollower {
+  id                String   @id @default(cuid())
+  userId            String   // Follower
+  providerId        String   // Signal provider being followed
+
+  // Settings
+  autoCopy          Boolean  @default(true)
+  maxPositionSize   Float?   // USD limit per trade
+  stopFollowing     Boolean  @default(false)
+
+  // Subscription
+  subscriptionActive Boolean @default(false)
+  subscriptionStart DateTime?
+  subscriptionEnd   DateTime?
+
+  // Analytics
+  totalCopied       Int      @default(0)
+  totalReturn       Float    @default(0)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider          SignalProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, providerId])
+  @@index([userId])
+  @@index([providerId])
+  @@index([autoCopy])
+  @@map("copy_followers")
+}
+
+// ============================================
+// TRADING BOT MARKETPLACE
+// ============================================
+
+model BotTemplate {
+  id                String   @id @default(cuid())
+  creatorId         String
+
+  // Template details
+  name              String
+  description       String
+  category          String   // trend_following, mean_reversion, arbitrage, etc.
+  strategyType      String   // technical, fundamental, hybrid
+
+  // Configuration
+  config            Json     // Bot configuration template
+  defaultParams     Json?    // Default parameters
+  indicators        String[]  // Required indicators
+
+  // Pricing
+  price             Float    @default(0) // One-time or monthly
+  pricingModel      String   @default("free") // free, one_time, subscription
+
+  // Performance (from backtests)
+  backtestedReturn  Float?
+  backtestedWinRate Float?
+  backtestedTrades  Int?
+  backtestPeriod    String?  // "2020-01-01 to 2024-12-31"
+
+  // Stats
+  downloads         Int      @default(0)
+  rating            Float    @default(0)
+  totalReviews      Int      @default(0)
+
+  // Status
+  verified          Boolean  @default(false)
+  published         Boolean  @default(false)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([category])
+  @@index([verified, published])
+  @@index([rating])
+  @@map("bot_templates")
+}
+
+// ============================================
+// WEBHOOK SYSTEM
+// ============================================
+
+model Webhook {
+  id                String   @id @default(cuid())
+  userId            String
+
+  // Webhook details
+  name              String
+  url               String
+  secret            String?  // For signature verification
+
+  // Events to listen for
+  events            String[] // signal_created, alert_triggered, bot_trade, etc.
+
+  // Status
+  enabled           Boolean  @default(true)
+  lastTriggeredAt   DateTime?
+  lastStatus        String?  // success, failed
+  failureCount      Int      @default(0)
+
+  // Settings
+  retryEnabled      Boolean  @default(true)
+  maxRetries        Int      @default(3)
+  timeoutSeconds    Int      @default(30)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  deliveries        WebhookDelivery[]
+
+  @@index([userId])
+  @@index([enabled])
+  @@map("webhooks")
+}
+
+model WebhookDelivery {
+  id                String   @id @default(cuid())
+  webhookId         String
+
+  // Event
+  event             String   // signal_created, etc.
+  payload           Json
+
+  // Delivery attempt
+  attemptNumber     Int      @default(1)
+  status            String   // pending, success, failed
+  statusCode        Int?
+  responseBody      String?
+  errorMessage      String?
+
+  // Timing
+  sentAt            DateTime @default(now())
+  respondedAt       DateTime?
+  duration          Int?     // milliseconds
+
+  nextRetryAt       DateTime?
+
+  webhook           Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId])
+  @@index([status])
+  @@index([sentAt])
+  @@index([nextRetryAt])
+  @@map("webhook_deliveries")
+}

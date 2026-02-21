@@ -1,0 +1,22 @@
+{
+  "name": "railway-ai-worker",
+  "version": "1.0.0",
+  "description": "Railway AI Trading Microservice",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["ai", "trading", "railway", "microservice"],
+  "author": "AILYDIAN",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "axios": "^1.7.9",
+    "hono": "^4.6.14",
+    "zod": "^3.24.1"
+  }
+}

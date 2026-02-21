@@ -1,0 +1,2379 @@
+#!/usr/bin/env node
+/**
+ * 🤖 TELEGRAM SCHEDULER RUNNER (Plain JavaScript)
+ * PM2 ile kolay çalışma için JavaScript wrapper
+ */
+
+// Load environment variables from .env.local (2 directories up)
+const path = require('path');
+require('dotenv').config({
+  path: path.join(__dirname, '../../.env.local')
+});
+
+const cron = require('node-cron');
+const http = require('http');
+const https = require('https');
+
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const CHAT_IDS = process.env.TELEGRAM_ALLOWED_CHAT_IDS ?
+  process.env.TELEGRAM_ALLOWED_CHAT_IDS.split(',').map(id => id.trim()) : [];
+
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('🤖 TELEGRAM SCHEDULER BAŞLATILIYOR...');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log(`📊 Base URL: ${BASE_URL}`);
+console.log(`👤 Chat IDs: ${CHAT_IDS.length} adet`);
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+// Simple HTTP GET
+function httpGet(url) {
+  return new Promise((resolve, reject) => {
+    const protocol = url.startsWith('https') ? https : http;
+    protocol.get(url, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch (e) {
+          resolve({ error: 'Parse error' });
+        }
+      });
+    }).on('error', reject);
+  });
+}
+
+// Sleep helper
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// HTTP POST helper (TA-Lib servisi için gerekli)
+function httpPost(url, data) {
+  return new Promise((resolve, reject) => {
+    const parsedUrl = new URL(url);
+    const protocol = parsedUrl.protocol === 'https:' ? https : http;
+
+    const options = {
+      hostname: parsedUrl.hostname,
+      port: parsedUrl.port,
+      path: parsedUrl.pathname + parsedUrl.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(data)
+      }
+    };
+
+    const req = protocol.request(options, (res) => {
+      let responseData = '';
+      res.on('data', (chunk) => responseData += chunk);
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(responseData));
+        } catch (e) {
+          resolve({ error: 'Parse error', raw: responseData });
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DİNAMİK COİN SEÇİM SİSTEMİ - Binance Top 200 USDT Pairs
+// ═══════════════════════════════════════════════════════════════════
+
+// Global cache için
+let cachedTopCoins = null;
+let lastCoinFetchTime = 0;
+const COIN_CACHE_DURATION = 3600000; // 1 saat cache
+
+/**
+ * Binance'den top 200 USDT pair'i çeker (24h volume bazında)
+ * Cache mekanizması ile 1 saat süreyle cache'lenir
+ */
+async function fetchTopUSDTPairs(limit = 200) {
+  try {
+    const now = Date.now();
+
+    // Cache kontrolü
+    if (cachedTopCoins && (now - lastCoinFetchTime) < COIN_CACHE_DURATION) {
+      console.log('[Coin Selection] 📦 Cache\'ten top coins alınıyor...');
+      return cachedTopCoins.slice(0, limit);
+    }
+
+    console.log('[Coin Selection] 🌐 Binance\'den top USDT pairs çekiliyor...');
+
+    const url = 'https://fapi.binance.com/fapi/v1/ticker/24hr';
+    const response = await httpGet(url);
+
+    if (!response || !Array.isArray(response)) {
+      console.error('[Coin Selection] ❌ Binance API hatası');
+      return ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'ADAUSDT', 'DOGEUSDT']; // Fallback
+    }
+
+    // Sadece USDT pair'leri filtrele ve volume'e göre sırala
+    const usdtPairs = response
+      .filter(ticker =>
+        ticker.symbol &&
+        ticker.symbol.endsWith('USDT') &&
+        !ticker.symbol.includes('DOWN') &&
+        !ticker.symbol.includes('UP') &&
+        !ticker.symbol.includes('BEAR') &&
+        !ticker.symbol.includes('BULL')
+      )
+      .map(ticker => ({
+        symbol: ticker.symbol,
+        volume: parseFloat(ticker.quoteVolume || 0),
+        priceChange: parseFloat(ticker.priceChangePercent || 0),
+        lastPrice: parseFloat(ticker.lastPrice || 0),
+        count: parseInt(ticker.count || 0) // Trade sayısı
+      }))
+      .sort((a, b) => b.volume - a.volume) // Volume'e göre sırala
+      .slice(0, limit);
+
+    // Cache'e kaydet
+    cachedTopCoins = usdtPairs;
+    lastCoinFetchTime = now;
+
+    console.log(`[Coin Selection] ✅ ${usdtPairs.length} USDT pair çekildi (Top: ${usdtPairs[0].symbol})`);
+
+    return usdtPairs;
+  } catch (error) {
+    console.error('[Coin Selection] ❌ Fetch hatası:', error.message);
+    // Fallback: En popüler coinler
+    return ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'ADAUSDT', 'DOGEUSDT'];
+  }
+}
+
+/**
+ * Akıllı coin seçimi - Farklı stratejiler ile
+ * @param {number} count - Seçilecek coin sayısı
+ * @param {string} strategy - 'momentum' | 'volume' | 'volatile' | 'balanced'
+ */
+async function getSmartCoinSelection(count = 6, strategy = 'balanced') {
+  try {
+    const topCoins = await fetchTopUSDTPairs(200);
+
+    if (!topCoins || topCoins.length === 0) {
+      return ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'];
+    }
+
+    let selected = [];
+
+    switch (strategy) {
+      case 'momentum':
+        // En yüksek pozitif price change
+        selected = topCoins
+          .filter(c => c.priceChange > 0)
+          .sort((a, b) => b.priceChange - a.priceChange)
+          .slice(0, count)
+          .map(c => c.symbol);
+        console.log(`[Coin Selection] 🚀 Momentum stratejisi: ${selected.slice(0, 3).join(', ')}...`);
+        break;
+
+      case 'volume':
+        // En yüksek volume
+        selected = topCoins
+          .slice(0, count)
+          .map(c => c.symbol);
+        console.log(`[Coin Selection] 📊 Volume stratejisi: ${selected.slice(0, 3).join(', ')}...`);
+        break;
+
+      case 'volatile':
+        // En volatil (yüksek price change - pozitif veya negatif)
+        selected = topCoins
+          .sort((a, b) => Math.abs(b.priceChange) - Math.abs(a.priceChange))
+          .slice(0, count)
+          .map(c => c.symbol);
+        console.log(`[Coin Selection] ⚡ Volatile stratejisi: ${selected.slice(0, 3).join(', ')}...`);
+        break;
+
+      case 'balanced':
+      default:
+        // Karışık: Top volume'den bazıları + momentum'dan bazıları
+        const topVolume = topCoins.slice(0, Math.ceil(count * 0.6)).map(c => c.symbol);
+        const topMomentum = topCoins
+          .filter(c => c.priceChange > 0)
+          .sort((a, b) => b.priceChange - a.priceChange)
+          .slice(0, Math.ceil(count * 0.4))
+          .map(c => c.symbol);
+
+        selected = [...new Set([...topVolume, ...topMomentum])].slice(0, count);
+        console.log(`[Coin Selection] ⚖️ Balanced stratejisi: ${selected.slice(0, 3).join(', ')}...`);
+        break;
+    }
+
+    // Fallback: Eğer yeterli coin seçilemediyse
+    if (selected.length < count) {
+      const fallback = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'ADAUSDT', 'DOGEUSDT'];
+      while (selected.length < count && fallback.length > 0) {
+        const coin = fallback.shift();
+        if (!selected.includes(coin)) {
+          selected.push(coin);
+        }
+      }
+    }
+
+    return selected;
+  } catch (error) {
+    console.error('[Coin Selection] ❌ Smart selection hatası:', error.message);
+    return ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'];
+  }
+}
+
+/**
+ * Rotasyon sistemi - Her çağrıda farklı coinler seç
+ * Top 50 coin arasında rotasyon yapar
+ */
+let rotationIndex = 0;
+async function getRotatedCoins(count = 6) {
+  try {
+    const topCoins = await fetchTopUSDTPairs(50); // Top 50'den seç
+
+    if (!topCoins || topCoins.length === 0) {
+      return ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'];
+    }
+
+    const symbols = topCoins.map(c => c.symbol);
+    const selected = [];
+
+    // Rotasyon ile seç
+    for (let i = 0; i < count; i++) {
+      const index = (rotationIndex + i) % symbols.length;
+      selected.push(symbols[index]);
+    }
+
+    // Bir sonraki çağrı için index'i güncelle
+    rotationIndex = (rotationIndex + count) % symbols.length;
+
+    console.log(`[Coin Selection] 🔄 Rotasyon: ${selected.slice(0, 3).join(', ')}... (Index: ${rotationIndex})`);
+
+    return selected;
+  } catch (error) {
+    console.error('[Coin Selection] ❌ Rotation hatası:', error.message);
+    return ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DİNAMİK COİN SEÇİM SİSTEMİ SONU
+// ═══════════════════════════════════════════════════════════════════
+
+// Telegram mesaj gönder (with retry and timeout)
+async function sendTelegramMessage(message, maxRetries = 3) {
+  console.log('[DEBUG sendTelegramMessage] Message received:', typeof message, message ? message.length : 'UNDEFINED');
+  console.log('[DEBUG sendTelegramMessage] Message preview:', message ? message.substring(0, 50) : 'NO MESSAGE');
+
+  if (!BOT_TOKEN || CHAT_IDS.length === 0) {
+    console.log('[Telegram] ⚠️  Bot token veya chat ID bulunamadı');
+    return;
+  }
+
+  for (const chatId of CHAT_IDS) {
+    let retries = 0;
+    let success = false;
+
+    while (retries < maxRetries && !success) {
+      try {
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        const data = JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'HTML'
+        });
+
+        console.log('[DEBUG sendTelegramMessage] JSON data:', data.substring(0, 150));
+
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            req.destroy();
+            reject(new Error('Request timeout'));
+          }, 10000); // 10 second timeout
+
+          const req = https.request(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(data, 'utf8')
+            }
+          }, (res) => {
+            clearTimeout(timeout);
+            let responseData = '';
+            res.on('data', (chunk) => responseData += chunk);
+            res.on('end', () => {
+              if (res.statusCode === 200) {
+                resolve(responseData);
+              } else {
+                reject(new Error(`HTTP ${res.statusCode}: ${responseData}`));
+              }
+            });
+          });
+
+          req.on('error', (err) => {
+            clearTimeout(timeout);
+            reject(err);
+          });
+
+          req.write(data);
+          req.end();
+        });
+
+        console.log(`[Telegram] ✅ Mesaj gönderildi: ${chatId}`);
+        success = true;
+
+        // Delay between messages to prevent rate limiting
+        await sleep(500);
+
+      } catch (error) {
+        retries++;
+        console.error(`[Telegram] ❌ Deneme ${retries}/${maxRetries} başarısız: ${error.message}`);
+
+        if (retries < maxRetries) {
+          // Exponential backoff: 1s, 2s, 4s
+          const delay = Math.pow(2, retries) * 1000;
+          console.log(`[Telegram] ⏳ ${delay}ms bekleniyor...`);
+          await sleep(delay);
+        } else {
+          console.error(`[Telegram] ❌ Tüm denemeler başarısız oldu: ${chatId}`);
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// SCHEDULER FUNCTIONS
+// ============================================================================
+
+async function sendNirvanaDaily() {
+  try {
+    console.log('\n[Scheduler] 📊 Nirvana günlük özet gönderiliyor...');
+    const data = await httpGet(`${BASE_URL}/api/nirvana`);
+
+    if (!data.success) {
+      console.log('[Scheduler] ❌ Nirvana API hatası');
+      return;
+    }
+
+    const message = `
+╭━━━━━━━━━━━━━━━━━━━━╮
+┃ 🌟 NİRVANA ÖZET 🌟
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ 📊 Aktif Strateji: ${data.data.activeStrategies}/${data.data.totalStrategies}
+┃ 🎯 Toplam Sinyal: ${data.data.totalSignals}
+┃ ${data.data.marketSentiment === 'BULLISH' ? '🟢 YÜKSELİŞ' : data.data.marketSentiment === 'BEARISH' ? '🔴 DÜŞÜŞ' : '🟡 NÖTR'} (${data.data.sentimentScore})
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ ⌚ ${new Date().toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+╰━━━━━━━━━━━━━━━━━━━━╯
+`.trim();
+
+    await sendTelegramMessage(message);
+    console.log('[Scheduler] ✅ Nirvana özet gönderildi');
+  } catch (error) {
+    console.error('[Scheduler] ❌ Nirvana hatası:', error.message);
+  }
+}
+
+// DEVRE DIŞI BIRAKILDI - HABER BİLDİRİMLERİ KALDIRILDI
+/*
+async function sendCryptoNews() {
+  try {
+    console.log('\n[Scheduler] 📰 Crypto News kontrol ediliyor...');
+    const data = await httpGet(`${BASE_URL}/api/crypto-news?refresh=true`);
+
+    if (!data.success || !data.data || data.data.length === 0) {
+      console.log('[Scheduler] ℹ️  Yeni haber bulunamadı');
+      return;
+    }
+
+    const importantNews = data.data.filter(n => n.impactScore >= 8);
+
+    for (const news of importantNews.slice(0, 3)) {
+      const message = `
+╭━━━━━━━━━━━━━━━━━━━━╮
+┃ 📰 KRİPTO HABER
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ <b>${news.titleTR || news.title}</b>
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ ${(news.descriptionTR || news.description || '').substring(0, 150)}...
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ 🎯 Etki: ${news.impactScore}/10
+┃ ⌚ ${new Date().toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+╰━━━━━━━━━━━━━━━━━━━━╯
+`.trim();
+
+      await sendTelegramMessage(message);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 1s bekle
+    }
+
+    console.log('[Scheduler] ✅ Crypto News gönderildi');
+  } catch (error) {
+    console.error('[Scheduler] ❌ Crypto News hatası:', error.message);
+  }
+}
+*/
+
+async function sendMarketCorrelation() {
+  try {
+    console.log('\n[Scheduler] 📊 Market Correlation sinyalleri gönderiliyor...');
+    const data = await httpGet(`${BASE_URL}/api/market-correlation?limit=5`);
+
+    if (!data.success || !data.data || !data.data.correlations || data.data.correlations.length === 0) {
+      console.log('[Scheduler] ℹ️  Market Correlation verisi yok');
+      return;
+    }
+
+    const topCoins = data.data.correlations.slice(0, 5);
+    let coinList = '';
+    topCoins.forEach((coin, index) => {
+      const medal = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'][index];
+      const correlation = (coin.btcCorrelation * 100).toFixed(0);
+      coinList += `┃ ${medal} ${coin.symbol}: ${correlation}% (${coin.omnipotentScore.toFixed(0)})\n`;
+    });
+
+    const message = `
+╭━━━━━━━━━━━━━━━━━━━━╮
+┃ 📊 MARKET CORRELATION
+├━━━━━━━━━━━━━━━━━━━━┤
+${coinList}├━━━━━━━━━━━━━━━━━━━━┤
+┃ ⌚ ${new Date().toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+╰━━━━━━━━━━━━━━━━━━━━╯
+`.trim();
+
+    await sendTelegramMessage(message);
+    console.log('[Scheduler] ✅ Market Correlation gönderildi');
+  } catch (error) {
+    console.error('[Scheduler] ❌ Market Correlation hatası:', error.message);
+  }
+}
+
+async function sendOmnipotentFutures() {
+  try {
+    console.log('\n[Scheduler] 🎯 Omnipotent Futures sinyalleri gönderiliyor...');
+    const data = await httpGet(`${BASE_URL}/api/omnipotent-futures?limit=10`);
+
+    if (!data.success || !data.data || !data.data.futures || data.data.futures.length === 0) {
+      console.log('[Scheduler] ℹ️  Omnipotent Futures verisi yok');
+      return;
+    }
+
+    const strongSignals = data.data.futures.filter(s => s.wyckoffScore >= 70);
+
+    if (strongSignals.length === 0) {
+      console.log('[Scheduler] ℹ️  Güçlü Wyckoff sinyali yok');
+      return;
+    }
+
+    const topSignal = strongSignals[0];
+    const phaseEmoji = {
+      'ACCUMULATION': '🟢',
+      'MARKUP': '🚀',
+      'DISTRIBUTION': '🔴',
+      'MARKDOWN': '⬇️'
+    };
+
+    const message = `
+╭━━━━━━━━━━━━━━━━━━━━╮
+┃ 🎯 OMNIPOTENT FUTURES
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ 💰 ${topSignal.symbol}
+┃ ${phaseEmoji[topSignal.wyckoffPhase] || '⚪'} ${topSignal.wyckoffPhase}
+┃ 📈 Skor: ${topSignal.wyckoffScore.toFixed(0)}/100
+┃ 💎 Confidence: ${(topSignal.confidence * 100).toFixed(0)}%
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ 🔥 ${strongSignals.length} güçlü sinyal aktif
+┃ ⌚ ${new Date().toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+╰━━━━━━━━━━━━━━━━━━━━╯
+`.trim();
+
+    await sendTelegramMessage(message);
+    console.log('[Scheduler] ✅ Omnipotent Futures gönderildi');
+  } catch (error) {
+    console.error('[Scheduler] ❌ Omnipotent Futures hatası:', error.message);
+  }
+}
+
+async function sendBreakoutSignals() {
+  try {
+    console.log('\n[Scheduler] 💥 Breakout Signals kontrol ediliyor...');
+    const data = await httpGet(`${BASE_URL}/api/breakout-signals?limit=10`);
+
+    if (!data.success || !data.data || data.data.length === 0) {
+      console.log('[Scheduler] ℹ️  Breakout signal verisi yok');
+      return;
+    }
+
+    const highConfidenceSignals = data.data.filter(s => s.confidence >= 0.75);
+
+    if (highConfidenceSignals.length === 0) {
+      console.log('[Scheduler] ℹ️  Yüksek confidence breakout yok');
+      return;
+    }
+
+    const buySignals = highConfidenceSignals.filter(s => s.signal === 'BUY').length;
+    const sellSignals = highConfidenceSignals.filter(s => s.signal === 'SELL').length;
+
+    const message = `
+╭━━━━━━━━━━━━━━━━━━━━╮
+┃ 💥 BREAKOUT SIGNALS
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ 🟢 Alış: ${buySignals} sinyal
+┃ 🔴 Satış: ${sellSignals} sinyal
+┃ 💎 Toplam: ${highConfidenceSignals.length} yüksek güven
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ ⌚ ${new Date().toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+╰━━━━━━━━━━━━━━━━━━━━╯
+`.trim();
+
+    await sendTelegramMessage(message);
+    console.log('[Scheduler] ✅ Breakout Signals gönderildi');
+  } catch (error) {
+    console.error('[Scheduler] ❌ Breakout Signals hatası:', error.message);
+  }
+}
+
+async function sendBTCETHAnalysis() {
+  try {
+    console.log('\n[Scheduler] 🔗 BTC-ETH Analysis gönderiliyor...');
+    const data = await httpGet(`${BASE_URL}/api/btc-eth-analysis`);
+
+    if (!data.success || !data.data) {
+      console.log('[Scheduler] ❌ BTC-ETH Analysis hatası');
+      return;
+    }
+
+    const { correlation30d, correlation7d, trend, volumeRatio } = data.data;
+    const trendEmoji = trend === 'Rising' ? '📈' : trend === 'Falling' ? '📉' : '➡️';
+
+    const message = `
+╭━━━━━━━━━━━━━━━━━━━━╮
+┃ 🔗 BTC-ETH ANALYSIS
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ 📊 30 Gün: ${(correlation30d * 100).toFixed(0)}%
+┃ 📅 7 Gün: ${(correlation7d * 100).toFixed(0)}%
+┃ ${trendEmoji} Trend: ${trend}
+┃ 📊 Volume: ${volumeRatio.toFixed(2)}x
+├━━━━━━━━━━━━━━━━━━━━┤
+┃ ⌚ ${new Date().toLocaleString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+╰━━━━━━━━━━━━━━━━━━━━╯
+`.trim();
+
+    await sendTelegramMessage(message);
+    console.log('[Scheduler] ✅ BTC-ETH Analysis gönderildi');
+  } catch (error) {
+    console.error('[Scheduler] ❌ BTC-ETH Analysis hatası:', error.message);
+  }
+}
+
+// ============================================================================
+// CRON JOBS
+// ============================================================================
+
+// Test mesajı (başlangıçta)
+setTimeout(async () => {
+  const testMessage = `🤖 TELEGRAM SCHEDULER AKTİF!
+
+✅ Scheduler servisi başarıyla başlatıldı
+⏰ ${new Date().toLocaleString('tr-TR')}
+
+📅 Zamanlamalar:
+- 🕐 Saatlik: Market sinyalleri
+- 🕓 4 Saatlik: Futures + Haberler
+- 📅 Günlük: Nirvana + BTC-ETH
+- 📆 Haftalık: Nirvana özet
+
+Sistem 7/24 çalışıyor! 🚀`;
+
+  console.log('[DEBUG] Test message length:', testMessage.length);
+  console.log('[DEBUG] Test message preview:', testMessage.substring(0, 100));
+  console.log('[DEBUG] BOT_TOKEN length:', (BOT_TOKEN || '').length);
+  console.log('[DEBUG] CHAT_IDS:', CHAT_IDS);
+
+  await sendTelegramMessage(testMessage);
+}, 3000);
+
+// ⚡ TOP BUY SİNYALLERİ (Her 15 dakikada) - ENHANCED VERSION
+async function sendTopBuySignals() {
+  try {
+    console.log('\n[Scheduler] 🎯 TÜMÜ STRATEJİLER taranıyor (6 strateji)...');
+
+    // TÜM sinyal kaynaklarını paralel olarak çek (6 strateji)
+    const [aiSignals, quantumSignals, conservativeSignals, breakoutSignals, omnipotentSignals, nirvanaData] = await Promise.all([
+      httpGet(`${BASE_URL}/api/ai-signals?limit=20`).catch(() => ({ data: { signals: [] } })),
+      httpGet(`${BASE_URL}/api/quantum-signals?limit=20`).catch(() => ({ data: { signals: [] } })),
+      httpGet(`${BASE_URL}/api/conservative-signals?limit=20`).catch(() => ({ data: { signals: [] } })),
+      httpGet(`${BASE_URL}/api/breakout-retest?limit=20`).catch(() => ({ data: { signals: [] } })),
+      httpGet(`${BASE_URL}/api/omnipotent-futures?limit=20`).catch(() => ({ data: { futures: [] } })),
+      httpGet(`${BASE_URL}/api/nirvana`).catch(() => ({ data: { strategies: [] } })),
+    ]);
+
+    // Tüm BUY sinyallerini topla
+    const allSignals = [];
+
+    // AI Signals
+    if (aiSignals.data?.signals) {
+      aiSignals.data.signals.forEach(s => {
+        if (s.type === 'BUY' && s.confidence >= 70) {
+          allSignals.push({
+            symbol: s.symbol,
+            confidence: s.confidence,
+            strategy: 'AI',
+            price: s.price,
+            targetPrice: s.price ? s.price * 1.05 : null, // 5% target
+            stopLoss: s.price ? s.price * 0.98 : null, // 2% stop loss
+            riskReward: '1:2.5',
+            reason: s.reasoning?.substring(0, 60) || 'AI Analizi'
+          });
+        }
+      });
+    }
+
+    // Quantum Signals
+    if (quantumSignals.data?.signals) {
+      quantumSignals.data.signals.forEach(s => {
+        if (s.type === 'BUY' && s.confidence >= 70) {
+          allSignals.push({
+            symbol: s.symbol,
+            confidence: s.confidence,
+            strategy: 'Quantum',
+            price: s.price,
+            targetPrice: s.price ? s.price * 1.06 : null, // 6% target
+            stopLoss: s.price ? s.price * 0.97 : null, // 3% stop loss
+            riskReward: '1:2',
+            quantumScore: s.quantumScore,
+            reason: 'Quantum Portfolio Optimization'
+          });
+        }
+      });
+    }
+
+    // Conservative Signals
+    if (conservativeSignals.data?.signals) {
+      conservativeSignals.data.signals.forEach(s => {
+        if (s.type === 'BUY' && s.confidence >= 70) {
+          allSignals.push({
+            symbol: s.symbol,
+            confidence: s.confidence,
+            strategy: 'Conservative',
+            price: s.price,
+            targetPrice: s.price ? s.price * 1.04 : null, // 4% target (conservative)
+            stopLoss: s.price ? s.price * 0.99 : null, // 1% stop loss (tight)
+            riskReward: '1:4',
+            reason: 'Low Risk High Volume'
+          });
+        }
+      });
+    }
+
+    // Breakout Signals
+    if (breakoutSignals.data?.signals) {
+      breakoutSignals.data.signals.forEach(s => {
+        if (s.type === 'BUY' && s.confidence >= 70) {
+          allSignals.push({
+            symbol: s.symbol,
+            confidence: s.confidence,
+            strategy: 'Breakout',
+            price: s.price,
+            targetPrice: s.price ? s.price * 1.08 : null, // 8% target (aggressive)
+            stopLoss: s.price ? s.price * 0.96 : null, // 4% stop loss
+            riskReward: '1:2',
+            reason: 'Support/Resistance Break'
+          });
+        }
+      });
+    }
+
+    // Omnipotent Futures (Wyckoff ACCUMULATION ve MARKUP fazları)
+    if (omnipotentSignals.data?.futures) {
+      omnipotentSignals.data.futures.forEach(s => {
+        if ((s.wyckoffPhase === 'ACCUMULATION' || s.wyckoffPhase === 'MARKUP') && s.confidence >= 75) {
+          allSignals.push({
+            symbol: s.symbol,
+            confidence: s.confidence,
+            strategy: 'Omnipotent',
+            price: s.price,
+            targetPrice: s.price ? s.price * 1.10 : null, // 10% target (high potential)
+            stopLoss: s.price ? s.price * 0.95 : null, // 5% stop loss
+            riskReward: '1:2',
+            wyckoffPhase: s.wyckoffPhase,
+            reason: `Wyckoff ${s.wyckoffPhase}`
+          });
+        }
+      });
+    }
+
+    // Nirvana Best Strategies (En yüksek BUY sinyallerine sahip stratejiler)
+    if (nirvanaData.data?.strategies) {
+      const bestStrategies = nirvanaData.data.strategies
+        .filter(st => st.status === 'active' && st.buySignals > 0 && st.avgConfidence >= 70)
+        .sort((a, b) => (b.buySignals * b.avgConfidence) - (a.buySignals * a.avgConfidence))
+        .slice(0, 3); // En iyi 3 strateji
+
+      bestStrategies.forEach(st => {
+        // Her stratejinin bir temsili sinyali olarak ekle
+        allSignals.push({
+          symbol: 'MULTI', // Çoklu coin stratejisi
+          confidence: Math.round(st.avgConfidence),
+          strategy: 'Nirvana',
+          strategyName: st.name.substring(0, 25),
+          buySignalsCount: st.buySignals,
+          price: null, // Multi-coin, tek fiyat yok
+          reason: `${st.buySignals} BUY signals`
+        });
+      });
+    }
+
+    if (allSignals.length === 0) {
+      console.log('[Scheduler] ℹ️  Yeterli güvenilirlikte AL sinyali yok (min %70)');
+      return;
+    }
+
+    // Confidence'a göre sırala
+    allSignals.sort((a, b) => b.confidence - a.confidence);
+
+    // Birbirinden farklı coinleri seç (diversity için) - Nirvana hariç
+    const uniqueSignals = [];
+    const seenSymbols = new Set();
+
+    for (const signal of allSignals) {
+      if (signal.symbol === 'MULTI') {
+        // Nirvana stratejilerini her zaman ekle (multi-coin)
+        uniqueSignals.push(signal);
+      } else if (!seenSymbols.has(signal.symbol) && uniqueSignals.length < 10) {
+        uniqueSignals.push(signal);
+        seenSymbols.add(signal.symbol);
+      }
+      if (uniqueSignals.length >= 10) break; // Maksimum 10 sinyal
+    }
+
+    if (uniqueSignals.length === 0) {
+      console.log('[Scheduler] ℹ️  Unique AL sinyali bulunamadı');
+      return;
+    }
+
+    // PREMIUM TELEGRAM MESAJI OLUŞTUR
+    let message = '╔═══════════════════════════╗\n';
+    message += '║ 💎 PREMIUM TRADE SIGNALS 💎 ║\n';
+    message += '╠═══════════════════════════╣\n';
+    message += `║ 📅 ${new Date().toLocaleString('tr-TR', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    })}\n`;
+    message += '╚═══════════════════════════╝\n\n';
+
+    uniqueSignals.forEach((signal, index) => {
+      const medal = ['🥇', '🥈', '🥉'][index] || `${index + 1}️⃣`;
+      const strategyIcon = {
+        'AI': '🤖',
+        'Quantum': '⚛️',
+        'Conservative': '🛡️',
+        'Breakout': '💥',
+        'Omnipotent': '🎯',
+        'Nirvana': '🌟'
+      }[signal.strategy] || '📊';
+
+      message += `${medal} <b>${signal.symbol}</b>\n`;
+      message += `${strategyIcon} ${signal.strategy}`;
+      if (signal.strategyName) {
+        message += ` (${signal.strategyName})`;
+      }
+      message += `\n`;
+
+      message += `📊 Güven: ${signal.confidence}%\n`;
+
+      if (signal.price && typeof signal.price === 'number') {
+        message += `💰 Giriş: $${signal.price.toFixed(signal.price < 1 ? 6 : 2)}\n`;
+
+        if (signal.targetPrice) {
+          message += `🎯 Hedef: $${signal.targetPrice.toFixed(signal.targetPrice < 1 ? 6 : 2)} (+${((signal.targetPrice/signal.price - 1) * 100).toFixed(1)}%)\n`;
+        }
+
+        if (signal.stopLoss) {
+          message += `🛑 Stop: $${signal.stopLoss.toFixed(signal.stopLoss < 1 ? 6 : 2)} (${((signal.stopLoss/signal.price - 1) * 100).toFixed(1)}%)\n`;
+        }
+
+        if (signal.riskReward) {
+          message += `⚖️ Risk/Reward: ${signal.riskReward}\n`;
+        }
+      } else if (signal.buySignalsCount) {
+        message += `📈 ${signal.buySignalsCount} aktif AL sinyali\n`;
+      }
+
+      if (signal.quantumScore) {
+        message += `🔬 Quantum: ${signal.quantumScore}/100\n`;
+      }
+
+      if (signal.wyckoffPhase) {
+        message += `📊 Faz: ${signal.wyckoffPhase}\n`;
+      }
+
+      if (signal.reason) {
+        message += `💡 ${signal.reason}\n`;
+      }
+
+      message += '\n';
+    });
+
+    // DISCLAIMER
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+    message += '📊 <b>Toplam:</b> ' + allSignals.length + ' sinyal tarandı\n';
+    message += '✨ <b>Seçilen:</b> ' + uniqueSignals.length + ' sinyal\n';
+    message += '🎯 <b>Stratejiler:</b> 6 (AI, Quantum, Conservative, Breakout, Omnipotent, Nirvana)\n\n';
+    message += '⚠️ <b>UYARI:</b>\n';
+    message += '• Giriş-çıkış fiyatları ve risk yönetimi kişiseldir\n';
+    message += '• Yatırım kararları size aittir\n';
+    message += '• Anlık piyasa koşullarını takip edin\n';
+    message += '• Stop-loss kullanmayı unutmayın\n\n';
+    message += '💼 Bu bilgiler yalnızca bilgilendirme amaçlıdır.';
+
+    // Message validation - boş mesaj gönderme!
+    if (!message || message.trim().length === 0) {
+      console.log('[Scheduler] ⚠️  Mesaj içeriği boş, gönderilmiyor');
+      return;
+    }
+
+    await sendTelegramMessage(message);
+    console.log(`[Scheduler] ✅ ${uniqueSignals.length} PREMIUM AL sinyali gönderildi (6 strateji tarandı)`);
+
+  } catch (error) {
+    console.error('[Scheduler] ❌ Top Buy Signals hatası:', error.message);
+  }
+}
+
+// ⚡ GLOBAL MARKET CRITICAL EVENTS SCANNER (Multi-Timeframe Analysis)
+async function sendCriticalMarketEvents() {
+  try {
+    console.log('\n[Scheduler] 🌍 GLOBAL MARKET CRITICAL EVENTS taranıyor...');
+
+    // 1. Binance futures verilerini çek (tüm coinler 24h değişim ile)
+    const futuresData = await httpGet(`${BASE_URL}/api/binance/futures`).catch(() => ({ data: { all: [] } }));
+
+    if (!futuresData.data?.all || futuresData.data.all.length === 0) {
+      console.log('[Scheduler] ⚠️  Binance futures data alınamadı');
+      return;
+    }
+
+    const criticalEvents = [];
+
+    // 2. HER COIN için kritik olayları tespit et
+    futuresData.data.all.forEach(coin => {
+      const symbol = coin.symbol;
+      const price = parseFloat(coin.price);
+      const change24h = parseFloat(coin.changePercent24h);
+      const volume24h = parseFloat(coin.volume24h);
+      const highPrice24h = parseFloat(coin.highPrice24h);
+      const lowPrice24h = parseFloat(coin.lowPrice24h);
+
+      // KRİTİK OLAY 1: Büyük fiyat hareketleri (±8% üzeri)
+      if (Math.abs(change24h) >= 8) {
+        const importance = Math.abs(change24h) >= 15 ? 'CRITICAL' : 'HIGH';
+        criticalEvents.push({
+          type: change24h > 0 ? 'STRONG_PUMP' : 'STRONG_DUMP',
+          symbol,
+          importance,
+          score: Math.abs(change24h),
+          data: {
+            price,
+            change24h,
+            volume24h,
+            reason: change24h > 0 ? `Güçlü yükseliş (+${change24h.toFixed(1)}%)` : `Güçlü düşüş (${change24h.toFixed(1)}%)`
+          }
+        });
+      }
+
+      // KRİTİK OLAY 2: ATH/ATL yakınlığı
+      const nearATH = ((price - highPrice24h) / highPrice24h) * 100;
+      const nearATL = ((price - lowPrice24h) / lowPrice24h) * 100;
+
+      if (nearATH >= -2 && nearATH <= 0) {
+        criticalEvents.push({
+          type: 'NEAR_ATH',
+          symbol,
+          importance: 'HIGH',
+          score: 90 + nearATH * 5, // Yaklaştıkça skor artar
+          data: {
+            price,
+            change24h,
+            highPrice24h,
+            reason: `24h zirvesine çok yakın (${Math.abs(nearATH).toFixed(2)}% altında)`
+          }
+        });
+      }
+
+      if (Math.abs(nearATL) <= 2 && nearATL >= 0) {
+        criticalEvents.push({
+          type: 'NEAR_ATL',
+          symbol,
+          importance: 'HIGH',
+          score: 90 - nearATL * 5,
+          data: {
+            price,
+            change24h,
+            lowPrice24h,
+            reason: `24h dipine çok yakın (${nearATL.toFixed(2)}% üstünde)`
+          }
+        });
+      }
+
+      // KRİTİK OLAY 3: Yüksek volume (top 50)
+      // Not: Volume sıralaması yapılacak
+    });
+
+    // 3. Stratejilerden kritik sinyalleri ekle
+    const [quantumData, omnipotentData, nirvanaData] = await Promise.all([
+      httpGet(`${BASE_URL}/api/quantum-signals?limit=10`).catch(() => ({ data: { signals: [] } })),
+      httpGet(`${BASE_URL}/api/omnipotent-futures?limit=10`).catch(() => ({ data: { futures: [] } })),
+      httpGet(`${BASE_URL}/api/nirvana`).catch(() => ({ data: { strategies: [] } }))
+    ]);
+
+    // Quantum sinyalleri - %95+ confidence kritik
+    if (quantumData.data?.signals) {
+      quantumData.data.signals.forEach(s => {
+        if (s.confidence >= 95 && s.type === 'BUY') {
+          criticalEvents.push({
+            type: 'QUANTUM_SIGNAL',
+            symbol: s.symbol,
+            importance: 'CRITICAL',
+            score: s.confidence + (s.quantumScore || 0) / 10,
+            data: {
+              price: s.price,
+              confidence: s.confidence,
+              quantumScore: s.quantumScore,
+              reason: `Ultra yüksek güven Quantum sinyali (%${s.confidence})`
+            }
+          });
+        }
+      });
+    }
+
+    // Omnipotent - ACCUMULATION fazı kritik
+    if (omnipotentData.data?.futures) {
+      omnipotentData.data.futures.forEach(s => {
+        if (s.wyckoffPhase === 'ACCUMULATION' && s.confidence >= 80) {
+          criticalEvents.push({
+            type: 'WYCKOFF_ACCUMULATION',
+            symbol: s.symbol,
+            importance: 'HIGH',
+            score: 85 + s.confidence / 10,
+            data: {
+              price: s.price,
+              phase: s.wyckoffPhase,
+              confidence: s.confidence,
+              reason: 'Wyckoff ACCUMULATION fazı - Büyük fırsat'
+            }
+          });
+        }
+      });
+    }
+
+    // Nirvana - Multi-strateji consensus
+    if (nirvanaData.data?.strategies) {
+      const strongConsensus = nirvanaData.data.strategies
+        .filter(st => st.status === 'active' && st.buySignals >= 5 && st.avgConfidence >= 85);
+
+      strongConsensus.forEach(st => {
+        criticalEvents.push({
+          type: 'MULTI_STRATEGY_CONSENSUS',
+          symbol: 'MULTI',
+          importance: 'HIGH',
+          score: 85 + st.buySignals,
+          data: {
+            strategyName: st.name.substring(0, 30),
+            buySignals: st.buySignals,
+            confidence: st.avgConfidence,
+            reason: `${st.buySignals} strateji aynı fikirde (%${st.avgConfidence.toFixed(0)})`
+          }
+        });
+      });
+    }
+
+    // 4. ÖNEM SIRASINA GÖRE SIRALA
+    criticalEvents.sort((a, b) => b.score - a.score);
+
+    if (criticalEvents.length === 0) {
+      console.log('[Scheduler] ℹ️  Kritik market olayı tespit edilmedi');
+      return;
+    }
+
+    // 5. EN ÖNEMLİ 7 OLAYI SEÇ
+    const topEvents = criticalEvents.slice(0, 7);
+
+    // 6. TELEGRAM MESAJI OLUŞTUR
+    let message = '╔═══════════════════════════════╗\n';
+    message += '║ 🌍 GLOBAL MARKET CRITICAL EVENTS ║\n';
+    message += '╠═══════════════════════════════╣\n';
+    message += `║ 📅 ${new Date().toLocaleString('tr-TR', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    })}\n`;
+    message += '╚═══════════════════════════════╝\n\n';
+
+    const typeIcons = {
+      'STRONG_PUMP': '🚀',
+      'STRONG_DUMP': '⬇️',
+      'NEAR_ATH': '🔥',
+      'NEAR_ATL': '❄️',
+      'QUANTUM_SIGNAL': '⚛️',
+      'WYCKOFF_ACCUMULATION': '🎯',
+      'MULTI_STRATEGY_CONSENSUS': '🌟'
+    };
+
+    const importanceColors = {
+      'CRITICAL': '🔴',
+      'HIGH': '🟠',
+      'MEDIUM': '🟡'
+    };
+
+    topEvents.forEach((event, index) => {
+      const icon = typeIcons[event.type] || '📊';
+      const impIcon = importanceColors[event.importance] || '⚪';
+      const medal = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣'][index];
+
+      message += `${medal} ${icon} <b>${event.symbol}</b>\n`;
+      message += `${impIcon} ${event.importance} (Score: ${event.score.toFixed(0)})\n`;
+
+      if (event.data.price) {
+        message += `💰 Price: $${typeof event.data.price === 'number' ? event.data.price.toFixed(event.data.price < 1 ? 6 : 2) : event.data.price}\n`;
+      }
+
+      if (event.data.change24h !== undefined) {
+        const changeEmoji = event.data.change24h > 0 ? '📈' : '📉';
+        message += `${changeEmoji} 24h: ${event.data.change24h > 0 ? '+' : ''}${event.data.change24h.toFixed(2)}%\n`;
+      }
+
+      if (event.data.confidence) {
+        message += `📊 Confidence: ${event.data.confidence}%\n`;
+      }
+
+      if (event.data.quantumScore) {
+        message += `🔬 Quantum: ${event.data.quantumScore}/100\n`;
+      }
+
+      if (event.data.buySignals) {
+        message += `📈 Buy Signals: ${event.data.buySignals}\n`;
+      }
+
+      message += `💡 ${event.data.reason}\n\n`;
+    });
+
+    // ÖZET
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+    message += `📊 <b>Toplam:</b> ${criticalEvents.length} kritik olay tespit edildi\n`;
+    message += `⭐ <b>Gösterilen:</b> Top ${topEvents.length}\n`;
+    message += `🎯 <b>Tarama:</b> Global market + 6 strateji\n`;
+    message += `⏰ <b>Sıklık:</b> Her 30 dakikada\n\n`;
+    message += '⚠️ <b>NOT:</b> Yüksek önem dereceli sinyaller\n';
+    message += '💼 Hızlı karar vermeniz gerekebilir';
+
+    if (!message || message.trim().length === 0) {
+      console.log('[Scheduler] ⚠️  Mesaj içeriği boş');
+      return;
+    }
+
+    await sendTelegramMessage(message);
+    console.log(`[Scheduler] ✅ ${topEvents.length} CRITICAL MARKET EVENT gönderildi`);
+
+  } catch (error) {
+    console.error('[Scheduler] ❌ Critical Market Events hatası:', error.message);
+  }
+}
+
+// 📊 SAATLİK BTC-ETH HIZLI ANALİZ (Her saat başı)
+async function sendHourlyBTCETHAnalysis() {
+  try {
+    console.log('\n[Scheduler] 🔍 Saatlik BTC-ETH Analizi hazırlanıyor...');
+
+    // Binance'den BTC ve ETH verilerini çek
+    const [btcData, ethData] = await Promise.all([
+      fetch('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=BTCUSDT').then(r => r.json()),
+      fetch('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=ETHUSDT').then(r => r.json())
+    ]);
+
+    const btcPrice = parseFloat(btcData.lastPrice);
+    const btcChange = parseFloat(btcData.priceChangePercent);
+    const ethPrice = parseFloat(ethData.lastPrice);
+    const ethChange = parseFloat(ethData.priceChangePercent);
+
+    // Trend analizi
+    const getTrend = (change) => {
+      if (change > 1) return { emoji: '↗️', text: 'Güçlü Yükseliş' };
+      if (change > 0.3) return { emoji: '↗️', text: 'Hafif Yükseliş' };
+      if (change < -1) return { emoji: '↘️', text: 'Güçlü Düşüş' };
+      if (change < -0.3) return { emoji: '↘️', text: 'Hafif Düşüş' };
+      return { emoji: '➡️', text: 'Yatay' };
+    };
+
+    const getMomentum = (change) => {
+      const absChange = Math.abs(change);
+      if (absChange > 2) return 'Çok Güçlü';
+      if (absChange > 1) return 'Güçlü';
+      if (absChange > 0.5) return 'Orta';
+      return 'Zayıf';
+    };
+
+    const btcTrend = getTrend(btcChange);
+    const ethTrend = getTrend(ethChange);
+    const btcMomentum = getMomentum(btcChange);
+    const ethMomentum = getMomentum(ethChange);
+
+    // Özet yorum
+    let summary = '';
+    if (btcChange > 1 && ethChange > 1) {
+      summary = 'BTC ve ETH güçlü yükselişte. Genel piyasa pozitif.';
+    } else if (btcChange < -1 && ethChange < -1) {
+      summary = 'BTC ve ETH güçlü düşüşte. Genel piyasa negatif.';
+    } else if (btcChange > 1) {
+      summary = 'BTC güçlü yükselişte, ETH daha yavaş. BTC dominansı artıyor.';
+    } else if (ethChange > 1) {
+      summary = 'ETH güçlü yükselişte, BTC daha yavaş. Altcoin momentum var.';
+    } else {
+      summary = 'BTC ve ETH yatay seyrediyor. Piyasa dengeli.';
+    }
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    let message = '╔══════════════════════════╗\n';
+    message += '║  ⏰ SAATLİK PİYASA RAPORU  ║\n';
+    message += '╠══════════════════════════╣\n';
+    message += `║  📅 ${dateStr} - ${timeStr} UTC\n`;
+    message += '╚══════════════════════════╝\n\n';
+
+    message += '🔶 <b>BITCOIN (BTC)</b>\n';
+    message += `💰 Fiyat: <b>$${btcPrice.toLocaleString('en-US')}</b>\n`;
+    message += `📊 1 Saatlik: ${btcChange >= 0 ? '+' : ''}${btcChange.toFixed(2)}% ${btcTrend.emoji}\n`;
+    message += `📈 Trend: ${btcTrend.text}\n`;
+    message += `⚡ Momentum: ${btcMomentum}\n\n`;
+
+    message += '🔷 <b>ETHEREUM (ETH)</b>\n';
+    message += `💰 Fiyat: <b>$${ethPrice.toLocaleString('en-US')}</b>\n`;
+    message += `📊 1 Saatlik: ${ethChange >= 0 ? '+' : ''}${ethChange.toFixed(2)}% ${ethTrend.emoji}\n`;
+    message += `📈 Trend: ${ethTrend.text}\n`;
+    message += `⚡ Momentum: ${ethMomentum}\n\n`;
+
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '💡 <b>ÖZET</b>\n';
+    message += `${summary}\n\n`;
+
+    message += '⚠️ <i>Bu bilgiler yalnızca bilgilendirme amaçlıdır.</i>';
+
+    await sendTelegramMessage(message);
+    console.log('[Scheduler] ✅ Saatlik BTC-ETH analizi gönderildi');
+
+  } catch (error) {
+    console.error('[Scheduler] ❌ Saatlik BTC-ETH analizi hatası:', error.message);
+  }
+}
+
+// 📈 4 SAATLİK DETAYLI MARKET RAPORU (00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC)
+async function send4HourlyMarketReport() {
+  try {
+    console.log('\n[Scheduler] 📊 4 Saatlik Detaylı Market Raporu hazırlanıyor...');
+
+    // Tüm verileri paralel olarak çek
+    const [btcData, ethData, globalData, topAltcoins] = await Promise.all([
+      fetch('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=BTCUSDT').then(r => r.json()),
+      fetch('https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=ETHUSDT').then(r => r.json()),
+      fetch('https://api.coingecko.com/api/v3/global').then(r => r.json()),
+      fetch('https://fapi.binance.com/fapi/v1/ticker/24hr').then(r => r.json())
+    ]);
+
+    // BTC Analizi
+    const btcPrice = parseFloat(btcData.lastPrice);
+    const btcChange24h = parseFloat(btcData.priceChangePercent);
+    const btcHigh = parseFloat(btcData.highPrice);
+    const btcLow = parseFloat(btcData.lowPrice);
+
+    // ETH Analizi
+    const ethPrice = parseFloat(ethData.lastPrice);
+    const ethChange24h = parseFloat(ethData.priceChangePercent);
+    const ethHigh = parseFloat(ethData.highPrice);
+    const ethLow = parseFloat(ethData.lowPrice);
+
+    // Market Cap verileri
+    const totalMarketCap = globalData.data.total_market_cap.usd;
+    const btcDominance = globalData.data.market_cap_percentage.btc;
+    const ethDominance = globalData.data.market_cap_percentage.eth;
+
+    // Top 10 altcoin ortalama değişimi (BTC ve ETH hariç)
+    const top10Altcoins = topAltcoins
+      .filter(coin => !['BTCUSDT', 'ETHUSDT', 'USDTUSDT', 'BUSDUSDT'].includes(coin.symbol))
+      .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
+      .slice(0, 10);
+
+    const altcoinAvgChange = top10Altcoins.reduce((sum, coin) => sum + parseFloat(coin.priceChangePercent), 0) / top10Altcoins.length;
+
+    // Altcoin Güven Endeksi Hesaplama
+    const altcoinConfidenceIndex = Math.min(100, Math.max(0,
+      (100 - btcDominance) * 0.6 +
+      ethDominance * 0.4 +
+      (altcoinAvgChange > 0 ? altcoinAvgChange : 0) * 0.3
+    ));
+
+    // Trend ve analiz fonksiyonları
+    const getTrendAnalysis = (change) => {
+      if (change > 3) return { emoji: '🚀', text: 'Güçlü Yükseliş', color: 'green' };
+      if (change > 1) return { emoji: '↗️', text: 'Orta Yükseliş', color: 'lightgreen' };
+      if (change < -3) return { emoji: '📉', text: 'Güçlü Düşüş', color: 'red' };
+      if (change < -1) return { emoji: '↘️', text: 'Orta Düşüş', color: 'orange' };
+      return { emoji: '➡️', text: 'Yatay', color: 'gray' };
+    };
+
+    // RSI tahmini (basitleştirilmiş)
+    const estimateRSI = (change24h) => {
+      const rsi = 50 + (change24h * 2);
+      return Math.min(100, Math.max(0, rsi));
+    };
+
+    const btcRSI = estimateRSI(btcChange24h);
+    const ethRSI = estimateRSI(ethChange24h);
+
+    const getRSIStatus = (rsi) => {
+      if (rsi > 70) return 'Aşırı Alım';
+      if (rsi > 60) return 'Nötr-Aşırı Alım Yakın';
+      if (rsi < 30) return 'Aşırı Satım';
+      if (rsi < 40) return 'Nötr-Aşırı Satım Yakın';
+      return 'Nötr';
+    };
+
+    const btcTrend = getTrendAnalysis(btcChange24h);
+    const ethTrend = getTrendAnalysis(ethChange24h);
+
+    // Destek-Direnç seviyeleri (basitleştirilmiş)
+    const btcSupport = (btcLow * 1.002).toFixed(0);
+    const btcResistance = (btcHigh * 0.998).toFixed(0);
+    const ethSupport = (ethLow * 1.002).toFixed(2);
+    const ethResistance = (ethHigh * 0.998).toFixed(2);
+
+    // BTC-ETH korelasyon tahmini
+    const correlation = Math.abs(btcChange24h - ethChange24h) < 2 ? 0.85 : 0.65;
+
+    // Altcoin endeks durumu
+    const getAltcoinStatus = (index) => {
+      if (index > 70) return { emoji: '🚀', text: 'YÜKSEK', desc: 'Güçlü altcoin momentum' };
+      if (index > 50) return { emoji: '📈', text: 'ORTA-YÜKSEK', desc: 'Altcoin piyasası güçleniyor' };
+      if (index > 30) return { emoji: '➡️', text: 'ORTA', desc: 'Dengeli piyasa' };
+      return { emoji: '📉', text: 'DÜŞÜK', desc: 'BTC dominansı yüksek' };
+    };
+
+    const altcoinStatus = getAltcoinStatus(altcoinConfidenceIndex);
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    let message = '╔═════════════════════════════════╗\n';
+    message += '║  📊 4 SAATLİK PİYASA ANALİZİ  ║\n';
+    message += '╠═════════════════════════════════╣\n';
+    message += `║  📅 ${dateStr} - ${timeStr} UTC\n`;
+    message += '║  ⏰ 4h Kapanış Raporu\n';
+    message += '╚═════════════════════════════════╝\n\n';
+
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '🔶 <b>BITCOIN ANALİZİ</b>\n\n';
+    message += `💰 Fiyat: <b>$${btcPrice.toLocaleString('en-US')}</b>\n`;
+    message += `📈 24 Saatlik: ${btcChange24h >= 0 ? '+' : ''}${btcChange24h.toFixed(2)}% ${btcTrend.emoji}\n\n`;
+    message += `🎯 Trend: <b>${btcTrend.text}</b>\n`;
+    message += `📍 Destek: $${btcSupport}\n`;
+    message += `📍 Direnç: $${btcResistance}\n\n`;
+    message += `📉 RSI (24h): ${btcRSI.toFixed(0)} (${getRSIStatus(btcRSI)})\n`;
+    message += `📊 MACD: ${btcChange24h > 0 ? 'Pozitif Kesişim ✅' : 'Negatif ⚠️'}\n\n`;
+    message += `💡 <i>Yorum: BTC ${btcTrend.text.toLowerCase()} trendinde,`;
+    message += ` $${btcResistance} direncini ${btcChange24h > 0 ? 'test ediyor' : 'izliyor'}.</i>\n\n`;
+
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '🔷 <b>ETHEREUM ANALİZİ</b>\n\n';
+    message += `💰 Fiyat: <b>$${ethPrice.toLocaleString('en-US')}</b>\n`;
+    message += `📈 24 Saatlik: ${ethChange24h >= 0 ? '+' : ''}${ethChange24h.toFixed(2)}% ${ethTrend.emoji}\n\n`;
+    message += `🎯 Trend: <b>${ethTrend.text}</b>\n`;
+    message += `📍 Destek: $${ethSupport}\n`;
+    message += `📍 Direnç: $${ethResistance}\n\n`;
+    message += `📉 RSI (24h): ${ethRSI.toFixed(0)} (${getRSIStatus(ethRSI)})\n`;
+    message += `📊 MACD: ${ethChange24h > 0 ? 'Pozitif ✅' : 'Negatif ⚠️'}\n\n`;
+    message += `🔗 BTC Korelasyon: ${correlation.toFixed(2)} (${correlation > 0.8 ? 'Yüksek' : 'Orta'})\n\n`;
+
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '🌍 <b>GLOBAL PİYASA</b>\n\n';
+    message += `💎 Total Market Cap: <b>$${(totalMarketCap / 1e12).toFixed(2)}T</b>\n`;
+    message += `📈 24h Değişim: ${((btcChange24h * btcDominance + ethChange24h * ethDominance) / 100).toFixed(2)}%\n\n`;
+    message += `🔶 BTC Dominance: ${btcDominance.toFixed(1)}%\n`;
+    message += `🔷 ETH Dominance: ${ethDominance.toFixed(1)}%\n\n`;
+
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '🎯 <b>ALTCOIN GÜVEN ENDEKSİ</b>\n\n';
+    message += `📊 Skor: <b>${altcoinConfidenceIndex.toFixed(0)}/100</b> ${altcoinStatus.emoji}\n`;
+    message += `📈 Durum: <b>${altcoinStatus.text}</b>\n\n`;
+    message += `💡 <b>Açıklama:</b>\n`;
+    message += `${altcoinStatus.desc}. `;
+
+    if (altcoinConfidenceIndex > 60) {
+      message += `BTC dominance azalırken, ETH ve major altcoinler momentum kazanıyor. Dikkatli altcoin pozisyonları için uygun ortam.`;
+    } else if (altcoinConfidenceIndex < 40) {
+      message += `BTC dominansı yüksek. Altcoin piyasası zayıf, BTC odaklı stratejiler ön planda.`;
+    } else {
+      message += `Piyasa dengeli. Seçici altcoin pozisyonları değerlendirilebilir.`;
+    }
+
+    message += `\n\nTop 10 Altcoin Ort: ${altcoinAvgChange >= 0 ? '+' : ''}${altcoinAvgChange.toFixed(2)}%\n\n`;
+
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '⚠️ <b>UYARI</b>\n';
+    message += '• Bu bilgiler yalnızca bilgilendirme amaçlıdır\n';
+    message += '• Yatırım kararları kişiseldir\n';
+    message += '• Risk yönetimini unutmayın';
+
+    await sendTelegramMessage(message);
+    console.log('[Scheduler] ✅ 4 Saatlik detaylı market raporu gönderildi');
+
+  } catch (error) {
+    console.error('[Scheduler] ❌ 4 Saatlik market raporu hatası:', error.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 📊 TA-LIB ENTEGRASYON FONKSİYONLARI
+// ═══════════════════════════════════════════════════════════════════════════
+
+
+// TA-Lib analizi Next.js API üzerinden al (strategy-analysis endpoint)
+async function getTALibAnalysis(symbol, interval = '1h') {
+  try {
+    const url = `${BASE_URL}/api/strategy-analysis/${symbol}`;
+    const response = await httpGet(url);
+
+    if (!response || !response.success || !response.data || !response.data.strategies) {
+      console.error(`[TA-Lib] ${symbol} veri alınamadı`);
+      return { error: true, symbol };
+    }
+
+    // TA-Lib stratejisini bul
+    const talibStrategy = response.data.strategies.find(s =>
+      s.name && s.name.toLowerCase().includes('ta-lib')
+    );
+
+    if (!talibStrategy) {
+      console.log(`[TA-Lib] ${symbol} için TA-Lib stratejisi bulunamadı`);
+      // Fallback: en yüksek confidence'a sahip stratejiyi kullan
+      const topStrategy = response.data.strategies.reduce((prev, current) =>
+        (prev.confidence > current.confidence) ? prev : current
+      );
+      return {
+        signal: topStrategy.signal,
+        confidence: topStrategy.confidence,
+        reason: topStrategy.reason || 'Kapsamlı teknik analiz',
+        strategyName: topStrategy.name,
+        symbol
+      };
+    }
+
+    // TA-Lib stratejisi bulundu
+    return {
+      signal: talibStrategy.signal,
+      confidence: talibStrategy.confidence,
+      reason: talibStrategy.reason || '158 indikatör analizi',
+      strategyName: talibStrategy.name,
+      symbol,
+      // API'den gelen ekstra veriler
+      rsi: talibStrategy.data?.rsi,
+      macd: talibStrategy.data?.macd,
+      bbands: talibStrategy.data?.bbands
+    };
+
+  } catch (error) {
+    console.error(`[TA-Lib] ${symbol} analiz hatası:`, error.message);
+    return { error: true, symbol };
+  }
+}
+
+// 1️⃣ SAATLİK TA-LIB SİNYALLERİ - DEVRE DIŞI BIRAKILDI
+/*
+async function sendTALibHourlySignals() {
+  try {
+    console.log('[TA-Lib] 📊 Saatlik TA-Lib sinyalleri hazırlanıyor...');
+
+    // Dinamik coin seçimi - Balanced strateji (top volume + momentum karışımı)
+    const symbols = await getSmartCoinSelection(4, 'balanced');
+    let message = '📊 <b>TA-LIB SAATLİK SİNYALLER</b>\n\n';
+    message += `🕐 Zaman: ${new Date().toLocaleString('tr-TR')}\n`;
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    for (const symbol of symbols) {
+      const analysis = await getTALibAnalysis(symbol, '1h');
+      if (!analysis || analysis.error) {
+        message += `❌ ${symbol}: Veri alınamadı\n\n`;
+        continue;
+      }
+
+      message += `<b>${symbol}</b>\n`;
+      message += `• Sinyal: ${analysis.signal || 'NEUTRAL'}\n`;
+      message += `• Güven: %${analysis.confidence || 0}\n`;
+      message += `• Strateji: ${analysis.strategyName || 'TA-Lib'}\n`;
+      if (analysis.reason) {
+        message += `• Neden: ${analysis.reason.substring(0, 50)}...\n`;
+      }
+      // İndikatörler varsa göster (opsiyonel)
+      if (analysis.rsi) message += `• RSI: ${analysis.rsi.toFixed(2)}\n`;
+      if (analysis.macd?.histogram) message += `• MACD: ${analysis.macd.histogram.toFixed(4)}\n`;
+      if (analysis.bbands?.position) message += `• BB: ${analysis.bbands.position}\n`;
+      message += `\n`;
+    }
+
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '⚠️ <b>UYARI</b>\n';
+    message += '• Bu bilgiler yalnızca bilgilendirme amaçlıdır\n';
+    message += '• Yatırım kararları kişiseldir\n';
+    message += '• Risk yönetimini unutmayın';
+
+    await sendTelegramMessage(message);
+    console.log('[TA-Lib] ✅ Saatlik TA-Lib sinyalleri gönderildi');
+
+  } catch (error) {
+    console.error('[TA-Lib] ❌ Saatlik sinyal hatası:', error.message);
+  }
+}
+*/
+
+// 2️⃣ 4 SAATLİK TA-LIB SİNYALLERİ
+async function sendTALib4HourlySignals() {
+  try {
+    console.log('[TA-Lib] 📊 4 Saatlik TA-Lib sinyalleri hazırlanıyor...');
+
+    // Dinamik coin seçimi - Rotasyon sistemi (her seferinde farklı coinler)
+    const symbols = await getRotatedCoins(6);
+    let message = '📊 <b>TA-LIB 4 SAATLİK DETAYLI ANALİZ</b>\n\n';
+    message += `🕓 Zaman: ${new Date().toLocaleString('tr-TR')}\n`;
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    for (const symbol of symbols) {
+      const analysis = await getTALibAnalysis(symbol, '4h');
+      if (!analysis || analysis.error) {
+        message += `❌ ${symbol}: Veri alınamadı\n\n`;
+        continue;
+      }
+
+      message += `<b>${symbol}</b>\n`;
+      message += `• RSI: ${analysis.rsi?.toFixed(2) || 'N/A'}\n`;
+      message += `• MACD: ${analysis.macd?.histogram?.toFixed(4) || 'N/A'}\n`;
+      message += `• EMA20/50: ${analysis.ema?.trend || 'N/A'}\n`;
+      message += `• BB Pozisyon: ${analysis.bbands?.position || 'N/A'}\n`;
+      message += `• Trend: ${analysis.trend || 'N/A'}\n`;
+      message += `• Sinyal: <b>${analysis.signal || 'NÖTR'}</b>\n\n`;
+    }
+
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '⚠️ <b>UYARI</b>\n';
+    message += '• Bu bilgiler yalnızca bilgilendirme amaçlıdır\n';
+    message += '• Yatırım kararları kişiseldir\n';
+    message += '• Risk yönetimini unutmayın';
+
+    await sendTelegramMessage(message);
+    console.log('[TA-Lib] ✅ 4 Saatlik TA-Lib sinyalleri gönderildi');
+
+  } catch (error) {
+    console.error('[TA-Lib] ❌ 4 Saatlik sinyal hatası:', error.message);
+  }
+}
+
+// 3️⃣ GÜNLÜK TA-LIB SİNYALLERİ
+async function sendTALibDailySignals() {
+  try {
+    console.log('[TA-Lib] 📊 Günlük TA-Lib sinyalleri hazırlanıyor...');
+
+    // Dinamik coin seçimi - En yüksek volume'lü 8 coin
+    const symbols = await getSmartCoinSelection(8, 'volume');
+    let message = '📊 <b>TA-LIB GÜNLÜK KAPSAMLI ANALİZ</b>\n\n';
+    message += `📅 Tarih: ${new Date().toLocaleDateString('tr-TR')}\n`;
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    for (const symbol of symbols) {
+      const analysis = await getTALibAnalysis(symbol, '1d');
+      if (!analysis || analysis.error) {
+        message += `❌ ${symbol}: Veri alınamadı\n\n`;
+        continue;
+      }
+
+      message += `<b>${symbol}</b>\n`;
+      message += `• RSI: ${analysis.rsi?.toFixed(2) || 'N/A'}\n`;
+      message += `• MACD: ${analysis.macd?.histogram?.toFixed(4) || 'N/A'}\n`;
+      message += `• EMA20/50/200: ${analysis.ema?.trend || 'N/A'}\n`;
+      message += `• BB Width: ${analysis.bbands?.width || 'N/A'}\n`;
+      message += `• ADX: ${analysis.adx?.toFixed(2) || 'N/A'}\n`;
+      message += `• Trend Gücü: ${analysis.trendStrength || 'N/A'}\n`;
+      message += `• Sinyal: <b>${analysis.signal || 'NÖTR'}</b>\n\n`;
+    }
+
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '⚠️ <b>UYARI</b>\n';
+    message += '• Bu bilgiler yalnızca bilgilendirme amaçlıdır\n';
+    message += '• Yatırım kararları kişiseldir\n';
+    message += '• Risk yönetimini unutmayın';
+
+    await sendTelegramMessage(message);
+    console.log('[TA-Lib] ✅ Günlük TA-Lib sinyalleri gönderildi');
+
+  } catch (error) {
+    console.error('[TA-Lib] ❌ Günlük sinyal hatası:', error.message);
+  }
+}
+
+// 4️⃣ MUHAFAZAKAR ALIM SİNYALLERİ (SAATLİK)
+async function sendConservativeSignals() {
+  try {
+    console.log('[Conservative] 🛡️ Muhafazakar alım sinyalleri hazırlanıyor...');
+
+    const url = `${BASE_URL}/api/conservative-signals`;
+    let response = await httpGet(url);
+    let dataSource = 'Binance (Primary)';
+    let isRateLimited = false;
+
+    // Check if primary API failed (rate limit, error, etc.)
+    if (!response || !response.success || !response.data || !response.data.signals) {
+      console.warn('[Conservative] ⚠️ Primary API başarısız, fallback deneniyor...');
+      isRateLimited = true;
+
+      // Wait 3 seconds and retry (cache might be available)
+      await sleep(3000);
+      response = await httpGet(url);
+
+      if (!response || !response.success || !response.data || !response.data.signals) {
+        console.error('[Conservative] ❌ Fallback da başarısız, bildirim gönderilemiyor');
+
+        // Send notification about the issue
+        const errorMessage = `⚠️ <b>MUHAFAZAKAR SİNYALLER - VERİ HATASI</b>\n\n` +
+          `🕐 ${new Date().toLocaleString('tr-TR')}\n\n` +
+          `❌ Piyasa verileri geçici olarak alınamıyor (API rate limit).\n` +
+          `♻️ Sistem otomatik olarak alternatif kaynakları deniyor:\n` +
+          `  • Binance API (Rate Limited)\n` +
+          `  • Bybit Futures (Fallback)\n` +
+          `  • CoinGecko (Backup)\n\n` +
+          `⏳ Bir sonraki 4 saatlik kapanışta tekrar denenecek.\n\n` +
+          `💡 <i>Bu geçici bir durumdur ve sistem normal çalışmaya devam edecektir.</i>`;
+
+        await sendTelegramMessage(errorMessage);
+        return;
+      }
+
+      dataSource = response.data.lastUpdate?.includes('cached') ? 'Cache (Stale Data)' : 'Bybit/CoinGecko Fallback';
+    }
+
+    const signals = response.data.signals.filter(s => s.signal === 'BUY').slice(0, 5); // En iyi 5 BUY sinyali
+
+    if (signals.length === 0) {
+      console.log('[Conservative] ⚠️ Muhafazakar alım sinyali bulunamadı');
+      return;
+    }
+
+    let message = '🛡️ <b>MUHAFAZAKAR ALIM SİNYALLERİ</b>\n\n';
+    message += `🕐 Zaman: ${new Date().toLocaleString('tr-TR')}\n`;
+    message += `📊 Toplam Sinyal: ${signals.length}\n`;
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    message += '💡 <i>Sıkı kriterler: RSI oversold, volume artışı, destek seviyesi</i>\n\n';
+
+    for (const signal of signals) {
+      message += `<b>${signal.symbol}</b>\n`;
+      message += `💵 Fiyat: $${signal.price?.toFixed(4) || 'N/A'}\n`;
+      message += `📈 24h Değişim: ${signal.changePercent24h > 0 ? '+' : ''}${signal.changePercent24h?.toFixed(2) || 0}%\n`;
+      message += `✅ Güven: %${signal.confidence || 0}\n`;
+      message += `📌 Neden: ${signal.reason?.substring(0, 80) || 'N/A'}...\n\n`;
+
+      // İndikatörler
+      if (signal.indicators) {
+        message += `📊 <b>İndikatörler:</b>\n`;
+        message += `• RSI: ${signal.indicators.rsi?.toFixed(2) || 'N/A'}\n`;
+        message += `• MACD: ${signal.indicators.macd?.toFixed(4) || 'N/A'}\n`;
+        message += `• Volume Ratio: ${signal.indicators.volumeRatio?.toFixed(2) || 'N/A'}x\n\n`;
+      }
+
+      // Hedefler ve Stop Loss
+      if (signal.targets && signal.targets.length > 0) {
+        message += `🎯 <b>Hedefler:</b>\n`;
+        message += `• Hedef 1: $${signal.targets[0]?.toFixed(4) || 'N/A'} (+${(((signal.targets[0] - signal.price) / signal.price) * 100).toFixed(2)}%)\n`;
+        if (signal.targets[1]) {
+          message += `• Hedef 2: $${signal.targets[1]?.toFixed(4)} (+${(((signal.targets[1] - signal.price) / signal.price) * 100).toFixed(2)}%)\n`;
+        }
+      }
+
+      if (signal.stopLoss) {
+        message += `🛑 Stop Loss: $${signal.stopLoss?.toFixed(4)} (${(((signal.stopLoss - signal.price) / signal.price) * 100).toFixed(2)}%)\n`;
+      }
+
+      message += '\n━━━━━━━━━━━━━━━━━━━━━\n\n';
+    }
+
+    message += '⚠️ <b>UYARI</b>\n';
+    message += '• Bu bilgiler yalnızca bilgilendirme amaçlıdır\n';
+    message += '• Yatırım kararları kişiseldir\n';
+    message += '• Risk yönetimini unutmayın\n';
+    message += '• Her zaman stop loss kullanın\n\n';
+
+    // Add data source info if using fallback
+    if (isRateLimited) {
+      message += `📡 <i>Veri Kaynağı: ${dataSource}</i>\n`;
+      message += `<i>Not: Binance API geçici olarak rate limit nedeniyle alternatif kaynak kullanıldı.</i>`;
+    } else {
+      message += `📡 <i>Veri Kaynağı: ${dataSource}</i>`;
+    }
+
+    await sendTelegramMessage(message);
+    console.log('[Conservative] ✅ Muhafazakar alım sinyalleri gönderildi');
+
+  } catch (error) {
+    console.error('[Conservative] ❌ Muhafazakar sinyal hatası:', error.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 🌍 DÜNYA BORSALARI PRE-MARKET ANALİZ FONKSİYONLARI
+// ═══════════════════════════════════════════════════════════════════════════
+
+// 🇯🇵 TOKYO PRE-MARKET (23:45 UTC - Tokyo açılışından 15 dk önce)
+async function sendTokyoPreMarket() {
+  try {
+    console.log('[Tokyo] 🇯🇵 Tokyo Pre-Market analizi hazırlanıyor...');
+
+    const btcData = await httpGet(`${BASE_URL}/api/binance/futures`);
+    const btcPrice = btcData?.data?.all?.find(c => c.symbol === 'BTCUSDT');
+    const ethPrice = btcData?.data?.all?.find(c => c.symbol === 'ETHUSDT');
+
+    let message = '🇯🇵 <b>TOKYO SEANS ÖNCESİ ANALİZ</b>\n\n';
+    message += `🕐 Zaman: ${new Date().toLocaleString('tr-TR')}\n`;
+    message += `📍 Tokyo Stock Exchange açılışına 15 dakika\n\n`;
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    message += '<b>📊 BTC/ETH Durum</b>\n';
+    message += `BTC: $${btcPrice?.price || 'N/A'} (24h: ${btcPrice?.changePercent24h || 'N/A'}%)\n`;
+    message += `ETH: $${ethPrice?.price || 'N/A'} (24h: ${ethPrice?.changePercent24h || 'N/A'}%)\n\n`;
+
+    message += '<b>🌏 Asya Piyasası Sentiment</b>\n';
+    const avgChange = parseFloat(btcPrice?.changePercent24h || 0);
+    if (avgChange > 2) {
+      message += '✅ Pozitif: Kripto piyasası Tokyo açılışı için güçlü\n';
+    } else if (avgChange < -2) {
+      message += '⚠️ Negatif: Risk-off modunda, dikkatli yaklaşım\n';
+    } else {
+      message += '➖ Nötr: Konsolide hareket, yön bekliyor\n';
+    }
+
+    message += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '⚠️ <b>UYARI</b>\n';
+    message += '• Bu bilgiler yalnızca bilgilendirme amaçlıdır\n';
+    message += '• Yatırım kararları kişiseldir\n';
+    message += '• Risk yönetimini unutmayın';
+
+    await sendTelegramMessage(message);
+    console.log('[Tokyo] ✅ Tokyo Pre-Market analizi gönderildi');
+
+  } catch (error) {
+    console.error('[Tokyo] ❌ Tokyo Pre-Market hatası:', error.message);
+  }
+}
+
+// 🇨🇳 HONG KONG/SHANGHAI PRE-MARKET (01:15 UTC)
+async function sendChinaPreMarket() {
+  try {
+    console.log('[China] 🇨🇳 Hong Kong/Shanghai Pre-Market analizi hazırlanıyor...');
+
+    const btcData = await httpGet(`${BASE_URL}/api/binance/futures`);
+    const btcPrice = btcData?.data?.all?.find(c => c.symbol === 'BTCUSDT');
+    const ethPrice = btcData?.data?.all?.find(c => c.symbol === 'ETHUSDT');
+    const globalData = await httpGet('https://api.coingecko.com/api/v3/global');
+
+    let message = '🇨🇳 <b>HONG KONG/SHANGHAI SEANS ÖNCESİ</b>\n\n';
+    message += `🕐 Zaman: ${new Date().toLocaleString('tr-TR')}\n`;
+    message += `📍 HK/Shanghai açılışına 15 dakika\n\n`;
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    message += '<b>📊 BTC/ETH 4H Analiz</b>\n';
+    message += `BTC: $${btcPrice?.price || 'N/A'} (24h: ${btcPrice?.changePercent24h || 'N/A'}%)\n`;
+    message += `ETH: $${ethPrice?.price || 'N/A'} (24h: ${ethPrice?.changePercent24h || 'N/A'}%)\n\n`;
+
+    const totalMC = globalData?.data?.total_market_cap?.usd || 0;
+    const btcDom = globalData?.data?.market_cap_percentage?.btc || 0;
+
+    message += '<b>💰 Market Cap Durumu</b>\n';
+    message += `Total: $${(totalMC / 1e12).toFixed(2)}T\n`;
+    message += `BTC Dominance: ${btcDom.toFixed(2)}%\n\n`;
+
+    message += '<b>🇨🇳 Çin Piyasası Etkisi</b>\n';
+    if (btcDom > 55) {
+      message += '⚠️ BTC dominansı yüksek, altcoin riski\n';
+    } else {
+      message += '✅ Altcoin season potansiyeli var\n';
+    }
+
+    message += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '⚠️ <b>UYARI</b>\n';
+    message += '• Bu bilgiler yalnızca bilgilendirme amaçlıdır\n';
+    message += '• Yatırım kararları kişiseldir\n';
+    message += '• Risk yönetimini unutmayın';
+
+    await sendTelegramMessage(message);
+    console.log('[China] ✅ China Pre-Market analizi gönderildi');
+
+  } catch (error) {
+    console.error('[China] ❌ China Pre-Market hatası:', error.message);
+  }
+}
+
+// 🇬🇧 LONDON PRE-MARKET (07:45 UTC)
+async function sendLondonPreMarket() {
+  try {
+    console.log('[London] 🇬🇧 London Pre-Market analizi hazırlanıyor...');
+
+    const btcData = await httpGet(`${BASE_URL}/api/binance/futures`);
+    const btcPrice = btcData?.data?.all?.find(c => c.symbol === 'BTCUSDT');
+    const ethPrice = btcData?.data?.all?.find(c => c.symbol === 'ETHUSDT');
+
+    let message = '🇬🇧 <b>LONDON SEANS ÖNCESİ ANALİZ</b>\n\n';
+    message += `🕐 Zaman: ${new Date().toLocaleString('tr-TR')}\n`;
+    message += `📍 London Stock Exchange açılışına 15 dakika\n\n`;
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    message += '<b>📊 BTC/ETH Günlük Trend</b>\n';
+    message += `BTC: $${btcPrice?.price || 'N/A'} (24h: ${btcPrice?.changePercent24h || 'N/A'}%)\n`;
+    message += `ETH: $${ethPrice?.price || 'N/A'} (24h: ${ethPrice?.changePercent24h || 'N/A'}%)\n\n`;
+
+    message += '<b>🇪🇺 Avrupa Makro Etkisi</b>\n';
+    const btcChange = parseFloat(btcPrice?.changePercent24h || 0);
+    if (btcChange > 3) {
+      message += '✅ Risk-on modu: Avrupa yatırımcıları pozitif\n';
+    } else if (btcChange < -3) {
+      message += '⚠️ Risk-off modu: Düşüş baskısı var\n';
+    } else {
+      message += '➖ Konsolidasyon: Yön bekleniyor\n';
+    }
+
+    message += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '⚠️ <b>UYARI</b>\n';
+    message += '• Bu bilgiler yalnızca bilgilendirme amaçlıdır\n';
+    message += '• Yatırım kararları kişiseldir\n';
+    message += '• Risk yönetimini unutmayın';
+
+    await sendTelegramMessage(message);
+    console.log('[London] ✅ London Pre-Market analizi gönderildi');
+
+  } catch (error) {
+    console.error('[London] ❌ London Pre-Market hatası:', error.message);
+  }
+}
+
+// 🇺🇸 NYSE PRE-MARKET ⭐ PREMIUM (14:15 UTC)
+async function sendNYSEPreMarket() {
+  try {
+    console.log('[NYSE] 🇺🇸 NYSE Pre-Market PREMIUM analizi hazırlanıyor...');
+
+    const btcData = await httpGet(`${BASE_URL}/api/binance/futures`);
+    const btcPrice = btcData?.data?.all?.find(c => c.symbol === 'BTCUSDT');
+    const ethPrice = btcData?.data?.all?.find(c => c.symbol === 'ETHUSDT');
+    const globalData = await httpGet('https://api.coingecko.com/api/v3/global');
+
+    // TA-Lib analizleri
+    const btcAnalysis = await getTALibAnalysis('BTCUSDT', '1h');
+    const ethAnalysis = await getTALibAnalysis('ETHUSDT', '1h');
+
+    let message = '🇺🇸 <b>NYSE PRE-MARKET PREMIUM ANALİZ ⭐</b>\n\n';
+    message += `🕐 Zaman: ${new Date().toLocaleString('tr-TR')}\n`;
+    message += `📍 NYSE/NASDAQ açılışına 15 dakika\n\n`;
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    message += '<b>📊 BTC TA-Lib Full Analiz</b>\n';
+    message += `Fiyat: $${btcPrice?.price || 'N/A'} (24h: ${btcPrice?.changePercent24h || 'N/A'}%)\n`;
+    if (btcAnalysis && !btcAnalysis.error) {
+      message += `RSI: ${btcAnalysis.rsi?.toFixed(2) || 'N/A'}\n`;
+      message += `MACD: ${btcAnalysis.macd?.histogram?.toFixed(4) || 'N/A'}\n`;
+      message += `BB Pozisyon: ${btcAnalysis.bbands?.position || 'N/A'}\n`;
+      message += `Sinyal: <b>${btcAnalysis.signal || 'NÖTR'}</b>\n\n`;
+    } else {
+      message += 'TA-Lib veri alınamadı\n\n';
+    }
+
+    message += '<b>📊 ETH TA-Lib Full Analiz</b>\n';
+    message += `Fiyat: $${ethPrice?.price || 'N/A'} (24h: ${ethPrice?.changePercent24h || 'N/A'}%)\n`;
+    if (ethAnalysis && !ethAnalysis.error) {
+      message += `RSI: ${ethAnalysis.rsi?.toFixed(2) || 'N/A'}\n`;
+      message += `MACD: ${ethAnalysis.macd?.histogram?.toFixed(4) || 'N/A'}\n`;
+      message += `Sinyal: <b>${ethAnalysis.signal || 'NÖTR'}</b>\n\n`;
+    } else {
+      message += 'TA-Lib veri alınamadı\n\n';
+    }
+
+    // Altcoin Market Cap AL/SAT Algoritması
+    const totalMC = globalData?.data?.total_market_cap?.usd || 0;
+    const btcMC = globalData?.data?.total_market_cap?.btc || 0;
+    const ethMC = globalData?.data?.total_market_cap?.eth || 0;
+    const btcDom = globalData?.data?.market_cap_percentage?.btc || 0;
+    const ethDom = globalData?.data?.market_cap_percentage?.eth || 0;
+
+    const altcoinMC = totalMC - (btcMC + ethMC);
+    const altcoinChange = parseFloat(btcPrice?.changePercent24h || 0);
+
+    let altcoinSignal = 'NÖTR';
+    let altcoinConfidence = 50;
+
+    if (altcoinChange > 5 && btcDom < 50) {
+      altcoinSignal = 'STRONG BUY';
+      altcoinConfidence = 85;
+    } else if (altcoinChange > 2 && btcDom < 55) {
+      altcoinSignal = 'BUY';
+      altcoinConfidence = 70;
+    } else if (altcoinChange < -5 && btcDom > 60) {
+      altcoinSignal = 'STRONG SELL';
+      altcoinConfidence = 80;
+    } else if (altcoinChange < -2 && btcDom > 58) {
+      altcoinSignal = 'SELL';
+      altcoinConfidence = 65;
+    }
+
+    message += '<b>💰 Altcoin MarketCap AL/SAT</b>\n';
+    message += `Total MC: $${(totalMC / 1e12).toFixed(2)}T\n`;
+    message += `BTC Dom: ${btcDom.toFixed(2)}%\n`;
+    message += `ETH Dom: ${ethDom.toFixed(2)}%\n`;
+    message += `Sinyal: <b>${altcoinSignal}</b> (${altcoinConfidence}%)\n\n`;
+
+    message += '<b>📈 S&P 500 Korelasyon</b>\n';
+    if (btcPrice?.changePercent24h > 2) {
+      message += '✅ Risk-on: NYSE açılışı pozitif etkileyebilir\n\n';
+    } else {
+      message += '⚠️ Risk-off: Dikkatli yaklaşım önerilir\n\n';
+    }
+
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '⚠️ <b>UYARI</b>\n';
+    message += '• Bu bilgiler yalnızca bilgilendirme amaçlıdır\n';
+    message += '• Yatırım kararları kişiseldir\n';
+    message += '• Risk yönetimini unutmayın';
+
+    await sendTelegramMessage(message);
+    console.log('[NYSE] ✅ NYSE Pre-Market PREMIUM analizi gönderildi');
+
+  } catch (error) {
+    console.error('[NYSE] ❌ NYSE Pre-Market hatası:', error.message);
+  }
+}
+
+// 🇺🇸 NYSE CLOSE ANALYSIS (20:45 UTC)
+async function sendNYSECloseAnalysis() {
+  try {
+    console.log('[NYSE Close] 🇺🇸 NYSE Close analizi hazırlanıyor...');
+
+    const btcData = await httpGet(`${BASE_URL}/api/binance/futures`);
+    const btcPrice = btcData?.data?.all?.find(c => c.symbol === 'BTCUSDT');
+    const ethPrice = btcData?.data?.all?.find(c => c.symbol === 'ETHUSDT');
+
+    let message = '🇺🇸 <b>NYSE KAPANIŞ ANALİZİ</b>\n\n';
+    message += `🕐 Zaman: ${new Date().toLocaleString('tr-TR')}\n`;
+    message += `📍 NYSE/NASDAQ kapanışına 15 dakika\n\n`;
+    message += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    message += '<b>📊 Günlük Kapanış Projeksiyon</b>\n';
+    message += `BTC: $${btcPrice?.price || 'N/A'} (24h: ${btcPrice?.changePercent24h || 'N/A'}%)\n`;
+    message += `ETH: $${ethPrice?.price || 'N/A'} (24h: ${ethPrice?.changePercent24h || 'N/A'}%)\n\n`;
+
+    message += '<b>🌙 Overnight Risk Analizi</b>\n';
+    const btcChange = parseFloat(btcPrice?.changePercent24h || 0);
+    if (btcChange > 2) {
+      message += '✅ Pozitif kapanış beklentisi\n';
+      message += '🌏 Asya seansı güçlü açılabilir\n';
+    } else if (btcChange < -2) {
+      message += '⚠️ Negatif kapanış riski\n';
+      message += '🌏 Asya seansı dikkatli yaklaşmalı\n';
+    } else {
+      message += '➖ Nötr kapanış\n';
+      message += '🌏 Asya seansı yön arayacak\n';
+    }
+
+    message += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    message += '⚠️ <b>UYARI</b>\n';
+    message += '• Bu bilgiler yalnızca bilgilendirme amaçlıdır\n';
+    message += '• Yatırım kararları kişiseldir\n';
+    message += '• Risk yönetimini unutmayın';
+
+    await sendTelegramMessage(message);
+    console.log('[NYSE Close] ✅ NYSE Close analizi gönderildi');
+
+  } catch (error) {
+    console.error('[NYSE Close] ❌ NYSE Close hatası:', error.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 🎯 DECISION ENGINE - OTOMATİK KARAR MOTORİ
+// ═══════════════════════════════════════════════════════════════════
+
+// Saatlik BTC-ETH Hızlı Analiz
+async function sendHourlyDecisionEngine() {
+  try {
+    console.log('\n[Decision Engine Hourly] 🎯 Saatlik BTC-ETH Analizi...');
+
+    const [btcDecision, ethDecision] = await Promise.all([
+      httpGet(`${BASE_URL}/api/decision-engine?symbol=BTCUSDT`).catch(() => ({ data: null })),
+      httpGet(`${BASE_URL}/api/decision-engine?symbol=ETHUSDT`).catch(() => ({ data: null }))
+    ]);
+
+    if (!btcDecision.data && !ethDecision.data) {
+      console.log('[Decision Engine Hourly] ℹ️  Veri alınamadı');
+      return;
+    }
+
+    // Karar türlerini Türkçeye çevir
+    const translateDecision = (decision) => {
+      const translations = {
+        'STRONG_BUY': 'GÜÇLÜ AL',
+        'BUY': 'AL',
+        'HOLD': 'BEKLE',
+        'SELL': 'SAT',
+        'STRONG_SELL': 'GÜÇLÜ SAT'
+      };
+      return translations[decision] || decision;
+    };
+
+    let message = '<b>⏰ SAATLİK PİYASA DURUMU</b>\n\n';
+
+    if (btcDecision.data) {
+      const btc = btcDecision.data;
+      const emoji = btc.decision === 'STRONG_BUY' || btc.decision === 'BUY' ? '🟢' :
+                    btc.decision === 'STRONG_SELL' || btc.decision === 'SELL' ? '🔴' : '🟡';
+      const decisionTR = translateDecision(btc.decision);
+      message += `${emoji} <b>Bitcoin</b>: ${decisionTR} (%${(btc.confidence * 100).toFixed(0)} güven)\n`;
+      message += `   💵 Fiyat: $${btc.currentPrice.toFixed(0)}\n\n`;
+    }
+
+    if (ethDecision.data) {
+      const eth = ethDecision.data;
+      const emoji = eth.decision === 'STRONG_BUY' || eth.decision === 'BUY' ? '🟢' :
+                    eth.decision === 'STRONG_SELL' || eth.decision === 'SELL' ? '🔴' : '🟡';
+      const decisionTR = translateDecision(eth.decision);
+      message += `${emoji} <b>Ethereum</b>: ${decisionTR} (%${(eth.confidence * 100).toFixed(0)} güven)\n`;
+      message += `   💵 Fiyat: $${eth.currentPrice.toFixed(0)}\n`;
+    }
+
+    message += `\n<i>📅 ${new Date().toLocaleString('tr-TR')}</i>`;
+
+    await sendTelegramMessage(message);
+    console.log('[Decision Engine Hourly] ✅ Tamamlandı');
+
+  } catch (error) {
+    console.error('[Decision Engine Hourly] ❌ Hata:', error.message);
+  }
+}
+
+// Günlük Kapanış BTC-ETH Detaylı Rapor
+async function sendDailyDecisionEngine() {
+  try {
+    console.log('\n[Decision Engine Daily] 📅 Günlük BTC-ETH Detaylı Analizi...');
+
+    const [btcDecision, ethDecision] = await Promise.all([
+      httpGet(`${BASE_URL}/api/decision-engine?symbol=BTCUSDT`).catch(() => ({ data: null })),
+      httpGet(`${BASE_URL}/api/decision-engine?symbol=ETHUSDT`).catch(() => ({ data: null }))
+    ]);
+
+    if (!btcDecision.data && !ethDecision.data) {
+      console.log('[Decision Engine Daily] ℹ️  Veri alınamadı');
+      return;
+    }
+
+    // Karar türlerini Türkçeye çevir
+    const translateDecision = (decision) => {
+      const translations = {
+        'STRONG_BUY': 'GÜÇLÜ AL',
+        'BUY': 'AL',
+        'HOLD': 'BEKLE',
+        'SELL': 'SAT',
+        'STRONG_SELL': 'GÜÇLÜ SAT'
+      };
+      return translations[decision] || decision;
+    };
+
+    let message = '<b>📅 GÜNLÜK KAPANIŞ RAPORU</b>\n\n';
+
+    if (btcDecision.data) {
+      const btc = btcDecision.data;
+      const emoji = btc.decision === 'STRONG_BUY' || btc.decision === 'BUY' ? '🟢' :
+                    btc.decision === 'STRONG_SELL' || btc.decision === 'SELL' ? '🔴' : '🟡';
+      const decisionTR = translateDecision(btc.decision);
+
+      message += `<b>━━━ ${emoji} Bitcoin (BTC) ━━━</b>\n`;
+      message += `💰 Güncel Fiyat: $${btc.currentPrice.toFixed(2)}\n`;
+      message += `🎯 Tavsiye: <b>${decisionTR}</b> (%${(btc.confidence * 100).toFixed(1)} güven)\n\n`;
+      message += `📊 Önerilen Giriş: $${btc.entryPrice.toFixed(2)}\n`;
+      message += `🛑 Zarar Durdur: $${btc.stopLoss.toFixed(2)}\n`;
+      message += `🎁 Hedef-1: $${btc.targets.tp1.toFixed(2)}\n`;
+      message += `🎁 Hedef-2: $${btc.targets.tp2.toFixed(2)}\n`;
+      message += `📈 Risk/Ödül: ${btc.riskRewardRatio.toFixed(2)}:1\n`;
+      message += `📊 Sinyal Durumu: ${btc.buySignalsCount} AL / ${btc.sellSignalsCount} SAT\n\n`;
+    }
+
+    if (ethDecision.data) {
+      const eth = ethDecision.data;
+      const emoji = eth.decision === 'STRONG_BUY' || eth.decision === 'BUY' ? '🟢' :
+                    eth.decision === 'STRONG_SELL' || eth.decision === 'SELL' ? '🔴' : '🟡';
+      const decisionTR = translateDecision(eth.decision);
+
+      message += `<b>━━━ ${emoji} Ethereum (ETH) ━━━</b>\n`;
+      message += `💰 Güncel Fiyat: $${eth.currentPrice.toFixed(2)}\n`;
+      message += `🎯 Tavsiye: <b>${decisionTR}</b> (%${(eth.confidence * 100).toFixed(1)} güven)\n\n`;
+      message += `📊 Önerilen Giriş: $${eth.entryPrice.toFixed(2)}\n`;
+      message += `🛑 Zarar Durdur: $${eth.stopLoss.toFixed(2)}\n`;
+      message += `🎁 Hedef-1: $${eth.targets.tp1.toFixed(2)}\n`;
+      message += `🎁 Hedef-2: $${eth.targets.tp2.toFixed(2)}\n`;
+      message += `📈 Risk/Ödül: ${eth.riskRewardRatio.toFixed(2)}:1\n`;
+      message += `📊 Sinyal Durumu: ${eth.buySignalsCount} AL / ${eth.sellSignalsCount} SAT\n\n`;
+    }
+
+    message += `<i>📅 ${new Date().toLocaleString('tr-TR')}</i>`;
+
+    await sendTelegramMessage(message);
+    console.log('[Decision Engine Daily] ✅ Tamamlandı');
+
+  } catch (error) {
+    console.error('[Decision Engine Daily] ❌ Hata:', error.message);
+  }
+}
+
+// 4 Saatlik Top AL Coinleri - En İyi Fırsatlar
+async function send4HourlyTopBuyCoins() {
+  try {
+    console.log('\n[4H Top Coins] 🎯 Top AL coinleri taranıyor...');
+
+    // Top 50 coin listesini al
+    const topCoins = await fetchTopUSDTPairs(50);
+    if (!topCoins || topCoins.length === 0) {
+      console.log('[4H Top Coins] ⚠️  Coin listesi alınamadı');
+      return;
+    }
+
+    // Karar türlerini Türkçeye çevir
+    const translateDecision = (decision) => {
+      const translations = {
+        'STRONG_BUY': 'GÜÇLÜ AL',
+        'BUY': 'AL',
+        'HOLD': 'BEKLE',
+        'SELL': 'SAT',
+        'STRONG_SELL': 'GÜÇLÜ SAT'
+      };
+      return translations[decision] || decision;
+    };
+
+    // İlk 20 coin için Decision Engine analizi yap (paralel)
+    const analysisPromises = topCoins.slice(0, 20).map(coin =>
+      httpGet(`${BASE_URL}/api/decision-engine?symbol=${coin.symbol}`)
+        .then(res => ({ ...res.data, symbol: coin.symbol }))
+        .catch(() => null)
+    );
+
+    const analyses = (await Promise.all(analysisPromises)).filter(a => a && a.decision);
+
+    // Sadece BUY ve STRONG_BUY olanları filtrele
+    const buyCoins = analyses.filter(a =>
+      a.decision === 'BUY' || a.decision === 'STRONG_BUY'
+    );
+
+    if (buyCoins.length === 0) {
+      console.log('[4H Top Coins] ℹ️  AL sinyali veren coin bulunamadı');
+
+      // Kullanıcıya bildirim gönder
+      const noSignalMessage = '<b>🎯 4 SAATLİK PİYASA TARAMASI</b>\n\n' +
+        '⚠️ Şu anda güçlü AL sinyali veren kripto para bulunamadı.\n\n' +
+        'Piyasa beklemede veya risk seviyesi yüksek.\n' +
+        'Yeni fırsatlar için takipte kalın!\n\n' +
+        `<i>📅 ${new Date().toLocaleString('tr-TR')}</i>`;
+
+      await sendTelegramMessage(noSignalMessage);
+      return;
+    }
+
+    // Confidence'a göre sırala ve top 8'i al
+    buyCoins.sort((a, b) => b.confidence - a.confidence);
+    const topBuyCoins = buyCoins.slice(0, 8);
+
+    // Mesaj oluştur
+    let message = '<b>🎯 EN İYİ ALIŞ FIRSATLARI</b>\n';
+    message += '<i>4 saatlik piyasa analizi sonuçları</i>\n\n';
+    message += `📊 ${topBuyCoins.length} Güçlü Fırsat Tespit Edildi\n\n`;
+
+    topBuyCoins.forEach((coin, index) => {
+      const emoji = coin.decision === 'STRONG_BUY' ? '🟢🟢' : '🟢';
+      const symbol = coin.symbol.replace('USDT', '');
+      const decisionTR = translateDecision(coin.decision);
+
+      message += `${index + 1}. ${emoji} <b>${symbol}</b>\n`;
+      message += `   💵 Fiyat: $${coin.currentPrice.toFixed(coin.currentPrice >= 1 ? 2 : 6)}\n`;
+      message += `   🎯 Tavsiye: ${decisionTR} (%${(coin.confidence * 100).toFixed(0)} güven)\n`;
+      message += `   📈 Risk/Ödül: ${coin.riskRewardRatio.toFixed(1)}:1`;
+      message += ` | Hedef: $${coin.targets.tp1.toFixed(coin.targets.tp1 >= 1 ? 2 : 6)}\n`;
+
+      if (index < topBuyCoins.length - 1) message += '\n';
+    });
+
+    message += `\n<i>📅 ${new Date().toLocaleString('tr-TR')}</i>`;
+
+    console.log(`[4H Top Coins] ✅ ${topBuyCoins.length} AL coini bulundu, gönderiliyor...`);
+    await sendTelegramMessage(message);
+    console.log('[4H Top Coins] ✅ Tamamlandı!');
+
+  } catch (error) {
+    console.error('[4H Top Coins] ❌ Hata:', error.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CRON SCHEDULER BAŞLANGICI
+// ═══════════════════════════════════════════════════════════════════
+
+// ⚡ 15 DAKİKALIK (Her 15 dakikada - En güvenilir AL sinyalleri)
+cron.schedule('*/15 * * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 15 Dakikalık AL Sinyali Scheduler Tetiklendi`);
+  await sendTopBuySignals();
+});
+
+// 🌍 30 DAKİKALIK (Her 30 dakikada - Kritik Piyasa Olayları)
+cron.schedule('*/30 * * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 30 Dakikalık Global Market Events Tetiklendi`);
+  await sendCriticalMarketEvents();
+});
+
+// 1️⃣ SAATLİK (her saat başı - BTC-ETH Analizi)
+cron.schedule('0 * * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 1 Saatlik BTC-ETH Analizi Tetiklendi`);
+  await sendHourlyBTCETHAnalysis();
+  await sendMarketCorrelation();
+});
+
+// 📊 TA-LIB SAATLİK (Her saat +5 dakika)
+cron.schedule('5 * * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] TA-Lib Saatlik Sinyaller Tetiklendi`);
+  // await sendTALibHourlySignals(); // DEVRE DIŞI BIRAKILDI
+});
+
+// 🛡️ MUHAFAZAKAR ALIM SİNYALLERİ (Her 4 saat - 00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC)
+cron.schedule('0 */4 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] Muhafazakar Alım Sinyalleri (4 Saatlik Kapanış) Tetiklendi`);
+  await sendConservativeSignals();
+});
+
+// ⏰ SAATLİK BTC-ETH KARAR ANALİZİ (Her saat +45 dakika)
+cron.schedule('45 * * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 🎯 Saatlik BTC-ETH Karar Analizi Tetiklendi`);
+  await sendHourlyDecisionEngine();
+});
+
+// 🎯 4 SAATLİK TOP AL COİNLERİ (00:15, 04:15, 08:15, 12:15, 16:15, 20:15)
+cron.schedule('15 */4 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 🎯 4 Saatlik Top AL Coinleri Tetiklendi`);
+  await send4HourlyTopBuyCoins();
+});
+
+// 2️⃣ 4 SAATLİK (00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC)
+cron.schedule('0 */4 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 4 Saatlik Detaylı Market Raporu Tetiklendi`);
+  await send4HourlyMarketReport();
+  // await sendCryptoNews(); // DEVRE DIŞI BIRAKILDI
+  await sendOmnipotentFutures();
+  await sendBreakoutSignals();
+});
+
+// 📊 TA-LIB 4 SAATLİK (Her 4 saat +10 dakika)
+cron.schedule('10 */4 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] TA-Lib 4 Saatlik Detaylı Analiz Tetiklendi`);
+  // await sendTALib4HourlySignals(); // DEVRE DIŞI BIRAKILDI
+});
+
+// 📅 GÜNLÜK KAPANIŞ - BTC-ETH KARAR RAPORU (00:00 UTC - Günlük kapanış)
+cron.schedule('0 0 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 📅 Günlük Kapanış BTC-ETH Karar Raporu Tetiklendi`);
+  await sendDailyDecisionEngine();
+});
+
+// 🌍 DÜNYA BORSALARI PRE-MARKET ANALİZLERİ
+
+// 🇯🇵 Tokyo Pre-Market (23:45 UTC)
+cron.schedule('45 23 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 🇯🇵 Tokyo Pre-Market Analizi Tetiklendi`);
+  await sendTokyoPreMarket();
+});
+
+// 🇨🇳 Hong Kong/Shanghai Pre-Market (01:15 UTC)
+cron.schedule('15 1 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 🇨🇳 Hong Kong/Shanghai Pre-Market Analizi Tetiklendi`);
+  await sendChinaPreMarket();
+});
+
+// 🇬🇧 London Pre-Market (07:45 UTC)
+cron.schedule('45 7 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 🇬🇧 London Pre-Market Analizi Tetiklendi`);
+  await sendLondonPreMarket();
+});
+
+// 🇺🇸 NYSE Pre-Market PREMIUM (14:15 UTC) - EN ÖNEMLİ SEANS
+cron.schedule('15 14 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 🇺🇸 NYSE Pre-Market PREMIUM Analizi Tetiklendi ⭐`);
+  await sendNYSEPreMarket();
+});
+
+// 🇺🇸 NYSE Close (20:45 UTC)
+cron.schedule('45 20 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 🇺🇸 NYSE Close Analizi Tetiklendi`);
+  await sendNYSECloseAnalysis();
+});
+
+// 3️⃣ GÜNLÜK (UTC 00:00 = Türkiye 03:00)
+cron.schedule('0 0 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] Günlük Scheduler Tetiklendi`);
+  await sendNirvanaDaily();
+  await sendBTCETHAnalysis();
+});
+
+// 📊 TA-LIB GÜNLÜK (UTC 00:10)
+cron.schedule('10 0 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] TA-Lib Günlük Kapsamlı Analiz Tetiklendi`);
+  // await sendTALibDailySignals(); // DEVRE DIŞI BIRAKILDI
+});
+
+// 4️⃣ HAFTALIK (Pazartesi UTC 00:00)
+cron.schedule('0 0 * * 1', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] Haftalık Scheduler Tetiklendi`);
+  await sendNirvanaDaily();
+});
+
+console.log('✅ Tüm Cron Job\'lar aktif edildi!');
+console.log('\n📅 SCHEDULER TAKVİMİ (Toplam 16+ Zamanlanmış Görev):');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('  ⚡ 15 Dakikalık: EN GÜVENİLİR AL SİNYALLERİ');
+console.log('  🌍 30 Dakikalık: GLOBAL CRITICAL MARKET EVENTS');
+console.log('  🕐 Saatlik (00:00): BTC-ETH Hızlı Analiz');
+console.log('  📊 Saatlik (00:05): TA-Lib Teknik Sinyaller ⭐NEW');
+console.log('  🕓 4 Saatlik (00:00, 04:00, 08:00, 12:00, 16:00, 20:00): Market Raporu');
+console.log('  📊 4 Saatlik (00:10, 04:10 ...): TA-Lib Detaylı Analiz ⭐NEW');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('🌍 DÜNYA BORSALARI PRE-MARKET ANALİZLERİ:');
+console.log('  🇯🇵 23:45 UTC: Tokyo Pre-Market ⭐NEW');
+console.log('  🇨🇳 01:15 UTC: Hong Kong/Shanghai Pre-Market ⭐NEW');
+console.log('  🇬🇧 07:45 UTC: London Pre-Market ⭐NEW');
+console.log('  🇺🇸 14:15 UTC: NYSE Pre-Market PREMIUM (Altcoin AL/SAT) ⭐NEW');
+console.log('  🇺🇸 20:45 UTC: NYSE Close Analysis ⭐NEW');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('  📅 00:00 UTC: Günlük (Nirvana + BTC-ETH)');
+console.log('  📊 00:10 UTC: TA-Lib Günlük Kapsamlı Analiz ⭐NEW');
+console.log('  📆 Pazartesi 00:00 UTC: Haftalık Nirvana Özet');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('\n🎯 YENİ SİSTEM ÖZELLİKLERİ:');
+console.log('   ✅ TA-Lib 158 İndikatör (RSI, MACD, BB, EMA, ADX)');
+console.log('   ✅ 5 Dünya Borsası Takibi (Tokyo, HK, London, NYSE)');
+console.log('   ✅ Altcoin MarketCap AL/SAT Algoritması');
+console.log('   ✅ White-Hat Etik Kurallar');
+console.log('   ✅ 7/24 Kesintisiz Çalışma');
+console.log('\n⏳ Scheduler çalışıyor... (Ctrl+C ile durdur)\n');
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n\n🛑 Scheduler durduruluyor...');
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  console.log('\n\n🛑 Scheduler PM2 tarafından durduruldu.');
+  process.exit(0);
+});
+
+// ============================================================================
+// 💎 PREMIUM FEATURES - PHASE 1
+// ============================================================================
+const premiumFeatures = require('./premium-features.js');
+
+// 🚨 LIQUIDATION CASCADE RISK (Her 2 saatte - yüksek volatilite kontrol)
+cron.schedule('30 */2 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 🚨 Liquidation Cascade Risk Check Tetiklendi`);
+  await premiumFeatures.sendLiquidationRiskAlert();
+});
+
+// 💰 FUNDING RATE ARBITRAGE (Her 8 saatte - funding zamanlarında)
+cron.schedule('0 */8 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 💰 Funding Rate Arbitrage Check Tetiklendi`);
+  await premiumFeatures.sendFundingArbitrageAlert();
+});
+
+// 💔 BTC-ETH CORRELATION BREAKDOWN (Her 6 saatte)
+cron.schedule('15 */6 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 💔 BTC-ETH Correlation Check Tetiklendi`);
+  await premiumFeatures.sendCorrelationBreakdownAlert();
+});
+
+// 🔄 MOMENTUM SHIFT DETECTOR (Her 4 saatte - 4h chart analizi)
+cron.schedule('0 */4 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 🔄 Momentum Shift Detection Tetiklendi`);
+  await premiumFeatures.sendMomentumShiftAlert();
+});
+
+// 📊 VOLATILITY FORECAST ENGINE (Her 12 saatte - piyasa volatilite analizi)
+cron.schedule('0 */12 * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 📊 Volatility Forecast Engine Tetiklendi`);
+  await premiumFeatures.sendVolatilityForecastAlert();
+});
+
+// ⚡ FLASH CRASH EARLY WARNING (Her 1 saatte - kritik risk taraması)
+cron.schedule('0 * * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] ⚡ Flash Crash Early Warning Tetiklendi`);
+  await premiumFeatures.sendFlashCrashAlert();
+});
+
+// 🐋 ON-CHAIN WHALE MONITOR (Her 10 dakikada - whale aktivitesi çok dinamik)
+cron.schedule('*/10 * * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 🐋 On-Chain Whale Monitor Tetiklendi`);
+  await premiumFeatures.sendWhaleActivityAlert();
+});
+
+// 📊 ORDER BOOK DEPTH ANALYZER (Her 1 saatte - büyük duvar analizi)
+cron.schedule('5 * * * *', async () => {
+  const now = new Date().toLocaleString('tr-TR');
+  console.log(`\n⏰ [${now}] 📊 Order Book Depth Analyzer Tetiklendi`);
+  await premiumFeatures.sendOrderBookAlert();
+});
+
+console.log('\n💎 PREMIUM FEATURES - 8 ÖZELLIK AKTIF!');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('  🚨 Her 2 saat: Liquidation Cascade Risk Analysis');
+console.log('  💰 Her 8 saat: Funding Rate Arbitrage Scanner');
+console.log('  💔 Her 6 saat: BTC-ETH Correlation Breakdown');
+console.log('  🔄 Her 4 saat: Momentum Shift Detector');
+console.log('  📊 Her 12 saat: Volatility Forecast Engine');
+console.log('  ⚡ Her 1 saat: Flash Crash Early Warning');
+console.log('  🐋 Her 10 dakika: On-Chain Whale Monitor (NEW!)');
+console.log('  📊 Her 1 saat: Order Book Depth Analyzer (NEW!)');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
