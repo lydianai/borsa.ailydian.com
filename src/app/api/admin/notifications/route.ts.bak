@@ -1,0 +1,74 @@
+/**
+ * Admin Notifications API
+ *
+ * White-hat compliance: Admin notification management
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth/helpers';
+import { prisma } from '@/lib/prisma';
+
+export async function GET(req: NextRequest) {
+  try {
+    await requireAdmin();
+
+    const searchParams = req.nextUrl.searchParams;
+    const unreadOnly = searchParams.get('unreadOnly') === 'true';
+
+    const notifications = await prisma.adminNotification.findMany({
+      where: unreadOnly ? { isRead: false } : undefined,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 50, // Last 50 notifications
+    });
+
+    const unreadCount = await prisma.adminNotification.count({
+      where: { isRead: false },
+    });
+
+    return NextResponse.json({
+      success: true,
+      notifications,
+      unreadCount,
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || 'Yetkisiz erişim' },
+      { status: error.message === 'Admin access required' ? 403 : 500 }
+    );
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    await requireAdmin();
+
+    const { notificationId } = await req.json();
+
+    if (!notificationId) {
+      return NextResponse.json(
+        { error: 'Notification ID gerekli' },
+        { status: 400 }
+      );
+    }
+
+    await prisma.adminNotification.update({
+      where: { id: notificationId },
+      data: {
+        isRead: true,
+        readAt: new Date(),
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Bildirim okundu olarak işaretlendi',
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || 'İşlem başarısız' },
+      { status: 500 }
+    );
+  }
+}

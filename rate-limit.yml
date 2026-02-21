@@ -1,0 +1,92 @@
+# Ngrok Traffic Policy - Rate Limiting Configuration
+# Usage: ngrok http 3000 --domain your-endpoint.ngrok.app --traffic-policy-file rate-limit.yml
+
+on_http_request:
+  # Global API Rate Limit - 100 requests per minute per IP
+  - expressions:
+      - req.url.contains('/api')
+    actions:
+      - type: rate_limit
+        config:
+          name: global_api_rate_limit
+          algorithm: sliding_window
+          capacity: 100
+          rate: 60s
+          bucket_key:
+            - conn.client_ip
+
+  # Groq API Specific - Stricter limit (30 requests per minute)
+  # Groq free tier: 30 RPM, 14,400 RPD
+  - expressions:
+      - req.url.contains('/api/ai-assistant')
+      - req.url.contains('/api/ai-signals')
+      - req.url.contains('/api/traditional-markets-analysis')
+      - req.url.contains('/api/crypto-news')
+    actions:
+      - type: rate_limit
+        config:
+          name: groq_api_rate_limit
+          algorithm: sliding_window
+          capacity: 30
+          rate: 60s
+          bucket_key:
+            - conn.client_ip
+      - type: add_headers
+        config:
+          headers:
+            X-RateLimit-Provider: "AI-Service"
+            X-RateLimit-Limit: "30"
+
+  # Authentication endpoints - More lenient
+  - expressions:
+      - req.url.contains('/api/auth')
+    actions:
+      - type: rate_limit
+        config:
+          name: auth_rate_limit
+          algorithm: sliding_window
+          capacity: 20
+          rate: 60s
+          bucket_key:
+            - conn.client_ip
+
+  # Market data endpoints - Higher limit for trading
+  - expressions:
+      - req.url.contains('/api/binance')
+      - req.url.contains('/api/market-insights')
+      - req.url.contains('/api/signals')
+    actions:
+      - type: rate_limit
+        config:
+          name: market_data_rate_limit
+          algorithm: sliding_window
+          capacity: 200
+          rate: 60s
+          bucket_key:
+            - conn.client_ip
+
+  # Bot analysis endpoints - Medium limit
+  - expressions:
+      - req.url.contains('/api/bot-analysis')
+      - req.url.contains('/api/quantum-pro')
+    actions:
+      - type: rate_limit
+        config:
+          name: bot_analysis_rate_limit
+          algorithm: sliding_window
+          capacity: 50
+          rate: 60s
+          bucket_key:
+            - conn.client_ip
+
+on_http_response:
+  # Add rate limit headers to all API responses
+  - expressions:
+      - req.url.contains('/api')
+    actions:
+      - type: add_headers
+        config:
+          headers:
+            X-RateLimit-Applied: "true"
+            X-Content-Type-Options: "nosniff"
+            X-Frame-Options: "DENY"

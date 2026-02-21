@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "id": "a3f77064d426",
+    "name": "borsa.ailydian.com",
+    "type": "node",
+    "path": "/Users/sardag/Desktop/PROJELER/borsa.ailydian.com"
+  },
+  "ailydian": {
+    "enabled": true,
+    "base_path": "/Users/sardag/Desktop/AILYDIAN-AGENT-ORCHESTRATOR",
+    "agents_path": "/Users/sardag/Desktop/AILYDIAN-AGENT-ORCHESTRATOR/agents",
+    "integration_date": "2026-01-01T12:48:51.178982"
+  },
+  "agents": {
+    "auto_activate": [],
+    "enabled_categories": [
+      "ai-advanced",
+      "engineering",
+      "design",
+      "testing"
+    ],
+    "disabled_agents": []
+  },
+  "rules": {
+    "require_permission_for_changes": true,
+    "auto_commit": false,
+    "auto_push": false,
+    "logging_enabled": true
+  },
+  "monitoring": {
+    "track_activity": true,
+    "send_metrics": true,
+    "dashboard_integration": true
+  }
+}

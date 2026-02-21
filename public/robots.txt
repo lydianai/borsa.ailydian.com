@@ -1,0 +1,304 @@
+# robots.txt - Ailydian Signal
+# Enterprise-grade bot management for SEO optimization
+# Last updated: 2025
+
+# ============================================
+# ALLOWED SEARCH ENGINES (Good Bots)
+# ============================================
+
+# Google
+User-agent: Googlebot
+User-agent: Googlebot-Image
+User-agent: Googlebot-News
+User-agent: Googlebot-Video
+User-agent: Google-InspectionTool
+User-agent: GoogleOther
+User-agent: Storebot-Google
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /private/
+Crawl-delay: 0
+
+# Bing
+User-agent: Bingbot
+User-agent: BingPreview
+User-agent: msnbot
+User-agent: msnbot-media
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /private/
+Crawl-delay: 0
+
+# Yandex
+User-agent: Yandex
+User-agent: YandexBot
+User-agent: YandexImages
+User-agent: YandexVideo
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /private/
+Crawl-delay: 1
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Crawl-delay: 1
+
+# Baidu (China)
+User-agent: Baiduspider
+User-agent: Baiduspider-image
+User-agent: Baiduspider-video
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Crawl-delay: 2
+
+# Other legitimate search engines
+User-agent: Slurp
+User-agent: Yahoo! Slurp
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Crawl-delay: 2
+
+# ============================================
+# SEO TOOLS - AGGRESSIVE CRAWLERS (Rate Limited)
+# ============================================
+
+# Ahrefs - SEO tool (resource intensive)
+User-agent: AhrefsBot
+User-agent: AhrefsSiteAudit
+Disallow: /
+
+# Semrush - SEO tool (resource intensive)
+User-agent: SemrushBot
+User-agent: SplitSignalBot
+Disallow: /
+
+# Majestic - SEO backlink crawler
+User-agent: MJ12bot
+Disallow: /
+
+# DotBot - Moz/OpenSiteExplorer
+User-agent: DotBot
+User-agent: rogerbot
+User-agent: MojeekBot
+Disallow: /
+
+# BLEXBot - Webmeup backlink crawler
+User-agent: BLEXBot
+Disallow: /
+
+# ============================================
+# AI SCRAPERS - BLOCK ALL (Data Mining Bots)
+# ============================================
+
+# OpenAI (ChatGPT, GPT models)
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: OpenAI-SearchBot
+Disallow: /
+
+# Google AI/Bard
+User-agent: Google-Extended
+User-agent: GoogleOther-Image
+User-agent: GoogleOther-Video
+Disallow: /
+
+# Anthropic Claude
+User-agent: anthropic-ai
+User-agent: Claude-Web
+Disallow: /
+
+# Common Crawl (AI training data)
+User-agent: CCBot
+User-agent: omgili
+User-agent: omgilibot
+Disallow: /
+
+# Meta AI (Facebook/Instagram AI)
+User-agent: FacebookBot
+User-agent: facebookexternalhit
+User-agent: Meta-ExternalAgent
+User-agent: meta-externalagent
+Disallow: /
+
+# Bytedance/TikTok AI
+User-agent: Bytespider
+User-agent: ByteDance
+Disallow: /
+
+# Diffbot - AI web scraper
+User-agent: Diffbot
+Disallow: /
+
+# Scrapy/Python scrapers
+User-agent: Scrapy
+User-agent: Python-urllib
+User-agent: python-requests
+Disallow: /
+
+# Applebot (Apple AI)
+User-agent: Applebot-Extended
+Disallow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Disallow: /
+
+# Cohere AI
+User-agent: cohere-ai
+Disallow: /
+
+# ============================================
+# MALICIOUS/SPAM BOTS - BLOCK ALL
+# ============================================
+
+# Archive crawlers (save content without permission)
+User-agent: ia_archiver
+User-agent: archive.org_bot
+User-agent: Wget
+User-agent: curl
+Disallow: /
+
+# Email harvesters
+User-agent: EmailCollector
+User-agent: EmailSiphon
+User-agent: EmailWolf
+User-agent: ExtractorPro
+User-agent: CherryPicker
+Disallow: /
+
+# Content scrapers
+User-agent: WebReaper
+User-agent: WebCopier
+User-agent: Offline Explorer
+User-agent: HTTrack
+User-agent: Microsoft.URL.Control
+User-agent: EmailCollector
+User-agent: penthesilea
+Disallow: /
+
+# Spam bots
+User-agent: grub-client
+User-agent: grub
+User-agent: looksmart
+User-agent: WebZip
+User-agent: larbin
+User-agent: b2w/0.1
+User-agent: psbot
+User-agent: Python-webchecker
+User-agent: NetMechanic
+User-agent: URL_Spider_SQL
+User-agent: Collector
+User-agent: WebCollage
+User-agent: CrunchBot
+Disallow: /
+
+# Click fraud bots
+User-agent: Clickagy
+User-agent: MauiBot
+User-agent: DomainStatsBot
+User-agent: SurveyBot
+Disallow: /
+
+# Aggressive SEO bots
+User-agent: SeznamBot
+User-agent: SEOkicks
+User-agent: spbot
+User-agent: SearchmetricsBot
+User-agent: SEOlyticsCrawler
+User-agent: LinkpadBot
+User-agent: serpstatbot
+Disallow: /
+
+# Image scrapers
+User-agent: Pinterestbot
+User-agent: Pinterest
+Disallow: /
+
+# Generic bad bots
+User-agent: sentibot
+User-agent: niki-bot
+User-agent: CazoodleBot
+User-agent: discobot
+User-agent: ecxi
+User-agent: GT::WWW
+User-agent: heritrix
+User-agent: HTTP::Lite
+User-agent: HTTrack
+User-agent: ia_archiver
+User-agent: id-search
+User-agent: id-search.org
+User-agent: IDBot
+User-agent: Indy Library
+User-agent: IRLbot
+User-agent: ISC Systems iRc Search 2.1
+User-agent: LinksManager.com_bot
+User-agent: linkwalker
+User-agent: lwp-trivial
+User-agent: MFC_Tear_Sample
+User-agent: Microsoft.URL.Control
+User-agent: Missigua Locator
+User-agent: panscient.com
+User-agent: PECL::HTTP
+User-agent: PHPCrawl
+User-agent: PleaseCrawl
+User-agent: SBIder
+User-agent: Snoopy
+User-agent: Steeler
+User-agent: URI::Fetch
+User-agent: urllib
+User-agent: Web Sucker
+User-agent: webalta
+User-agent: WebAuto
+User-agent: WebBandit
+User-agent: WebCopier
+User-agent: WebFetch
+User-agent: WebGo IS
+User-agent: WebLeacher
+User-agent: WebReaper
+User-agent: WebSauger
+User-agent: Website Quester
+User-agent: Webster
+User-agent: WebStripper
+User-agent: WebWhacker
+User-agent: WebZIP
+User-agent: Widow
+User-agent: WWW-Collector-E
+User-agent: Xenu
+User-agent: Zade
+User-agent: Zeus
+User-agent: ZyBORG
+User-agent: coccoc
+User-agent: Incutio
+User-agent: lmspider
+User-agent: memorybot
+User-agent: serf
+User-agent: Unknown
+User-agent: uptime files
+Disallow: /
+
+# ============================================
+# SITEMAPS
+# ============================================
+Sitemap: https://borsa.ailydian.com/sitemap.xml
+
+# ============================================
+# DEFAULT POLICY FOR UNKNOWN BOTS
+# ============================================
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /private/
+Crawl-delay: 2

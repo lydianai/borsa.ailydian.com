@@ -1,0 +1,21 @@
+# TA-Lib Service Requirements
+# 500+ Technical Indicators
+
+# Core dependencies
+flask==3.0.0
+flask-cors==4.0.0
+numpy
+
+# TA-Lib (requires system installation first)
+# Install system TA-Lib:
+# macOS: brew install ta-lib
+# Ubuntu: sudo apt-get install ta-lib
+# Then: pip install TA-Lib
+TA-Lib
+
+# Performance
+gunicorn
+
+# Utilities
+python-dotenv
+requests

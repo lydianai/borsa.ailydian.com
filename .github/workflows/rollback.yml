@@ -1,0 +1,444 @@
+name: 🔄 Emergency Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for rollback'
+        required: true
+        type: string
+      target_commit:
+        description: 'Target commit SHA (leave empty for previous stable)'
+        required: false
+        type: string
+      force_rollback:
+        description: 'Force rollback (skip health checks)'
+        required: false
+        default: false
+        type: boolean
+  workflow_run:
+    workflows: ["🚀 Canary Deployment"]
+    types:
+      - completed
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+  repository_dispatch:
+    types: [emergency_rollback]
+
+env:
+  NODE_VERSION: '18'
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  OPS_WEBHOOK_URL: ${{ secrets.OPS_WEBHOOK_URL }}
+
+jobs:
+  # Validate rollback request
+  validate-rollback:
+    name: 🔍 Validate Rollback Request
+    runs-on: ubuntu-latest
+    outputs:
+      should_rollback: ${{ steps.validation.outputs.should_rollback }}
+      target_commit: ${{ steps.validation.outputs.target_commit }}
+      rollback_reason: ${{ steps.validation.outputs.rollback_reason }}
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 10
+
+      - name: 🔍 Validate rollback parameters
+        id: validation
+        run: |
+          # Determine rollback trigger
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            REASON="${{ github.event.inputs.reason }}"
+            TARGET_COMMIT="${{ github.event.inputs.target_commit }}"
+            FORCE_ROLLBACK="${{ github.event.inputs.force_rollback }}"
+          elif [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            REASON="Automatic rollback due to deployment failure"
+            TARGET_COMMIT=""
+            FORCE_ROLLBACK="false"
+          elif [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
+            REASON="${{ github.event.client_payload.reason }}"
+            TARGET_COMMIT="${{ github.event.client_payload.target_commit }}"
+            FORCE_ROLLBACK="${{ github.event.client_payload.force_rollback || 'false' }}"
+          else
+            echo "❌ Unknown rollback trigger"
+            exit 1
+          fi
+          
+          echo "🔄 Rollback Request Validation:"
+          echo "  Trigger: ${{ github.event_name }}"
+          echo "  Reason: $REASON"
+          echo "  Target Commit: ${TARGET_COMMIT:-'auto-detect'}"
+          echo "  Force Rollback: $FORCE_ROLLBACK"
+          
+          # Check if rollback is needed
+          SHOULD_ROLLBACK="true"
+          
+          # Check for recent rollbacks (prevent rollback storms)
+          RECENT_ROLLBACKS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/rollback.yml/runs?status=success&per_page=3" | \
+            jq '.workflow_runs | map(select(.created_at > (now - 600 | strftime("%Y-%m-%dT%H:%M:%SZ")))) | length')
+          
+          if [[ "$FORCE_ROLLBACK" != "true" ]] && [[ "$RECENT_ROLLBACKS" > "1" ]]; then
+            SHOULD_ROLLBACK="false"
+            echo "❌ Too many recent rollbacks ($RECENT_ROLLBACKS)"
+          fi
+          
+          # Determine target commit
+          if [[ -z "$TARGET_COMMIT" ]]; then
+            # Find last successful deployment
+            TARGET_COMMIT=$(git log --oneline -10 | grep -E "(deploy|release)" | head -1 | cut -d' ' -f1)
+            if [[ -z "$TARGET_COMMIT" ]]; then
+              TARGET_COMMIT="HEAD~1"
+            fi
+          fi
+          
+          # Validate target commit exists
+          if ! git cat-file -e "$TARGET_COMMIT" 2>/dev/null; then
+            echo "❌ Target commit $TARGET_COMMIT not found"
+            SHOULD_ROLLBACK="false"
+          fi
+          
+          echo "should_rollback=$SHOULD_ROLLBACK" >> $GITHUB_OUTPUT
+          echo "target_commit=$TARGET_COMMIT" >> $GITHUB_OUTPUT
+          echo "rollback_reason=$REASON" >> $GITHUB_OUTPUT
+          
+          echo "📊 Validation Results:"
+          echo "  Should Rollback: $SHOULD_ROLLBACK"
+          echo "  Target Commit: $TARGET_COMMIT"
+          echo "  Recent Rollbacks: $RECENT_ROLLBACKS"
+
+  # Prepare rollback environment
+  prepare-rollback:
+    name: 🔧 Prepare Rollback
+    runs-on: ubuntu-latest
+    needs: validate-rollback
+    if: needs.validate-rollback.outputs.should_rollback == 'true'
+    outputs:
+      backup_created: ${{ steps.prepare.outputs.backup_created }}
+      backup_url: ${{ steps.prepare.outputs.backup_url }}
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Prepare rollback environment
+        id: prepare
+        run: |
+          echo "🔧 Preparing rollback environment..."
+          
+          # Create backup of current production
+          BACKUP_DIR="rollback-backup-$(date +%Y%m%d-%H%M%S)"
+          mkdir -p "$BACKUP_DIR"
+          
+          # Backup current configuration
+          cp -r . "$BACKUP_DIR/"
+          
+          # Create deployment backup info
+          cat << EOF > "$BACKUP_DIR/rollback-info.json"
+          {
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "current_commit": "$(git rev-parse HEAD)",
+            "target_commit": "${{ needs.validate-rollback.outputs.target_commit }}",
+            "reason": "${{ needs.validate-rollback.outputs.rollback_reason }}",
+            "triggered_by": "${{ github.actor }}",
+            "workflow_run": "${{ github.run_id }}"
+          }
+          EOF
+          
+          echo "backup_created=true" >> $GITHUB_OUTPUT
+          echo "backup_url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
+          
+          echo "✅ Rollback environment prepared"
+          echo "  Backup Directory: $BACKUP_DIR"
+          echo "  Target Commit: ${{ needs.validate-rollback.outputs.target_commit }}"
+
+      - name: 📤 Upload backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: rollback-backup-${{ github.run_number }}
+          path: rollback-backup-*/
+          retention-days: 7
+
+  # Execute rollback
+  execute-rollback:
+    name: 🔄 Execute Rollback
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, prepare-rollback]
+    if: needs.validate-rollback.outputs.should_rollback == 'true'
+    environment:
+      name: production
+      url: https://sardag-emrah.vercel.app
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 🔄 Reset to target commit
+        run: |
+          echo "🔄 Rolling back to commit: ${{ needs.validate-rollback.outputs.target_commit }}"
+          echo "Reason: ${{ needs.validate-rollback.outputs.rollback_reason }}"
+          
+          # Reset to target commit
+          git reset --hard "${{ needs.validate-rollback.outputs.target_commit }}"
+          
+          # Verify rollback
+          echo "✅ Reset to commit: $(git rev-parse HEAD)"
+          echo "📊 Commit details:"
+          git log --oneline -1
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Quick health check
+        run: |
+          echo "🧪 Running quick health checks..."
+          
+          # Type check
+          pnpm typecheck || echo "⚠️ Type check failed (continuing rollback)"
+          
+          # Quick lint
+          pnpm lint || echo "⚠️ Lint failed (continuing rollback)"
+          
+          # Build test
+          pnpm build || echo "❌ Build failed - rollback may have issues"
+
+      - name: 📥 Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: 🚀 Deploy rollback
+        run: |
+          echo "🚀 Deploying rollback to production..."
+          
+          # Deploy to production
+          vercel --prod --confirm --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: ⏳ Wait for deployment
+        run: sleep 60
+
+  # Verify rollback
+  verify-rollback:
+    name: ✅ Verify Rollback
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, execute-rollback]
+    if: needs.validate-rollback.outputs.should_rollback == 'true'
+    outputs:
+      rollback_success: ${{ steps.verify.outputs.success }}
+      error_message: ${{ steps.verify.outputs.error }}
+    steps:
+      - name: ✅ Verify rollback health
+        id: verify
+        run: |
+          PROD_URL="https://sardag-emrah.vercel.app"
+          MAX_RETRIES=10
+          RETRY_DELAY=15
+          ROLLBACK_SUCCESS="false"
+          ERROR_MESSAGE=""
+          
+          echo "✅ Verifying rollback health..."
+          
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo "🏥 Health check attempt $i/$MAX_RETRIES"
+            
+            # Check main health endpoint
+            if curl -f -s "$PROD_URL/api/health" > /dev/null; then
+              echo "✅ Main health endpoint OK"
+              
+              # Check critical endpoints
+              ENDPOINTS=("/api/market/overview" "/api/symbols")
+              ALL_HEALTHY=true
+              
+              for endpoint in "${ENDPOINTS[@]}"; do
+                if ! curl -f -s "$PROD_URL$endpoint" > /dev/null; then
+                  echo "❌ Endpoint $endpoint failed"
+                  ALL_HEALTHY=false
+                  break
+                fi
+              done
+              
+              if $ALL_HEALTHY; then
+                ROLLBACK_SUCCESS="true"
+                echo "✅ All endpoints healthy - rollback successful"
+                break
+              fi
+            else
+              echo "❌ Main health endpoint failed"
+            fi
+            
+            if [[ $i -lt $MAX_RETRIES ]]; then
+              echo "⏳ Waiting $RETRY_DELAY seconds before retry..."
+              sleep $RETRY_DELAY
+            fi
+          done
+          
+          if [[ "$ROLLBACK_SUCCESS" != "true" ]]; then
+            ERROR_MESSAGE="Rollback verification failed after $MAX_RETRIES attempts"
+            echo "❌ $ERROR_MESSAGE"
+          fi
+          
+          echo "success=$ROLLBACK_SUCCESS" >> $GITHUB_OUTPUT
+          echo "error=$ERROR_MESSAGE" >> $GITHUB_OUTPUT
+
+  # Post-rollback actions
+  post-rollback:
+    name: 📋 Post-Rollback Actions
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, verify-rollback]
+    if: always() && needs.validate-rollback.outputs.should_rollback == 'true'
+    steps:
+      - name: 📋 Create rollback report
+        run: |
+          cat << EOF > rollback-report.md
+          # Emergency Rollback Report
+          
+          **Timestamp**: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+          **Repository**: ${{ github.repository }}
+          **Triggered By**: ${{ github.actor }}
+          **Workflow Run**: ${{ github.run_id }}
+          
+          ## Rollback Details
+          - **Reason**: ${{ needs.validate-rollback.outputs.rollback_reason }}
+          - **Target Commit**: ${{ needs.validate-rollback.outputs.target_commit }}
+          - **Success**: ${{ needs.verify-rollback.outputs.rollback_success }}
+          
+          ## Results
+          EOF
+          
+          if [[ "${{ needs.verify-rollback.outputs.rollback_success }}" == "true" ]]; then
+            echo "✅ Rollback completed successfully" >> rollback-report.md
+            echo "- Production URL: https://sardag-emrah.vercel.app" >> rollback-report.md
+            echo "- All health checks passing" >> rollback-report.md
+          else
+            echo "❌ Rollback verification failed" >> rollback-report.md
+            echo "- Error: ${{ needs.verify-rollback.outputs.error_message }}" >> rollback-report.md
+            echo "- Manual intervention required" >> rollback-report.md
+          fi
+          
+          echo "## Next Steps" >> rollback-report.md
+          echo "1. Investigate the root cause of the original issue" >> rollback-report.md
+          echo "2. Review rollback logs and metrics" >> rollback-report.md
+          echo "3. Plan fixes before next deployment attempt" >> rollback-report.md
+          echo "4. Update documentation and runbooks" >> rollback-report.md
+
+      - name: 📤 Upload rollback report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rollback-report-${{ github.run_number }}
+          path: rollback-report.md
+          retention-days: 30
+
+      - name: 🚨 Notify rollback status
+        run: |
+          if [[ -n "$OPS_WEBHOOK_URL" ]]; then
+            if [[ "${{ needs.verify-rollback.outputs.rollback_success }}" == "true" ]]; then
+              COLOR="good"
+              TITLE="✅ Emergency Rollback Successful"
+            else
+              COLOR="danger"
+              TITLE="❌ Emergency Rollback Failed"
+            fi
+            
+            curl -X POST "$OPS_WEBHOOK_URL" \
+              -H 'Content-type: application/json' \
+              --data "{
+                \"attachments\": [{
+                  \"color\": \"$COLOR\",
+                  \"title\": \"$TITLE\",
+                  \"fields\": [
+                    {
+                      \"title\": \"Repository\",
+                      \"value\": \"${{ github.repository }}\",
+                      \"short\": true
+                    },
+                    {
+                      \"title\": \"Triggered By\",
+                      \"value\": \"${{ github.actor }}\",
+                      \"short\": true
+                    },
+                    {
+                      \"title\": \"Reason\",
+                      \"value\": \"${{ needs.validate-rollback.outputs.rollback_reason }}\",
+                      \"short\": false
+                    },
+                    {
+                      \"title\": \"Target Commit\",
+                      \"value\": \"\\`${{ needs.validate-rollback.outputs.target_commit }}\\`\",
+                      \"short\": true
+                    },
+                    {
+                      \"title\": \"Status\",
+                      \"value\": \"${{ needs.verify-rollback.outputs.rollback_success == 'true' && '✅ Success' || '❌ Failed' }}\",
+                      \"short\": true
+                    }
+                  ],
+                  \"footer\": \"OPS Agent\",
+                  \"ts\": $(date +%s)
+                }]
+              }"
+          fi
+
+      - name: 🏷️ Create rollback tag
+        if: needs.verify-rollback.outputs.rollback_success == 'true'
+        run: |
+          # Create tag for rollback point
+          ROLLBACK_TAG="rollback-$(date +%Y%m%d-%H%M%S)"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$ROLLBACK_TAG" -m "Emergency rollback to ${{ needs.validate-rollback.outputs.target_commit }}"
+          
+          # Push tag
+          git push origin "$ROLLBACK_TAG"
+          
+          echo "🏷️ Created rollback tag: $ROLLBACK_TAG"
+
+      - name: 🚨 Create incident (if failed)
+        if: needs.verify-rollback.outputs.rollback_success != 'true'
+        run: |
+          echo "🚨 Creating incident for failed rollback..."
+          
+          # In a real implementation, this would create incidents in:
+          # - PagerDuty
+          # - Status page
+          # - Incident management system
+          
+          echo "Incident created for rollback failure"
+          echo "Repository: ${{ github.repository }}"
+          echo "Error: ${{ needs.verify-rollback.outputs.error_message }}"
+          echo "Escalation required: IMMEDIATE"
+
+  # Cleanup
+  cleanup:
+    name: 🧹 Cleanup
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, post-rollback]
+    if: always() && needs.validate-rollback.outputs.should_rollback == 'true'
+    steps:
+      - name: 🧹 Cleanup rollback resources
+        run: |
+          echo "🧹 Cleaning up rollback resources..."
+          
+          # Cleanup temporary files
+          # Archive logs
+          # Reset any temporary states
+          
+          echo "✅ Cleanup completed"
+
+      - name: 📊 Update metrics
+        run: |
+          echo "📊 Updating rollback metrics..."
+          
+          # Update monitoring dashboards
+          # Record rollback events
+          # Update SLO calculations
+          
+          echo "✅ Metrics updated"

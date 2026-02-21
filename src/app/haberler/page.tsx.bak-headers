@@ -1,0 +1,587 @@
+'use client';
+
+/**
+ * 📰 KRİPTO HABERLER SAYFASI
+ * - RapidAPI + Groq AI entegrasyonu
+ * - Türkçe çeviri
+ * - Sadece önemli haberler (>= 7/10)
+ * - Kategori filtreleri
+ * - Auto-refresh
+ */
+
+import { useState, useEffect } from 'react';
+import { SharedSidebar } from '@/components/SharedSidebar';
+import { PWAProvider } from '@/components/PWAProvider';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { COLORS } from '@/lib/colors';
+import { Icons } from '@/components/Icons';
+import type { CryptoNewsItemWithTranslation, CryptoNewsAPIResponse } from '@/types/rapid-api';
+
+export default function HaberlerPage() {
+  const [news, setNews] = useState<CryptoNewsItemWithTranslation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedNews, setSelectedNews] = useState<CryptoNewsItemWithTranslation | null>(null);
+  const [countdown, setCountdown] = useState(10);
+
+  // Fetch news
+  const fetchNews = async (refresh: boolean = false) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const url = refresh ? '/api/crypto-news?refresh=true' : '/api/crypto-news';
+      const response = await fetch(url);
+      const result: CryptoNewsAPIResponse = await response.json();
+
+      if (result.success) {
+        setNews(result.data);
+        console.log(`📰 ${result.data.length} önemli haber yüklendi${result.cached ? ' (cache)' : ''}`);
+      } else {
+        setError(result.error || 'Haberler yüklenemedi');
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial load
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  // Auto-refresh every 10 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchNews();
+    }, 10 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Countdown
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown(prev => (prev > 0 ? prev - 1 : 10));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Filter news
+  const filteredNews = news.filter(item => {
+    if (selectedCategory === 'all') return true;
+    return item.category === selectedCategory;
+  });
+
+  // Categories
+  const categories = [
+    { key: 'all', label: 'Tümü', icon: Icons.Fire },
+    { key: 'bitcoin', label: 'Bitcoin', icon: Icons.TrendingUp },
+    { key: 'ethereum', label: 'Ethereum', icon: Icons.Atom },
+    { key: 'regulation', label: 'Düzenleme', icon: Icons.Shield },
+    { key: 'defi', label: 'DeFi', icon: Icons.Bot },
+    { key: 'market', label: 'Piyasa', icon: Icons.TrendingUp },
+  ];
+
+  return (
+    <PWAProvider>
+      <div className="dashboard-container">
+        {/* Sidebar */}
+        <SharedSidebar
+          currentPage="haberler"
+        />
+
+        {/* Main Content */}
+        <div className="dashboard-main">
+          {/* Header */}
+          <header className="dashboard-header" style={{ borderBottom: `1px solid ${COLORS.bg.primary}`, paddingBottom: '16px' }}>
+            <div className="header-left">
+              <h1 className="header-title neon-text">📰 KRİPTO HABERLER</h1>
+            </div>
+
+            <div className="header-right">
+              <div className="header-stat">
+                <Icons.Fire style={{ fontSize: '16px', color: COLORS.gray[500] }} />
+                <span className="stat-value">{news.length}</span>
+                <span className="stat-label">Haber</span>
+              </div>
+              <div className="header-stat">
+                <Icons.Refresh style={{ fontSize: '16px', color: COLORS.gray[500] }} />
+                <span className="stat-value">{countdown}m</span>
+              </div>
+              <HeaderActions onAiAssistantOpen={() => {}} />
+            </div>
+          </header>
+
+          {/* Filters */}
+          <div style={{
+            padding: '16px 24px',
+            background: COLORS.bg.secondary,
+            borderBottom: `1px solid ${COLORS.border.default}`,
+            display: 'flex',
+            gap: '12px',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+          }}>
+            <span style={{ color: COLORS.text.muted, fontSize: '14px', fontWeight: '600' }}>
+              Kategori:
+            </span>
+            {categories.map(cat => {
+              const IconComponent = cat.icon;
+              const isActive = selectedCategory === cat.key;
+
+              return (
+                <button
+                  key={cat.key}
+                  onClick={() => setSelectedCategory(cat.key)}
+                  style={{
+                    padding: '8px 16px',
+                    background: isActive ? COLORS.premium : 'transparent',
+                    border: `1px solid ${isActive ? COLORS.premium : COLORS.border.default}`,
+                    borderRadius: '6px',
+                    color: isActive ? '#ffffff' : COLORS.text.primary,
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseOver={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'transparent';
+                    }
+                  }}
+                >
+                  <IconComponent style={{ width: '16px', height: '16px' }} />
+                  {cat.label}
+                </button>
+              );
+            })}
+
+            <button
+              onClick={() => fetchNews(true)}
+              style={{
+                marginLeft: 'auto',
+                padding: '8px 16px',
+                background: 'transparent',
+                border: `1px solid ${COLORS.border.default}`,
+                borderRadius: '6px',
+                color: COLORS.text.primary,
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Icons.Zap style={{ width: '16px', height: '16px' }} />
+              Yenile
+            </button>
+          </div>
+
+          {/* Content */}
+          <main className="dashboard-content" style={{ padding: '24px' }}>
+            {/* Loading */}
+            {loading && (
+              <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+                <LoadingAnimation />
+                <p style={{ color: COLORS.text.muted, marginTop: '16px' }}>
+                  Haberler yükleniyor ve Türkçe'ye çevriliyor...
+                </p>
+              </div>
+            )}
+
+            {/* Error */}
+            {error && !loading && (
+              <div style={{
+                background: 'rgba(255,0,0,0.1)',
+                border: `1px solid ${COLORS.danger}`,
+                borderRadius: '8px',
+                padding: '24px',
+                textAlign: 'center',
+              }}>
+                <Icons.Fire style={{ width: '48px', height: '48px', color: COLORS.danger, margin: '0 auto 16px' }} />
+                <h3 style={{ color: COLORS.danger, marginBottom: '8px' }}>Hata</h3>
+                <p style={{ color: COLORS.text.secondary }}>{error}</p>
+                <button
+                  onClick={() => fetchNews(true)}
+                  style={{
+                    marginTop: '16px',
+                    padding: '8px 24px',
+                    background: COLORS.danger,
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                  }}
+                >
+                  Tekrar Dene
+                </button>
+              </div>
+            )}
+
+            {/* News Grid */}
+            {!loading && !error && (
+              <>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+                  gap: '20px',
+                }}>
+                  {filteredNews.map((item) => (
+                    <NewsCard
+                      key={item.id}
+                      news={item}
+                      onClick={() => setSelectedNews(item)}
+                    />
+                  ))}
+                </div>
+
+                {filteredNews.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+                    <Icons.Bot style={{ width: '64px', height: '64px', color: COLORS.text.muted, margin: '0 auto 16px' }} />
+                    <h3 style={{ color: COLORS.text.muted }}>Bu kategoride haber bulunamadı</h3>
+                  </div>
+                )}
+              </>
+            )}
+          </main>
+        </div>
+
+        {/* News Modal */}
+        {selectedNews && (
+          <NewsModal
+            news={selectedNews}
+            onClose={() => setSelectedNews(null)}
+          />
+        )}
+      </div>
+    </PWAProvider>
+  );
+}
+
+// ============================================
+// NEWS CARD COMPONENT
+// ============================================
+function NewsCard({
+  news,
+  onClick,
+}: {
+  news: CryptoNewsItemWithTranslation;
+  onClick: () => void;
+}) {
+  const sentimentColor =
+    news.sentiment === 'positive' ? COLORS.success :
+    news.sentiment === 'negative' ? COLORS.danger :
+    COLORS.warning;
+
+  const sentimentIcon =
+    news.sentiment === 'positive' ? '📈' :
+    news.sentiment === 'negative' ? '📉' :
+    '➡️';
+
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        background: COLORS.bg.primary,
+        border: `1px solid ${COLORS.border.default}`,
+        borderRadius: '12px',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        transition: 'all 0.3s',
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = `0 8px 24px rgba(255,255,255,0.1)`;
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'none';
+      }}
+    >
+      {/* Image */}
+      <div style={{
+        width: '100%',
+        height: '200px',
+        background: `url(${news.image}) center/cover`,
+        position: 'relative',
+      }}>
+        {/* Impact Badge */}
+        <div style={{
+          position: 'absolute',
+          top: '12px',
+          right: '12px',
+          background: 'rgba(0,0,0,0.8)',
+          backdropFilter: 'blur(8px)',
+          padding: '6px 12px',
+          borderRadius: '20px',
+          fontSize: '12px',
+          fontWeight: '700',
+          color: '#ffffff',
+        }}>
+          🔥 {news.impactScore}/10
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: '16px' }}>
+        {/* Title */}
+        <h3 style={{
+          color: COLORS.text.primary,
+          fontSize: '16px',
+          fontWeight: '600',
+          marginBottom: '8px',
+          lineHeight: '1.4',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}>
+          {news.titleTR}
+        </h3>
+
+        {/* Description */}
+        <p style={{
+          color: COLORS.text.secondary,
+          fontSize: '14px',
+          lineHeight: '1.5',
+          marginBottom: '12px',
+          display: '-webkit-box',
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}>
+          {news.descriptionTR}
+        </p>
+
+        {/* Meta */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginTop: '12px',
+          paddingTop: '12px',
+          borderTop: `1px solid ${COLORS.border.default}`,
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '12px',
+            color: COLORS.text.muted,
+          }}>
+            <span>{sentimentIcon}</span>
+            <span>{news.source.name}</span>
+            <span>•</span>
+            <span>{new Date(news.publishedAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+
+          <div style={{
+            padding: '4px 8px',
+            background: `${sentimentColor}20`,
+            color: sentimentColor,
+            borderRadius: '4px',
+            fontSize: '11px',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+          }}>
+            {news.category}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================
+// NEWS MODAL COMPONENT
+// ============================================
+function NewsModal({
+  news,
+  onClose,
+}: {
+  news: CryptoNewsItemWithTranslation;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0,0,0,0.8)',
+        backdropFilter: 'blur(8px)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: COLORS.bg.primary,
+          border: `1px solid ${COLORS.border.default}`,
+          borderRadius: '12px',
+          maxWidth: '800px',
+          width: '100%',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          boxShadow: '0 0 40px rgba(255,255,255,0.3)',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{
+          padding: '24px',
+          borderBottom: `1px solid ${COLORS.border.default}`,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+        }}>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '8px',
+            }}>
+              <span style={{
+                background: 'rgba(255,100,0,0.2)',
+                color: '#ff6400',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                fontSize: '12px',
+                fontWeight: '700',
+              }}>
+                🔥 ÖNEM: {news.impactScore}/10
+              </span>
+              <span style={{
+                background: `${COLORS.premium}20`,
+                color: COLORS.premium,
+                padding: '4px 8px',
+                borderRadius: '4px',
+                fontSize: '12px',
+                fontWeight: '700',
+                textTransform: 'uppercase',
+              }}>
+                {news.category}
+              </span>
+            </div>
+
+            <h2 className="neon-text" style={{ fontSize: '1.75rem', margin: '12px 0' }}>
+              {news.titleTR}
+            </h2>
+
+            <div style={{
+              color: COLORS.text.muted,
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}>
+              <span>📰 {news.source.name}</span>
+              <span>•</span>
+              <span>📅 {new Date(news.publishedAt).toLocaleDateString('tr-TR')}</span>
+              <span>•</span>
+              <span>🕐 {new Date(news.publishedAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: `1px solid ${COLORS.border.default}`,
+              color: COLORS.text.primary,
+              padding: '8px 16px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: '600',
+            }}
+          >
+            KAPAT
+          </button>
+        </div>
+
+        {/* Image */}
+        <div style={{
+          width: '100%',
+          height: '300px',
+          background: `url(${news.image}) center/cover`,
+        }} />
+
+        {/* Content */}
+        <div style={{ padding: '24px' }}>
+          <p style={{
+            color: COLORS.text.secondary,
+            fontSize: '16px',
+            lineHeight: '1.7',
+            marginBottom: '24px',
+          }}>
+            {news.descriptionTR}
+          </p>
+
+          {/* Tags */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px',
+            marginBottom: '24px',
+          }}>
+            {news.tags.map((tag, idx) => (
+              <span
+                key={idx}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  color: COLORS.text.secondary,
+                  padding: '4px 12px',
+                  borderRadius: '16px',
+                  fontSize: '12px',
+                }}
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+
+          {/* Original Link */}
+          <a
+            href={news.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              padding: '12px 24px',
+              background: COLORS.premium,
+              color: '#ffffff',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              fontWeight: '600',
+              fontSize: '14px',
+            }}
+          >
+            🔗 Orijinal Haberi Oku
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}

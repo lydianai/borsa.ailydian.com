@@ -1,0 +1,68 @@
+# 🐳 DOCKERIGNORE
+# ================
+# Exclude files from Docker build context
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Testing
+tests/
+test/
+*.test.py
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Docker
+Dockerfile.template
+docker-compose.yml
+.dockerignore
+
+# PM2
+ecosystem.config.js
+
+# Misc
+*.bak
+*.tmp
+*.temp
+.cache/

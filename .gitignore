@@ -1,0 +1,70 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build & cache
+.next/
+out/
+build/
+dist/
+.turbo/
+.cache/
+.tmp/
+
+# Environment (NEVER commit)
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Secrets & certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+keys/
+Telegram/*.json
+Telegram/*.env
+
+# Python
+venv/
+**/venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Runtime data (large)
+**/queue/
+**/logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Binary libraries
+Ta-Lib/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel/
+
+# Generated
+/generated/prisma
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo

@@ -1,0 +1,8 @@
+ignoredBuiltDependencies:
+  - '@sentry/cli'
+  - '@vercel/speed-insights'
+  - bcrypt
+  - esbuild
+  - msgpackr-extract
+  - protobufjs
+  - sharp
