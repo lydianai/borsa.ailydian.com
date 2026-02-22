@@ -277,7 +277,7 @@ Please review and approve or reject this fix plan.`;
    */
   private async isStagingHealthy(): Promise<boolean> {
     try {
-      const response = await fetch('https://sardag-emrah-staging.vercel.app/api/health');
+      const response = await fetch('https://lytrade-staging.vercel.app/api/health');
       return response.ok;
     } catch {
       return false;

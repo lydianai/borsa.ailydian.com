@@ -1,5 +1,5 @@
 /**
- * 🔍 LyTrade-EMRAH OPS AGENT - Health Checker
+ * 🔍 LyTrade OPS AGENT - Health Checker
  * 
  * Sistem sağlığını kategorize eder:
  * - healthz: HTTP/WS endpoint'leri, lag ölçümü
@@ -281,7 +281,7 @@ export class HealthChecker {
       }
 
       const content = await response.text();
-      if (!content.includes('SarDag Emrah')) {
+      if (!content.includes('LyTrade')) {
         issues.push({
           category: 'ui',
           severity: 'medium',

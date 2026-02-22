@@ -120,7 +120,7 @@ export class DeploymentExecutors {
       if (!this.dryRun) {
         console.log(`  🚀 Deploying to canary environment...`);
         // Vercel canary deployment
-        execSync(`vercel --name sardag-emrah-canary --confirm`, { cwd: this.workspaceRoot, stdio: 'pipe' });
+        execSync(`vercel --name lytrade-canary --confirm`, { cwd: this.workspaceRoot, stdio: 'pipe' });
       }
 
       // Monitor deployment health
@@ -172,7 +172,7 @@ export class DeploymentExecutors {
       // Deploy to green environment
       if (!this.dryRun) {
         console.log('  🚀 Deploying to green environment...');
-        execSync('vercel --name sardag-emrah-green --confirm', { cwd: this.workspaceRoot, stdio: 'pipe' });
+        execSync('vercel --name lytrade-green --confirm', { cwd: this.workspaceRoot, stdio: 'pipe' });
       }
 
       // Health check green environment
@@ -282,7 +282,7 @@ ${plan.rollbackPlan ? `- ${plan.rollbackPlan.type}: ${plan.rollbackPlan.target}`
     };
 
     if (!this.dryRun) {
-      const response = await fetch('https://api.github.com/repos/sardag-emrah/sardag-emrah/pulls', {
+      const response = await fetch('https://api.github.com/repos/lydianai/borsa.ailydian.com/pulls', {
         method: 'POST',
         headers: {
           'Authorization': `token ${this.githubToken}`,
@@ -299,7 +299,7 @@ ${plan.rollbackPlan ? `- ${plan.rollbackPlan.type}: ${plan.rollbackPlan.target}`
       return pr.html_url;
     }
 
-    return 'https://github.com/sardag-emrah/sardag-emrah/pull/dry-run';
+    return 'https://github.com/lydianai/borsa.ailydian.com/pull/dry-run';
   }
 
   /**
@@ -310,9 +310,9 @@ ${plan.rollbackPlan ? `- ${plan.rollbackPlan.type}: ${plan.rollbackPlan.target}`
     
     // Check multiple health endpoints
     const checks = [
-      this.checkEndpoint('https://sardag-emrah-canary.vercel.app/api/health'),
-      this.checkEndpoint('https://sardag-emrah-canary.vercel.app/api/market/overview'),
-      this.checkEndpoint('https://sardag-emrah-canary.vercel.app/api/symbols')
+      this.checkEndpoint('https://lytrade-canary.vercel.app/api/health'),
+      this.checkEndpoint('https://lytrade-canary.vercel.app/api/market/overview'),
+      this.checkEndpoint('https://lytrade-canary.vercel.app/api/symbols')
     ];
 
     const results = await Promise.allSettled(checks);
@@ -326,7 +326,7 @@ ${plan.rollbackPlan ? `- ${plan.rollbackPlan.type}: ${plan.rollbackPlan.target}`
    */
   private async checkDeploymentHealth(deploymentId: string): Promise<boolean> {
     try {
-      const response = await fetch('https://sardag-emrah-canary.vercel.app/api/health', {
+      const response = await fetch('https://lytrade-canary.vercel.app/api/health', {
         timeout: 10000
       });
       return response.ok;
@@ -340,7 +340,7 @@ ${plan.rollbackPlan ? `- ${plan.rollbackPlan.type}: ${plan.rollbackPlan.target}`
    */
   private async checkGreenEnvironmentHealth(): Promise<boolean> {
     try {
-      const response = await fetch('https://sardag-emrah-green.vercel.app/api/health', {
+      const response = await fetch('https://lytrade-green.vercel.app/api/health', {
         timeout: 10000
       });
       return response.ok;
