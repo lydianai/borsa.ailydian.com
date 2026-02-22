@@ -1,4 +1,4 @@
-// Ailydian Signal - AI-Powered Crypto Trading Platform
+// LyTrade Scanner - AI-Powered Crypto Trading Platform
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -10,71 +10,40 @@ import { Providers } from '@/components/Providers';
 import './globals.css';
 import '@/styles/animations.css';
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://borsa.ailydian.com';
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Ailydian Signal - Yapay Zeka Destekli Kripto Para Trading Sinyalleri',
-    template: '%s | Ailydian Signal'
+    default: 'LyTrade Scanner - AI-Powered Crypto Trading Signals',
+    template: '%s | LyTrade Scanner'
   },
-  description: '617 kripto para çifti için gerçek zamanlı Ailydian yapay zeka trading sinyalleri. 18+ strateji, teknik analiz, whale takibi ve akıllı risk yönetimi ile profesyonel kripto trading platformu.',
-  applicationName: 'Ailydian Signal',
+  description: 'Open-source AI-powered crypto trading platform with real-time signals for 600+ pairs. Multi-strategy analysis, whale tracking, and professional risk management.',
+  applicationName: 'LyTrade Scanner',
   keywords: [
-    // Türkçe ana kelimeler
-    'Ailydian kripto sinyalleri',
-    'kripto trading sinyalleri',
-    'binance futures sinyalleri',
-    'yapay zeka trading',
-    'Ailydian yapay zeka',
-    'teknik analiz',
-    'whale tracker',
-    'kripto trading bot',
-    'futures trading',
-    'bitcoin sinyalleri',
-    'ethereum analiz',
-    'altcoin sinyalleri',
-    'risk yönetimi',
-    'trading stratejileri',
-    'anlık sinyal',
-    'kripto piyasa analizi',
-    'borsa sinyalleri',
-    'kripto para takibi',
-    'otomatik ticaret',
-    'algoritmik trading',
-    'piyasa tarayıcı',
-
-    // İngilizce keywords (global SEO)
-    'Ailydian crypto signals',
     'crypto trading signals',
-    'Ailydian artificial intelligence',
+    'open source trading platform',
     'binance futures signals',
-    'cryptocurrency trading bot',
-    'whale tracking',
-    'technical analysis crypto',
-    'real-time crypto signals',
-    'bitcoin trading signals',
+    'ai trading',
+    'technical analysis',
+    'whale tracker',
+    'crypto trading bot',
+    'futures trading',
+    'bitcoin signals',
     'altcoin signals',
     'crypto market scanner',
     'automated trading',
     'algorithmic trading',
     'perpetual futures',
     'crypto portfolio management',
-
-    // Uzun kuyruk keywords
-    'Ailydian trading platform',
-    'en iyi kripto sinyalleri 2025',
-    'ücretsiz kripto analiz',
-    '617 kripto para tarama',
-    'yapay zeka destekli yatırım',
-    'whale takip sistemi',
+    'real-time crypto signals',
     'conservative buy signals',
-    'quantum trading signals',
-    'real-time market analysis',
-    'Ailydian signal platform'
+    'multi-strategy analysis',
+    'risk management',
+    'self-hosted trading',
   ],
-  authors: [{ name: 'Ailydian', url: 'https://ailydian.com' }],
-  creator: 'Ailydian',
-  publisher: 'Ailydian',
+  authors: [{ name: 'LyTrade', url: 'https://github.com/AiLydian/lytrade-scanner' }],
+  creator: 'LyTrade',
+  publisher: 'LyTrade',
   manifest: '/manifest.json',
   metadataBase: new URL(siteUrl),
 
@@ -84,36 +53,33 @@ export const metadata: Metadata = {
     locale: 'tr_TR',
     alternateLocale: ['en_US', 'en_GB', 'de_DE', 'fr_FR', 'es_ES', 'ru_RU', 'ar_SA', 'zh_CN', 'ja_JP'],
     url: siteUrl,
-    siteName: 'Ailydian Signal',
-    title: 'Ailydian Signal - Yapay Zeka Destekli Kripto Trading Platformu',
-    description: '617 kripto para için gerçek zamanlı Ailydian yapay zeka sinyalleri. 18+ strateji ile profesyonel trading analizi. Whale takibi, teknik göstergeler ve akıllı risk yönetimi.',
+    siteName: 'LyTrade Scanner',
+    title: 'LyTrade Scanner - AI-Powered Crypto Trading Platform',
+    description: 'Open-source AI-powered crypto trading signals for 600+ pairs. Multi-strategy analysis, whale tracking, and professional risk management.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Ailydian Signal - AI-Powered Crypto Trading Platform',
+        alt: 'LyTrade Scanner - AI-Powered Crypto Trading Platform',
         type: 'image/png',
       },
       {
         url: '/og-image-square.png',
         width: 1200,
         height: 1200,
-        alt: 'Ailydian Signal Logo',
+        alt: 'LyTrade Scanner Logo',
         type: 'image/png',
       }
     ],
-    emails: ['info@ailydian.com'],
   },
 
   // Twitter Card
   twitter: {
     card: 'summary_large_image',
-    title: 'Ailydian Signal - AI Kripto Trading Sinyalleri',
-    description: '617 kripto para için gerçek zamanlı Ailydian yapay zeka trading sinyalleri. Profesyonel analiz, whale takibi ve risk yönetimi.',
+    title: 'LyTrade Scanner - AI Crypto Trading Signals',
+    description: 'Open-source AI-powered crypto trading signals for 600+ pairs. Multi-strategy analysis, whale tracking, and risk management.',
     images: ['/og-image.png'],
-    creator: '@ailydian',
-    site: '@ailydian',
   },
 
   // Icons & Favicons
@@ -136,7 +102,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Ailydian Signal',
+    title: 'LyTrade Scanner',
     startupImage: [
       {
         url: '/icons/apple-splash-2048-2732.png',
@@ -201,16 +167,16 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Ailydian Signal" />
+        <meta name="apple-mobile-web-app-title" content="LyTrade Scanner" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 
         {/* Multi-language support - hreflang */}
-        <link rel="alternate" hrefLang="tr" href="https://borsa.ailydian.com" />
-        <link rel="alternate" hrefLang="en" href="https://borsa.ailydian.com/en" />
-        <link rel="alternate" hrefLang="x-default" href="https://borsa.ailydian.com" />
+        <link rel="alternate" hrefLang="tr" href={siteUrl} />
+        <link rel="alternate" hrefLang="en" href={`${siteUrl}/en`} />
+        <link rel="alternate" hrefLang="x-default" href={siteUrl} />
 
         {/* Canonical URL */}
-        <link rel="canonical" href="https://borsa.ailydian.com" />
+        <link rel="canonical" href={siteUrl} />
 
         {/* Preconnect for performance */}
         <link rel="preconnect" href="https://fstream.binance.com" />
@@ -236,19 +202,12 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Organization',
-              name: 'Ailydian',
-              url: 'https://ailydian.com',
-              logo: 'https://borsa.ailydian.com/og-image-square.png',
+              name: 'LyTrade',
+              url: siteUrl,
+              logo: `${siteUrl}/og-image-square.png`,
               sameAs: [
-                'https://twitter.com/ailydian',
-                'https://linkedin.com/company/ailydian',
-              ],
-              contactPoint: {
-                '@type': 'ContactPoint',
-                contactType: 'Customer Support',
-                email: 'info@ailydian.com',
-                availableLanguage: ['Turkish', 'English']
-              }
+                'https://github.com/AiLydian/lytrade-scanner',
+              ]
             }),
           }}
         />
@@ -260,10 +219,10 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'WebApplication',
-              name: 'Ailydian Signal',
-              alternateName: 'Ailydian Kripto Trading Platform',
-              description: '617 kripto para için gerçek zamanlı Ailydian yapay zeka trading sinyalleri. Yapay zeka destekli piyasa analizi, whale takibi ve profesyonel trading stratejileri.',
-              url: 'https://borsa.ailydian.com',
+              name: 'LyTrade Scanner',
+              alternateName: 'AI Crypto Trading Platform',
+              description: 'Open-source AI-powered crypto trading signals for 600+ pairs. Multi-strategy analysis, whale tracking, and professional risk management.',
+              url: siteUrl,
               applicationCategory: 'FinanceApplication',
               operatingSystem: 'Web, iOS, Android',
               browserRequirements: 'Requires JavaScript. Requires HTML5.',
@@ -296,14 +255,14 @@ export default function RootLayout({
                 'Market Correlation Matrix'
               ],
               screenshot: [
-                'https://borsa.ailydian.com/og-image.png',
-                'https://borsa.ailydian.com/og-image-square.png'
+                `${siteUrl}/og-image.png`,
+                `${siteUrl}/og-image-square.png`
               ],
               inLanguage: ['tr-TR', 'en-US'],
               creator: {
                 '@type': 'Organization',
-                name: 'Ailydian',
-                url: 'https://ailydian.com'
+                name: 'LyTrade',
+                url: siteUrl
               }
             }),
           }}
@@ -321,25 +280,25 @@ export default function RootLayout({
                   '@type': 'ListItem',
                   position: 1,
                   name: 'Ana Sayfa',
-                  item: 'https://borsa.ailydian.com'
+                  item: siteUrl
                 },
                 {
                   '@type': 'ListItem',
                   position: 2,
                   name: 'Market Scanner',
-                  item: 'https://borsa.ailydian.com/market-scanner'
+                  item: `${siteUrl}/market-scanner`
                 },
                 {
                   '@type': 'ListItem',
                   position: 3,
                   name: 'Trading Signals',
-                  item: 'https://borsa.ailydian.com/trading-signals'
+                  item: `${siteUrl}/trading-signals`
                 },
                 {
                   '@type': 'ListItem',
                   position: 4,
                   name: 'AI Signals',
-                  item: 'https://borsa.ailydian.com/ai-signals'
+                  item: `${siteUrl}/ai-signals`
                 }
               ]
             }),
@@ -356,34 +315,34 @@ export default function RootLayout({
               mainEntity: [
                 {
                   '@type': 'Question',
-                  name: 'Ailydian Signal nedir?',
+                  name: 'What is LyTrade Scanner?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Ailydian Signal, 617 kripto para çifti için gerçek zamanlı Ailydian yapay zeka destekli trading sinyalleri sunan profesyonel bir kripto analiz platformudur. 18+ yapay zeka stratejisi, whale takibi ve teknik analiz araçları ile yatırımcılara piyasa içgörüleri sağlar.'
+                    text: 'LyTrade Scanner is an open-source, AI-powered crypto trading platform providing real-time signals for 600+ cryptocurrency pairs. It combines 11+ trading strategies, whale tracking, and technical analysis tools.'
                   }
                 },
                 {
                   '@type': 'Question',
-                  name: 'Kaç kripto para çifti destekleniyor?',
+                  name: 'How many crypto pairs are supported?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: '617 farklı kripto para çifti için gerçek zamanlı analiz ve sinyal desteği sunuyoruz. Binance Futures piyasasındaki tüm major ve altcoin çiftlerini kapsıyoruz.'
+                    text: 'LyTrade Scanner supports 600+ cryptocurrency pairs from Binance Futures, covering all major and altcoin pairs with real-time analysis and signal generation.'
                   }
                 },
                 {
                   '@type': 'Question',
-                  name: 'Yapay zeka trading sinyalleri nasıl çalışır?',
+                  name: 'How do the AI trading signals work?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Ailydian yapay zeka sistemimiz 18+ farklı trading stratejisini birleştirerek, teknik göstergeler, whale hareketleri, order flow, funding rate ve CVD analizlerini gerçek zamanlı olarak değerlendirir ve al/sat sinyalleri üretir.'
+                    text: 'The AI system combines 11+ different trading strategies, evaluating technical indicators, whale movements, order flow, funding rates, and CVD analysis in real-time to generate buy/sell signals with confidence scoring.'
                   }
                 },
                 {
                   '@type': 'Question',
-                  name: 'Whale tracker özelliği nedir?',
+                  name: 'Is LyTrade Scanner free to use?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Whale tracker özelliği, büyük yatırımcıların (whale) piyasadaki hareketlerini takip eder. Büyük hacimli işlemler, unusual aktiviteler ve whale pozisyonlarını analiz ederek öncü sinyaller sunar.'
+                    text: 'Yes, LyTrade Scanner is open-source under the MIT license. You can clone, run locally, and customize it for free. You only need free API keys for Binance data and optionally an AI provider for AI-powered features.'
                   }
                 }
               ]

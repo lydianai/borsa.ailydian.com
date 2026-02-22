@@ -29,9 +29,9 @@ export const getStripe = () => {
       apiVersion: STRIPE_API_VERSION,
       typescript: true,
       appInfo: {
-        name: 'Ailydian Signal',
+        name: 'LyTrade Scanner',
         version: '1.0.0',
-        url: 'https://ailydian.com',
+        url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
       },
     });
   }

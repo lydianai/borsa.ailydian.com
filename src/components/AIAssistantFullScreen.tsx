@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Ailydian AI ASSISTANT - FULL SCREEN
+ * LyTrade AI ASSISTANT - FULL SCREEN
  * Premium frameless design
  */
 
@@ -230,7 +230,7 @@ function generateCapabilitiesResponse(): string {
     'Market Yapısı Değerlendirmesi',
   ];
 
-  let response = '📋 **Ailydian AI Asistan Yetenekleri:**\n\n';
+  let response = '📋 **LyTrade AI Asistan Yetenekleri:**\n\n';
   response += '**✅ Temel Yetenekler:**\n';
   normalAbilities.forEach((ability) => {
     response += `• ${ability}\n`;
@@ -471,7 +471,7 @@ export function AIAssistantFullScreen({ isOpen, onClose }: AIAssistantFullScreen
           <Icons.Bot style={{ width: '32px', height: '32px', color: '#ffffff' }} />
           <div>
             <h1 className="neon-text" style={{ fontSize: '24px', margin: 0, fontWeight: 700 }}>
-              Ailydian AI Asistan
+              LyTrade AI Asistan
             </h1>
             <p style={{ color: '#8b8b8b', fontSize: '13px', margin: 0 }}>
               Gelişmiş AI + Tüm Stratejiler
@@ -645,7 +645,7 @@ export function AIAssistantFullScreen({ isOpen, onClose }: AIAssistantFullScreen
                   }}
                 >
                   <span style={{ fontWeight: 600 }}>
-                    {msg.role === 'user' ? 'SİZ' : 'Ailydian AI'}
+                    {msg.role === 'user' ? 'SİZ' : 'LyTrade AI'}
                   </span>
                   <span>{msg.timestamp.toLocaleTimeString('tr-TR')}</span>
                 </div>

@@ -1,4 +1,4 @@
-# robots.txt - Ailydian Signal
+# robots.txt - LyTrade Scanner
 # Enterprise-grade bot management for SEO optimization
 # Last updated: 2025
 
@@ -290,7 +290,8 @@ Disallow: /
 # ============================================
 # SITEMAPS
 # ============================================
-Sitemap: https://borsa.ailydian.com/sitemap.xml
+# Sitemap URL - update to your deployment domain
+# Sitemap: https://your-domain.com/sitemap.xml
 
 # ============================================
 # DEFAULT POLICY FOR UNKNOWN BOTS

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * 🎯 Ailydian MARKET SCANNER - Ultra Premium Edition
+ * 🎯 LyTrade MARKET SCANNER - Ultra Premium Edition
  * Real-time market scanner + Heatmap + Multi-Timeframe + Advanced Analytics
  * Unique Features:
  * - Live Heatmap Visualization

@@ -96,10 +96,8 @@ export function SharedSidebar({
   const { timeframe, sortBy, setTimeframe, setSortBy } = useGlobalFilters();
   const { unreadCount: globalUnreadCount } = useNotifications(true, 10000);
 
-  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-  const isProduction = typeof window !== 'undefined' && window.location.hostname === 'borsa.ailydian.com';
   const isAdmin = typeof window !== 'undefined' && localStorage.getItem('user-role') === 'admin';
-  const hasActivePayment = isLocalhost || isProduction || isAdmin;
+  const hasActivePayment = true; // All features available in open-source version
 
   useEffect(() => {
     setMounted(true);

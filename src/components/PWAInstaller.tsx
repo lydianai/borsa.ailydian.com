@@ -102,7 +102,7 @@ export function PWAInstaller() {
       }}
     >
       <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: '600' }}>
-        📱 Ailydian'ı Yükle
+        📱 LyTrade'i Yükle
       </div>
       <div style={{ color: '#8b8b8b', fontSize: '12px' }}>
         Uygulamayı ana ekranınıza ekleyerek daha hızlı erişim sağlayın

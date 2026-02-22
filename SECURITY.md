@@ -15,8 +15,9 @@ We take security seriously. If you discover a vulnerability, please report it re
 
 ### How to Report
 
-1. Email: **security@ailydian.com**
-2. Include:
+1. Open a **private security advisory** on GitHub: [Report a vulnerability](https://github.com/AiLydian/lytrade-scanner/security/advisories/new)
+2. Or email the maintainers directly (see GitHub profile)
+3. Include:
    - Description of the vulnerability
    - Steps to reproduce
    - Potential impact assessment
@@ -37,7 +38,7 @@ We support responsible disclosure. Security researchers acting in good faith wil
 
 - Do not access, modify, or delete user data
 - Do not disrupt services
-- Report findings exclusively to our security team
+- Report findings exclusively to the maintainers
 - Allow reasonable time for remediation before disclosure
 
 ## Security Measures
@@ -50,12 +51,8 @@ We support responsible disclosure. Security researchers acting in good faith wil
 
 ## Contact
 
-| Channel | Address |
-|---------|---------|
-| Security Reports | security@ailydian.com |
-| General Inquiries | info@ailydian.com |
-| Business | ailydian@ailydian.com |
+Report security issues via [GitHub Security Advisories](https://github.com/AiLydian/lytrade-scanner/security/advisories/new).
 
 ---
 
-*Copyright (c) 2025-2026 AiLydian. All Rights Reserved.*
+*LyTrade Scanner is open-source software licensed under the MIT License.*

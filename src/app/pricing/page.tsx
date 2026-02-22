@@ -271,7 +271,7 @@ export default function PricingPage() {
       {/* Compliance Notice */}
       <div className="max-w-4xl mx-auto mt-12 text-center text-xs text-gray-600 border-t border-gray-900 pt-6">
         <p>
-          ⚠️ <strong>Eğitim ve Analiz Aracı:</strong> Ailydian Signal sadece eğitim ve analiz amaçlı
+          ⚠️ <strong>Eğitim ve Analiz Aracı:</strong> LyTrade Scanner sadece eğitim ve analiz amaçlı
           ticaret sinyalleri sağlar. Tüm ticaret risk içerir. Geçmiş performans gelecekteki sonuçları
           garanti etmez. Lütfen sorumlu bir şekilde ticaret yapın ve kaybetmeyi göze alamayacağınız
           miktardan fazla yatırım yapmayın.
