@@ -2,7 +2,7 @@
 
 **Tarih**: 24 Ekim 2025
 **Durum**: ✅ TAMAMLANDI
-**Proje**: SARDAG Trading Scanner
+**Proje**: AiLydian Trading Scanner
 
 ---
 
@@ -175,7 +175,7 @@ useEffect(() => {
 
 ### Mevcut PWA Sistemi (Önceden Tamamlandı)
 
-✅ **manifest.json** - SARDAG branding
+✅ **manifest.json** - AiLydian branding
 ✅ **Service Worker (sw.js)** - Offline-first caching
 ✅ **PWAProvider** - App wrapper
 ✅ **PWAInstaller** - Install prompt UI
@@ -187,7 +187,7 @@ useEffect(() => {
 // Push Notifications (hazır ama henüz aktif değil)
 self.addEventListener('push', (event) => {
   let data = {
-    title: 'SARDAG Trading Scanner',
+    title: 'AiLydian Trading Scanner',
     body: 'Yeni sinyal tespit edildi!',
     icon: '/icons/icon-192x192.png',
   };

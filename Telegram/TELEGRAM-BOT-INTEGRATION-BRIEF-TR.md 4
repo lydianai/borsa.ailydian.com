@@ -1,6 +1,6 @@
 # 🤖 TELEGRAM BOT ENTEGRASYONU - KAPSAMLI BRIEF
 
-**Proje:** SARDAG-EMRAH Trading Scanner
+**Proje:** AiLydian-EMRAH Trading Scanner
 **Tarih:** 26 Ekim 2025
 **Hedef:** Minimal manuel kurulum ile Telegram bot entegrasyonu
 **Süre:** ~1 saat kurulum + otomatik çalışma
@@ -10,7 +10,7 @@
 ## 📋 İÇİNDEKİLER
 
 1. [Telegram Bot Nedir?](#telegram-bot-nedir)
-2. [SARDAG-EMRAH İçin Kullanım Senaryoları](#kullanım-senaryoları)
+2. [AiLydian-EMRAH İçin Kullanım Senaryoları](#kullanım-senaryoları)
 3. [Minimal Kurulum (5 Adım)](#minimal-kurulum)
 4. [Teknik Mimari](#teknik-mimari)
 5. [Kod İmplementasyonu](#kod-implementasyonu)
@@ -27,7 +27,7 @@
 
 Telegram bot, Telegram platformu üzerinde çalışan otomatik programlardır. Kullanıcılara mesaj gönderebilir, komutları yanıtlayabilir ve bildirimler yapabilirler.
 
-### SARDAG-EMRAH İçin Neden Telegram?
+### AiLydian-EMRAH İçin Neden Telegram?
 
 ✅ **Gerçek Zamanlı Bildirimler**
 - Trading sinyalleri anında iletilir
@@ -57,7 +57,7 @@ Telegram bot, Telegram platformu üzerinde çalışan otomatik programlardır. K
 ### Senaryo 1: Trading Sinyalleri (Otomatik Push)
 
 **Nasıl Çalışır:**
-1. SARDAG sistem her 10 saniyede bir piyasayı tarar
+1. AiLydian sistem her 10 saniyede bir piyasayı tarar
 2. Yeni BUY/SELL sinyali bulunduğunda
 3. Telegram bot **anında** kullanıcılara bildirim gönderir
 
@@ -126,7 +126,7 @@ Detay: https://sardag.app
 **Kullanıcı Botla Konuşabilir:**
 ```
 /start
-→ "👋 Hoş geldin! SARDAG Trading Bot'a hoş geldiniz..."
+→ "👋 Hoş geldin! AiLydian Trading Bot'a hoş geldiniz..."
 
 /signals
 → "📊 Son 10 trading sinyali..."
@@ -172,7 +172,7 @@ Telegram'da `@BotFather` hesabını aç ve şu komutları gönder:
 /newbot
 → BotFather: "Alright, a new bot. How are we going to call it?"
 
-SARDAG Trading Scanner
+AiLydian Trading Scanner
 → BotFather: "Good. Now let's choose a username for your bot."
 
 SardagTradingBot
@@ -313,7 +313,7 @@ Başarılı olursa:
          │
          v
 ┌─────────────────────────────────┐
-│ SARDAG APIs                     │
+│ AiLydian APIs                     │
 │ - /api/signals                  │
 │ - /api/binance/futures          │
 │ - /api/unified/analysis/[symbol]│
@@ -347,7 +347,7 @@ Başarılı olursa:
 
 ```
 ┌─────────────────────────────────┐
-│ SARDAG Signal Scanner           │
+│ AiLydian Signal Scanner           │
 │ (Her 10 saniye çalışır)         │
 └────────┬────────────────────────┘
          │
@@ -443,7 +443,7 @@ bot.command('start', async (ctx) => {
   await ctx.reply(
     `👋 Hoş geldin, ${ctx.from?.first_name}!
 
-🤖 **SARDAG Trading Scanner Bot**
+🤖 **AiLydian Trading Scanner Bot**
 
 Bu bot ile:
 ✅ Gerçek zamanlı trading sinyalleri al
@@ -469,7 +469,7 @@ Komutlar:
  */
 bot.command('signals', async (ctx) => {
   try {
-    // SARDAG API'den sinyalleri çek
+    // AiLydian API'den sinyalleri çek
     const response = await fetch('https://sardag.app/api/signals');
     const data = await response.json();
 
@@ -1193,7 +1193,7 @@ await ctx.reply('Mesaj', { reply_markup: keyboard });
 
 ## ✅ SONUÇ
 
-Telegram bot entegrasyonu ile SARDAG-EMRAH projesi:
+Telegram bot entegrasyonu ile AiLydian-EMRAH projesi:
 
 ✅ **Gerçek zamanlı bildirimler** - Kullanıcılar anında sinyal alır
 ✅ **Minimal kurulum** - 5 adım, 15 dakika
@@ -1216,4 +1216,4 @@ Telegram bot entegrasyonu ile SARDAG-EMRAH projesi:
 **Kurulum:** ⚡ 15 dakika
 **Maliyet:** 💰 $0 (ücretsiz)
 
-**🤖 SARDAG Trading Scanner - Telegram Bot Ready!**
+**🤖 AiLydian Trading Scanner - Telegram Bot Ready!**

@@ -49,7 +49,7 @@ class BinanceClient:
 
         self.session = requests.Session()
         self.session.headers.update({
-            'User-Agent': 'SARDAG-Trading-Scanner/1.0'
+            'User-Agent': 'AiLydian-Trading-Scanner/1.0'
         })
 
         if self.api_key:

@@ -2,7 +2,7 @@
 
 ## Genel Bakış
 
-SARDAG Trading Scanner platformu artık **Google Authenticator** ile **İki Faktörlü Kimlik Doğrulama (2FA)** desteğine sahiptir. Bu sistem, hesap güvenliğini artırmak için TOTP (Time-based One-Time Password) standardını kullanır.
+AiLydian Trading Scanner platformu artık **Google Authenticator** ile **İki Faktörlü Kimlik Doğrulama (2FA)** desteğine sahiptir. Bu sistem, hesap güvenliğini artırmak için TOTP (Time-based One-Time Password) standardını kullanır.
 
 ## Özellikler
 
@@ -197,7 +197,7 @@ Login akışı 3 adımda çalışır:
 1. **Login sayfasında** kullanıcı adı ve şifreni gir
 2. **6 haneli kodu gir**
    - Google Authenticator uygulamasını aç
-   - SARDAG hesabının yanındaki 6 haneli kodu kopyala
+   - AiLydian hesabının yanındaki 6 haneli kodu kopyala
 3. **Giriş Yap** butonuna tıkla
 
 #### Telefonu Kaybettiysen: Yedek Kod Kullanımı
@@ -368,7 +368,7 @@ curl -s "http://localhost:3000/api/auth/login" \
 
 ## İletişim ve Destek
 
-Bu 2FA sistemi SARDAG Trading Scanner platformu için özel olarak geliştirilmiştir.
+Bu 2FA sistemi AiLydian Trading Scanner platformu için özel olarak geliştirilmiştir.
 
 **Özellikler:**
 - ✅ Production-ready

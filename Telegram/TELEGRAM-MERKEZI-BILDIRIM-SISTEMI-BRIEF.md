@@ -1,6 +1,6 @@
 # 📱 TELEGRAM MERKEZİ BİLDİRİM SİSTEMİ - BRIEF
 
-**SARDAG-EMRAH Trading Platform**
+**AiLydian-EMRAH Trading Platform**
 **Tarih**: 26 Ekim 2025
 **Durum**: Aktif - Localhost Test Edildi
 
@@ -45,7 +45,7 @@
 ### Önerilen Sistem:
 
 ```
-SARDAG-EMRAH Platform
+AiLydian-EMRAH Platform
          ↓
 Strategy Aggregator (600+ coin analizi)
          ↓
@@ -69,7 +69,7 @@ User's Telegram App 📱
 **Seçenek A: Sadece Telegram (Önerilen)** ⭐
 
 ```
-User → SARDAG-EMRAH Platform
+User → AiLydian-EMRAH Platform
          ↓
      (Web/Mobil UI)
          ↓
@@ -397,7 +397,7 @@ Bar:    ■■■■■■□□□□
 ### Kullanıcı Akışı:
 
 ```
-User lands on SARDAG-EMRAH
+User lands on AiLydian-EMRAH
          ↓
 Sees "📱 Telegram Bildirimleri" section
          ↓
@@ -524,4 +524,4 @@ Neden?
 
 ---
 
-**💡 Telegram, SARDAG-EMRAH için en güvenilir, en hızlı ve en kolay bildirim sistemidir!**
+**💡 Telegram, AiLydian-EMRAH için en güvenilir, en hızlı ve en kolay bildirim sistemidir!**

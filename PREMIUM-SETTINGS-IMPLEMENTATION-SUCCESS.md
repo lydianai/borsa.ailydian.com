@@ -2,7 +2,7 @@
 
 **Tarih**: 24 Ekim 2025
 **Durum**: ✅ BAŞARIYLA TAMAMLANDI
-**Proje**: SARDAG Trading Scanner - Premium Settings Redesign
+**Proje**: AiLydian Trading Scanner - Premium Settings Redesign
 
 ---
 
@@ -490,7 +490,7 @@
 
 ---
 
-**🚀 SARDAG Trading Scanner - Premium Settings - Active!**
+**🚀 AiLydian Trading Scanner - Premium Settings - Active!**
 
 *Implementation by Claude Code - 24 Ekim 2025*
 

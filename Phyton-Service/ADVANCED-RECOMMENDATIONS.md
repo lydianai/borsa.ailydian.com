@@ -794,7 +794,7 @@ def setup_swagger(app, spec_url='/api/swagger.json'):
     swaggerui_blueprint = get_swaggerui_blueprint(
         SWAGGER_URL,
         spec_url,
-        config={'app_name': "SARDAG Trading Scanner API"}
+        config={'app_name': "AiLydian Trading Scanner API"}
     )
 
     app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)

@@ -1,6 +1,6 @@
 # 🤖 TELEGRAM BOT KURULUMU TAMAMLANDI
 
-**Proje:** SARDAG-EMRAH Trading Scanner
+**Proje:** AiLydian-EMRAH Trading Scanner
 **Tarih:** 26 Ekim 2025
 **Durum:** ✅ TAMAMLANDI - 0 HATA
 **Süre:** ~30 dakika
@@ -165,7 +165,7 @@ TELEGRAM_BOT_WEBHOOK_SECRET=your-super-secret-webhook-key-here-min-32-chars
 
 1. Telegram'da **@BotFather** ile konuş
 2. `/newbot` komutunu gönder
-3. Bot adını gir: `SARDAG Trading Scanner`
+3. Bot adını gir: `AiLydian Trading Scanner`
 4. Bot kullanıcı adını gir: `SardagTradingBot` (veya benzeri)
 5. Bot token'ı kopyala
 
@@ -480,4 +480,4 @@ Telegram bot entegrasyonu başarıyla tamamlandı!
 **Manuel Adımlar:** 5 adım (~10 dakika)
 **Maliyet:** $0/ay (ücretsiz)
 
-**🤖 SARDAG Trading Scanner - Telegram Bot Ready!**
+**🤖 AiLydian Trading Scanner - Telegram Bot Ready!**

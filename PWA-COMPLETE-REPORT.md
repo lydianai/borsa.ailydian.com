@@ -2,14 +2,14 @@
 
 **Tarih**: 24 Ekim 2025
 **Durum**: ✅ EKSİKSİZ TAMAMLANDI
-**Proje**: SARDAG Trading Scanner
+**Proje**: AiLydian Trading Scanner
 
 ---
 
 ## 🎯 PWA DURUMU: %100 HAZIR
 
 ```
-✅ manifest.json → Tam donanımlı, SARDAG branding
+✅ manifest.json → Tam donanımlı, AiLydian branding
 ✅ Service Worker (sw.js) → Offline-first caching stratejisi
 ✅ PNG Icons → 8 boyut (72x72'den 512x512'ye)
 ✅ Shortcut Icons → 3 kısayol (Scanner, Signals, Conservative)
@@ -31,8 +31,8 @@
 
 ```json
 {
-  "name": "SARDAG Trading Scanner",
-  "short_name": "SARDAG",
+  "name": "AiLydian Trading Scanner",
+  "short_name": "AiLydian",
   "description": "Premium AI-Powered Trading Scanner with 13 Advanced Strategies",
   "start_url": "/",
   "display": "standalone",
@@ -122,9 +122,9 @@
 
 ```typescript
 export const metadata: Metadata = {
-  title: 'SARDAG Trading Scanner',
+  title: 'AiLydian Trading Scanner',
   description: 'Premium AI-Powered Trading Scanner with 13 Advanced Strategies',
-  applicationName: 'SARDAG',
+  applicationName: 'AiLydian',
   keywords: ['trading', 'crypto', 'scanner', 'signals', 'AI', 'quantum', 'binance', 'futures'],
   manifest: '/manifest.json',
   icons: {
@@ -140,7 +140,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'SARDAG',
+    title: 'AiLydian',
   },
 };
 
@@ -159,7 +159,7 @@ export const viewport: Viewport = {
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="SARDAG" />
+<meta name="apple-mobile-web-app-title" content="AiLydian" />
 <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
 ```
 
@@ -180,7 +180,7 @@ export const viewport: Viewport = {
 #### UI Design
 ```
 ┌──────────────────────────────────┐
-│ 📱 SARDAG'ı Yükle                │
+│ 📱 AiLydian'ı Yükle                │
 │ Uygulamayı ana ekranınıza       │
 │ ekleyerek daha hızlı erişim     │
 │ sağlayın                         │
@@ -385,7 +385,7 @@ Response: {
 ```javascript
 self.addEventListener('push', (event) => {
   let data = {
-    title: 'SARDAG Trading Scanner',
+    title: 'AiLydian Trading Scanner',
     body: 'Yeni sinyal tespit edildi!',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-96x96.png',
@@ -493,7 +493,7 @@ To activate push notifications:
 
 ---
 
-## 🎯 SARDAG BRANDING
+## 🎯 AiLydian BRANDING
 
 ### App Shortcuts
 
@@ -528,7 +528,7 @@ Status Bar: black-translucent (iOS)
 - [ ] **Push Notifications**: VAPID setup + backend integration
 - [ ] **Background Sync**: Failed API requests retry
 - [ ] **Periodic Sync**: Auto-refresh market data (Chrome only)
-- [ ] **Share Target**: Share coins to SARDAG
+- [ ] **Share Target**: Share coins to AiLydian
 - [ ] **File Handler**: Open CSV/JSON trading data
 - [ ] **Protocol Handler**: sardag:// URL scheme
 
@@ -563,7 +563,7 @@ Status Bar: black-translucent (iOS)
 
 ### Completed Features ✅
 
-1. ✅ **manifest.json** → SARDAG branded, 8 icons, 3 shortcuts
+1. ✅ **manifest.json** → AiLydian branded, 8 icons, 3 shortcuts
 2. ✅ **Service Worker (sw.js)** → Offline-first caching
 3. ✅ **PNG Icons** → 8 boyut (72-512px)
 4. ✅ **PWAInstaller** → Install prompt component
@@ -597,7 +597,7 @@ Status Bar: black-translucent (iOS)
 - ✅ **Offline-First**: Smart caching ile offline çalışma
 - ✅ **Installable**: Home screen'e eklenebilir
 - ✅ **iOS Support**: Apple Web App tam desteği
-- ✅ **SARDAG Branded**: Özel iconlar ve shortcuts
+- ✅ **AiLydian Branded**: Özel iconlar ve shortcuts
 - ✅ **Production Ready**: Deploy edilmeye hazır
 - ✅ **Push Ready**: Notification altyapısı hazır
 
@@ -612,7 +612,7 @@ Status Bar: black-translucent (iOS)
 
 ---
 
-**🚀 SARDAG Trading Scanner - PWA Active! ✨**
+**🚀 AiLydian Trading Scanner - PWA Active! ✨**
 
 *Implementation by Claude Code - 24 Ekim 2025*
 
@@ -623,7 +623,7 @@ Status Bar: black-translucent (iOS)
 ### Install Prompt (Desktop)
 ```
 ┌────────────────────────────────────┐
-│ 📱 SARDAG'ı Yükle                  │
+│ 📱 AiLydian'ı Yükle                  │
 │                                    │
 │ Uygulamayı ana ekranınıza         │
 │ ekleyerek daha hızlı erişim       │
@@ -636,7 +636,7 @@ Status Bar: black-translucent (iOS)
 ### Home Screen Icon (iOS/Android)
 ```
 ┌──────┐
-│ ⚡   │  SARDAG
+│ ⚡   │  AiLydian
 │ ⚡⚡  │  Trading
 └──────┘
 ```

@@ -1,7 +1,7 @@
 # 🔐 BORSA AILYDIAN - LOGIN CREDENTIALS (PRIVATE)
 **Version:** 2.1 - BORSA NIRVANA SECURITY
 **Date:** 2025-10-02
-**Owner:** SARDAG
+**Owner:** AiLydian
 **⚠️ BU DOSYA SİSTEM SAHİBİ İÇİNDİR - HERKESE AÇIK DEĞİLDİR**
 
 ---

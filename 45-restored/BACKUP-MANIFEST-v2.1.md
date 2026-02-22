@@ -1,8 +1,8 @@
 # 🔐 BORSA AILYDIAN COMPLETE BACKUP MANIFEST
 **Version:** 2.1 - BORSA
-**Owner:** SARDAG
+**Owner:** AiLydian
 **Date:** 2025-10-02 01:22:53
-**Backup Name:** SARDAG-BORSA-V2.1-20251002_012253
+**Backup Name:** AiLydian-BORSA-V2.1-20251002_012253
 
 ---
 
@@ -137,6 +137,6 @@
 ---
 
 **Backup Created:** 2025-10-02 01:22:53 UTC
-**Owner:** SARDAG
+**Owner:** AiLydian
 **Version:** 2.1 - BORSA
 **Status:** ✅ COMPLETE & VERIFIED

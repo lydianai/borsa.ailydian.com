@@ -1,4 +1,4 @@
-# 🏥 SARDAG Trading Scanner - Sistem Sağlık Raporu
+# 🏥 AiLydian Trading Scanner - Sistem Sağlık Raporu
 
 **Tarih:** 2025-11-01
 **Analiz Zamanı:** Real-time Production System

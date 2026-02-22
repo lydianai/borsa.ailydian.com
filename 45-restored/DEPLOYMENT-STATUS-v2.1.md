@@ -2,7 +2,7 @@
 **NIRVANA LEVEL SECURITY DEPLOYED**
 **Date:** 2025-10-02
 **Version:** 2.1 - BORSA
-**Owner:** SARDAG
+**Owner:** AiLydian
 
 ---
 
@@ -108,7 +108,7 @@ railway up
 ### ✅ Security Headers
 ```
 X-Powered-By: CLASSIFIED
-Server: SARDAG-SECURE
+Server: AiLydian-SECURE
 X-Framework: PROTECTED
 X-Security-Monitoring: ACTIVE
 X-SOC-Status: PROTECTED
@@ -140,7 +140,7 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 ## 📦 BACKUP COMPLETED
 
 ### Backup Archive
-**File:** `SARDAG-BORSA-V2.1-20251002_012253.tar.gz`
+**File:** `AiLydian-BORSA-V2.1-20251002_012253.tar.gz`
 **Size:** 194 MB (203,423,744 bytes)
 **Total Files:** 31,619 files
 **Source Code Files:** 13,915 files
@@ -165,7 +165,7 @@ SHA256: 4e10aebb16a475ca3e941845e965265e0fa0102f9e64ef1f62c366c882bd9b1c
 
 ### Restore Command
 ```bash
-tar -xzf SARDAG-BORSA-V2.1-20251002_012253.tar.gz
+tar -xzf AiLydian-BORSA-V2.1-20251002_012253.tar.gz
 cd borsa
 npm install
 npm run dev
@@ -174,11 +174,11 @@ npm run dev
 ### Verify Backup Integrity
 ```bash
 # MD5 verification
-md5 SARDAG-BORSA-V2.1-20251002_012253.tar.gz
+md5 AiLydian-BORSA-V2.1-20251002_012253.tar.gz
 # Should output: e67479956714329cd303515d9475cebd
 
 # SHA256 verification
-shasum -a 256 SARDAG-BORSA-V2.1-20251002_012253.tar.gz
+shasum -a 256 AiLydian-BORSA-V2.1-20251002_012253.tar.gz
 # Should output: 4e10aebb16a475ca3e941845e965265e0fa0102f9e64ef1f62c366c882bd9b1c
 ```
 
@@ -242,9 +242,9 @@ shasum -a 256 SARDAG-BORSA-V2.1-20251002_012253.tar.gz
 4. `RAILWAY-DEPLOYMENT-GUIDE.md` - Railway deployment guide
 
 ### Backup Files
-1. `SARDAG-BORSA-V2.1-20251002_012253.tar.gz` - Backup archive
-2. `SARDAG-BORSA-V2.1-CHECKSUM.txt` - Checksum verification
-3. `SARDAG-BORSA-V2.1-BACKUP-README.md` - Restore instructions
+1. `AiLydian-BORSA-V2.1-20251002_012253.tar.gz` - Backup archive
+2. `AiLydian-BORSA-V2.1-CHECKSUM.txt` - Checksum verification
+3. `AiLydian-BORSA-V2.1-BACKUP-README.md` - Restore instructions
 4. `BACKUP-MANIFEST-v2.1.md` - Backup contents manifest
 
 ---
@@ -314,7 +314,7 @@ shasum -a 256 SARDAG-BORSA-V2.1-20251002_012253.tar.gz
 
 ## 📞 DEPLOYMENT CONTACT
 
-**Project Owner:** SARDAG
+**Project Owner:** AiLydian
 **Repository:** https://github.com/sardagsoftware/borsa.git
 **Version:** 2.1 - BORSA
 **Security Level:** NIRVANA

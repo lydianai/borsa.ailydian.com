@@ -1,6 +1,6 @@
 # ✅ TELEGRAM BİRLEŞİK BİLDİRİM SİSTEMİ - TAMAMLANDI
 
-**SARDAG-EMRAH Trading Platform**
+**AiLydian-EMRAH Trading Platform**
 **Tarih**: 26 Ekim 2025
 **Durum**: ✅ ENTEGRASYON TAMAMLANDI
 **Dil**: Türkçe

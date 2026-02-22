@@ -10,7 +10,7 @@ WHITE-HAT COMPLIANCE:
 - Educational purpose
 
 Version: 1.0.0
-Author: SARDAG Trading Scanner Team
+Author: AiLydian Trading Scanner Team
 """
 
 __version__ = "1.0.0"
