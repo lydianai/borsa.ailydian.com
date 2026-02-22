@@ -63,7 +63,7 @@ class SignalNotifier {
   }
 
   private sendTestNotification(): void {
-    new Notification('SARDAG Trading Scanner', {
+    new Notification('LyTrade Trading Scanner', {
       body: 'Notifications enabled! You will receive alerts for strong signals.',
       icon: '/favicon.ico',
       badge: '/favicon.ico',

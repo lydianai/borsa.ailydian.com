@@ -1,5 +1,5 @@
 /**
- * 🧠 ADVANCED AI ANALYZER - SARDAG EMRAH OTONOM SİSTEM
+ * 🧠 ADVANCED AI ANALYZER - LyTrade EMRAH OTONOM SİSTEM
  *
  * Strategy Engine C (Premium AI) ile gelişmiş piyasa analizi.
  * Strategy Engine A'ya ek olarak daha derinlemesine analiz için kullanılır.
@@ -60,7 +60,7 @@ export async function analyzeMarketWithAdvancedAI(marketData: {
 }) {
   const client = getAdvancedAIClient();
 
-  const prompt = `SARDAG EMRAH Otonom AI Agent olarak şu market datasını analiz et:
+  const prompt = `LyTrade EMRAH Otonom AI Agent olarak şu market datasını analiz et:
 
 ${JSON.stringify(marketData, null, 2)}
 
@@ -175,7 +175,7 @@ export async function evaluateStrategyPerformance(strategyData: {
 }) {
   const client = getAdvancedAIClient();
 
-  const prompt = `SARDAG EMRAH Trading Strategy Performance Evaluator olarak şu stratejiyi analiz et:
+  const prompt = `LyTrade EMRAH Trading Strategy Performance Evaluator olarak şu stratejiyi analiz et:
 
 **Strateji**: ${strategyData.strategyName}
 **Başarı Oranı**: ${strategyData.successRate}%
@@ -246,7 +246,7 @@ export async function suggestCoinWeights(coinData: {
 }) {
   const client = getAdvancedAIClient();
 
-  const prompt = `SARDAG EMRAH Adaptive Weight Calculator olarak şu coin için strateji ağırlıkları öner:
+  const prompt = `LyTrade EMRAH Adaptive Weight Calculator olarak şu coin için strateji ağırlıkları öner:
 
 **Coin**: ${coinData.symbol}
 

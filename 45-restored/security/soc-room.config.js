@@ -1,7 +1,7 @@
 /**
  * 🛡️ SOC ROOM - 24/7 SECURITY MONITORING
  * Security Operations Center Configuration
- * borsa.ailydian.com - SARDAG PROTECTED
+ * borsa.ailydian.com - LyTrade PROTECTED
  */
 
 module.exports = {

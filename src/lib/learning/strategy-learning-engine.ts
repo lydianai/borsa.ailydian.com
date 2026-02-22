@@ -1,5 +1,5 @@
 /**
- * 🎓 STRATEJİ ÖĞRENME MOTORU - SARDAG EMRAH EVRİM SİSTEMİ
+ * 🎓 STRATEJİ ÖĞRENME MOTORU - LyTrade EMRAH EVRİM SİSTEMİ
  *
  * AI Memory Store + Advanced AI Engine kullanarak stratejileri geliştirir.
  * Her 4 saatte bir otomatik olarak:

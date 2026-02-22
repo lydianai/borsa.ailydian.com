@@ -1,5 +1,5 @@
 /**
- * 📋 SARDAG-EMRAH OPS AGENT - Change Planner
+ * 📋 LyTrade-EMRAH OPS AGENT - Change Planner
  * 
  * Sağlık sorunlarını analiz eder ve güvenli değişiklik planları oluşturur:
  * - Issues/alerts → plan → küçük değişiklik paketleri (change-set)

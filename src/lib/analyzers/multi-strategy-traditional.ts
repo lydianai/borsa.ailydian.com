@@ -1,6 +1,6 @@
 /**
  * 🎯 MULTI-STRATEGY TRADITIONAL MARKETS ANALYZER
- * Tüm SARDAG stratejilerini geleneksel piyasalara uygular
+ * Tüm LyTrade stratejilerini geleneksel piyasalara uygular
  *
  * Stratejiler:
  * 1. RSI (Relative Strength Index)

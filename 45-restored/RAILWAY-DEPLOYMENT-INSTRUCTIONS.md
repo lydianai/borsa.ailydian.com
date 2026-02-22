@@ -31,7 +31,7 @@ The Railway CLI detected "Multiple services found" because the project needs ser
 #### 1. **Create AI Models Service**
 
 1. Go to https://railway.app
-2. Log in as: **AiLyDian - Yapay Zeka Gateway (sardagemrah@gmail.com)**
+2. Log in as: **AiLyDian - Yapay Zeka Gateway (info@ailydian.com)**
 3. Open project: **lydian-trader-borsa**
 4. Click **"+ New"** → **"Empty Service"**
 5. Name it: **`ai-models`**

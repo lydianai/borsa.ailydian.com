@@ -67,7 +67,7 @@ Bot sahibiyseniz bu Chat ID'yi .env dosyasına ekleyin:
   await ctx.reply(
     `👋 Hoş geldin, ${ctx.from?.first_name || 'Trader'}!
 
-🤖 **SARDAG Trading Scanner Bot**
+🤖 **LyTrade Trading Scanner Bot**
 ${isPrivateMode() ? '🔒 **(Gizli Mod Aktif)**' : ''}
 
 ${subscribed ? '✅ Bildirimler aktif edildi!' : '⚠️ Bildirim aktivasyonu başarısız.'}
@@ -98,7 +98,7 @@ bot.command('signals', async (ctx) => {
   try {
     await ctx.reply('⏳ Sinyaller yükleniyor...');
 
-    // SARDAG API'den sinyalleri çek
+    // LyTrade API'den sinyalleri çek
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const response = await fetch(`${baseUrl}/api/signals`);
 

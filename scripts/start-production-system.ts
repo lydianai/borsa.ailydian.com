@@ -28,7 +28,7 @@ const colors = {
 };
 
 console.log(`${colors.cyan}${colors.bright}
-🚀 SARDAG PRODUCTION SYSTEM STARTUP
+🚀 LyTrade PRODUCTION SYSTEM STARTUP
 ==================================
 ${colors.reset}`);
 

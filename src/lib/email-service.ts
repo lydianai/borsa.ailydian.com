@@ -130,7 +130,7 @@ class EmailService {
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 40px auto; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; overflow: hidden;">
     <tr>
       <td style="padding: 32px; text-align: center; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); border-bottom: 1px solid ${signalColor};">
-        <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff;">SARDAG Trading Signal</h1>
+        <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff;">LyTrade Trading Signal</h1>
         <p style="margin: 8px 0 0 0; font-size: 14px; color: #888;">Automated Trading Alert</p>
       </td>
     </tr>
@@ -175,7 +175,7 @@ class EmailService {
     <tr>
       <td style="padding: 24px; text-align: center; background: #0a0a0a; border-top: 1px solid #333;">
         <p style="margin: 0; font-size: 12px; color: #666;">
-          This is an automated trading signal from SARDAG Trading System<br>
+          This is an automated trading signal from LyTrade Trading System<br>
           Do not reply to this email
         </p>
       </td>
@@ -255,7 +255,7 @@ class EmailService {
     <tr>
       <td style="padding: 24px; text-align: center; background: #0a0a0a; border-top: 1px solid #333;">
         <p style="margin: 0; font-size: 12px; color: #666;">
-          SARDAG Trading System - Daily Summary Report<br>
+          LyTrade Trading System - Daily Summary Report<br>
           Do not reply to this email
         </p>
       </td>
@@ -267,7 +267,7 @@ class EmailService {
 
     return this.sendWithRetry({
       to,
-      subject: `SARDAG Daily Summary - ${data.date} (${data.totalSignals} signals)`,
+      subject: `LyTrade Daily Summary - ${data.date} (${data.totalSignals} signals)`,
       html,
     });
   }
@@ -306,7 +306,7 @@ class EmailService {
     <tr>
       <td style="padding: 24px; text-align: center; background: #0a0a0a; border-top: 1px solid #333;">
         <p style="margin: 0; font-size: 12px; color: #666;">
-          SARDAG Trading System Alert<br>
+          LyTrade Trading System Alert<br>
           Do not reply to this email
         </p>
       </td>
@@ -318,7 +318,7 @@ class EmailService {
 
     return this.sendWithRetry({
       to,
-      subject: `SARDAG Alert: ${title}`,
+      subject: `LyTrade Alert: ${title}`,
       html,
     });
   }

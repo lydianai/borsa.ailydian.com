@@ -1,5 +1,5 @@
 /**
- * 🔍 SARDAG-EMRAH OPS AGENT - Health Checker
+ * 🔍 LyTrade-EMRAH OPS AGENT - Health Checker
  * 
  * Sistem sağlığını kategorize eder:
  * - healthz: HTTP/WS endpoint'leri, lag ölçümü
