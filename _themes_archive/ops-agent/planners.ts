@@ -1,5 +1,5 @@
 /**
- * 📋 LyTrade-EMRAH OPS AGENT - Change Planner
+ * 📋 LyTrade OPS AGENT - Change Planner
  * 
  * Sağlık sorunlarını analiz eder ve güvenli değişiklik planları oluşturur:
  * - Issues/alerts → plan → küçük değişiklik paketleri (change-set)
@@ -7,7 +7,7 @@
  * - Manuel onay gerektiren değişiklikleri belirler
  */
 
-import { Logger } from '@sardag-emrah/observability';
+import { Logger } from '@lytrade/observability';
 import { HealthCheckResult, HealthIssue } from './checkers';
 
 export interface ChangePlan {

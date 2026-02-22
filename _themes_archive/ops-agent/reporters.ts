@@ -328,7 +328,7 @@ ${details.deployments.slice(0, 5).map(deployment =>
                 type: 'plain_text',
                 text: 'View Full Report'
               },
-              url: `https://github.com/sardag-emrah/sardag-emrah/reports/${report.id}.md`
+              url: `https://github.com/lydianai/borsa.ailydian.com/reports/${report.id}.md`
             }
           ]
         }
