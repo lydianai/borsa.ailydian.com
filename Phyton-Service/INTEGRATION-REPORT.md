@@ -309,7 +309,7 @@ Validation: True
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    SARDAG Trading Scanner                      │
+│                    AiLydian Trading Scanner                      │
 │                     Python Microservices                       │
 └────────────────────────────────────────────────────────────────┘
                                │

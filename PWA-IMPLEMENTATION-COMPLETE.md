@@ -1,4 +1,4 @@
-# ✅ PWA IMPLEMENTATION COMPLETE - SARDAG Trading Scanner
+# ✅ PWA IMPLEMENTATION COMPLETE - AiLydian Trading Scanner
 
 ## 📱 İMPLEMENTASYON ÖZETİ
 
@@ -18,7 +18,7 @@
 - ✅ Sidebar notification badge (pulse animasyonlu)
 
 ### ✅ PHASE 2: PWA Implementation (COMPLETED)
-- ✅ manifest.json (SARDAG branding)
+- ✅ manifest.json (AiLydian branding)
 - ✅ Service Worker (offline-first cache)
 - ✅ PWA Provider + Install Prompt
 - ✅ Icon generation system
@@ -30,7 +30,7 @@
 ### 1. PWA Core Files
 ```
 /public/
-  ├── manifest.json          # PWA manifest with SARDAG branding
+  ├── manifest.json          # PWA manifest with AiLydian branding
   ├── sw.js                  # Service Worker (offline-first)
   └── icons/
       ├── icon.svg           # Source SVG logo
@@ -99,8 +99,8 @@
 
 ```json
 {
-  "name": "SARDAG Trading Scanner",
-  "short_name": "SARDAG",
+  "name": "AiLydian Trading Scanner",
+  "short_name": "AiLydian",
   "description": "Premium AI-Powered Trading Scanner with 13 Advanced Strategies",
   "display": "standalone",
   "background_color": "#0a0a0a",
@@ -129,7 +129,7 @@
 - **Accent**: `#FFD700` (Altın - Muhafazakâr)
 
 ### Logo Design
-- Lightning bolt ⚡ (SARDAG identity)
+- Lightning bolt ⚡ (AiLydian identity)
 - Neon glow effect
 - Monogram "S"
 - 512x512 resolution (maskable)
@@ -260,7 +260,7 @@ Google Analytics 4 entegrasyonuna hazır!
 - ✅ **PHASE 1**: TOP 10 system + Notifications (6 pages)
 - ✅ **PHASE 2**: Full PWA implementation
 - ✅ **Service Worker**: Offline-first caching
-- ✅ **Manifest**: SARDAG branding complete
+- ✅ **Manifest**: AiLydian branding complete
 - ✅ **Icons**: 11 SVG placeholders generated
 - ✅ **Install Prompt**: Beautiful UI with neon theme
 

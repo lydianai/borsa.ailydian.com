@@ -369,7 +369,7 @@ pnpm dev
 
 ## 📞 SUPPORT
 
-**System Owner**: SARDAG
+**System Owner**: AiLydian
 **Framework**: Next.js 16.0.0
 **Deployment**: Vercel-ready
 **Monitoring**: Console logs (development)

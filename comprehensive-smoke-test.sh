@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# SARDAG TRADING SCANNER - COMPREHENSIVE SMOKE TEST
+# AiLydian TRADING SCANNER - COMPREHENSIVE SMOKE TEST
 # Tests all endpoints and verifies REAL DATA (no mocks)
 
-echo "🔥 SARDAG Trading Scanner - Comprehensive Smoke Test"
+echo "🔥 AiLydian Trading Scanner - Comprehensive Smoke Test"
 echo "======================================================"
 echo ""
 

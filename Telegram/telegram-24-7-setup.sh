@@ -247,7 +247,7 @@ echo "📋 Step 6: Setting up cron jobs..."
 CRON_FILE="/tmp/sardag-cron"
 
 cat > "$CRON_FILE" << EOF
-# SARDAG-EMRAH Telegram System - Health Check (Every 5 minutes)
+# AiLydian-EMRAH Telegram System - Health Check (Every 5 minutes)
 */5 * * * * cd $(pwd) && bash scripts/health-check.sh
 
 # Save subscribers (Every hour)

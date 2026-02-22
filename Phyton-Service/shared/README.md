@@ -1,6 +1,6 @@
 # 🔧 Shared Utilities Library
 
-Common utilities for all SARDAG Trading Scanner Python microservices.
+Common utilities for all AiLydian Trading Scanner Python microservices.
 
 ## 📚 Modules
 
@@ -271,7 +271,7 @@ All utilities enforce white-hat trading rules:
 
 ## 📝 License
 
-Internal use only. SARDAG Trading Scanner project.
+Internal use only. AiLydian Trading Scanner project.
 
 **Version:** 1.0.0
 **Last Updated:** 2025-11-01

@@ -36,7 +36,7 @@ stratejileri ile birleştir ve gerçekleştir todo oluştur ve başla"
 
 **Gereksinimler:**
 - ✅ Aynı Harem Altın API entegrasyon mantığını kullan
-- ✅ SARDAG stratejileri ile entegre et
+- ✅ AiLydian stratejileri ile entegre et
 - ✅ White-hat kurallarıyla implement et
 - ✅ TODO oluştur ve adım adım tamamla
 
@@ -277,7 +277,7 @@ Her adapter aynı yapıyı takip ediyor:
 
 ### Multi-Strategy Integration
 
-Tüm yeni ürünler SARDAG stratejileriyle uyumlu:
+Tüm yeni ürünler AiLydian stratejileriyle uyumlu:
 - ✅ MA7 Pullback Strategy
 - ✅ Red Wick Green Closure
 - ✅ MA Crossover Pullback

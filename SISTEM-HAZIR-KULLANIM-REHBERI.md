@@ -1,4 +1,4 @@
-# 🔥 SARDAG TRADING SCANNER - SİSTEM HAZIR! 🚀
+# 🔥 AiLydian TRADING SCANNER - SİSTEM HAZIR! 🚀
 
 ## ✅ TAMAMLANAN SİSTEM DURUMU
 

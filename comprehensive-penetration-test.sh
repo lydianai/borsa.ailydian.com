@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# SARDAG EMRAH - COMPREHENSIVE PENETRATION TEST
+# AiLydian EMRAH - COMPREHENSIVE PENETRATION TEST
 # Tests: Security, Performance, Functionality, Error Handling
 
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║   🔒 COMPREHENSIVE PENETRATION TEST - SARDAG EMRAH 🔒       ║"
+echo "║   🔒 COMPREHENSIVE PENETRATION TEST - AiLydian EMRAH 🔒       ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo ""
 

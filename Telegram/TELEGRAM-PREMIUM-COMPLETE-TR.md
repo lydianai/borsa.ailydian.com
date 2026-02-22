@@ -9,7 +9,7 @@
 
 ## 📋 ÖZet
 
-SARDAG-EMRAH trading scanner için **ultra-premium Telegram bildirim sistemi** başarıyla kuruldu ve entegre edildi.
+AiLydian-EMRAH trading scanner için **ultra-premium Telegram bildirim sistemi** başarıyla kuruldu ve entegre edildi.
 
 ### ✨ Özellikler
 
@@ -88,7 +88,7 @@ SARDAG-EMRAH trading scanner için **ultra-premium Telegram bildirim sistemi** b
 
 🔗 [Detaylı Analiz →](https://sardag.app/trading-signals)
 
-░▒▓ SARDAG Trading Scanner ▓▒░
+░▒▓ AiLydian Trading Scanner ▓▒░
 ```
 
 ### Günlük Özet Formatı
@@ -127,7 +127,7 @@ SARDAG-EMRAH trading scanner için **ultra-premium Telegram bildirim sistemi** b
 
 🔗 [Tüm Sinyaller →](https://sardag.app)
 
-░▒▓ SARDAG Trading Scanner ▓▒░
+░▒▓ AiLydian Trading Scanner ▓▒░
 ```
 
 ---
@@ -337,7 +337,7 @@ Filtreleme Kuralları (Otomatik):
 
 ## 🎯 Özellik Karşılaştırması
 
-| Özellik | Standart Bot | **SARDAG Premium Bot** |
+| Özellik | Standart Bot | **AiLydian Premium Bot** |
 |---------|--------------|----------------------|
 | Mesaj Formatı | Düz metin | ✨ Unicode art + renk paleti |
 | Piyasa Desteği | Sadece crypto | 🌍 600+ coin + traditional markets |
@@ -532,7 +532,7 @@ curl -X POST "https://api.telegram.org/bot<YOUR_TOKEN>/setWebhook" \
 
 ## 🎉 SONUÇ
 
-✅ **SARDAG-EMRAH Telegram Premium Bildirim Sistemi başarıyla kuruldu!**
+✅ **AiLydian-EMRAH Telegram Premium Bildirim Sistemi başarıyla kuruldu!**
 
 ### Öne Çıkan Başarılar:
 1. 🎨 **Telegram'da hiç görülmemiş benzersiz ultra-premium tasarım**

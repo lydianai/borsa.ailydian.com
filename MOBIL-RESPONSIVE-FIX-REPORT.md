@@ -1,7 +1,7 @@
-# SARDAG EMRAH - MOBİL UYUMLULUK VE YAN MENÜ FİX RAPORU
+# AiLydian EMRAH - MOBİL UYUMLULUK VE YAN MENÜ FİX RAPORU
 **Tarih:** 2025-10-25  
 **Developer:** Claude (Anthropic)  
-**Proje:** SARDAG Trading Dashboard
+**Proje:** AiLydian Trading Dashboard
 
 ---
 
@@ -317,4 +317,4 @@ Bu fix tamamen production-ready. Mobil kullanıcılar artık sorunsuz şekilde m
 
 ---
 
-**✨ SARDAG TRADING DASHBOARD - MOBİL READY! ✨**
+**✨ AiLydian TRADING DASHBOARD - MOBİL READY! ✨**

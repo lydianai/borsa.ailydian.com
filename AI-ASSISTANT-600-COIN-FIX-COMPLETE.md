@@ -147,7 +147,7 @@ async function getUnifiedAnalysis(symbol: string, baseUrl: string, marketData: a
 
 **Yeni System Prompt:**
 ```typescript
-const systemPrompt = `Sen SARDAG Trading Scanner'ın uzman AI asistanısın.
+const systemPrompt = `Sen AiLydian Trading Scanner'ın uzman AI asistanısın.
 
 SİSTEM YETENEKLERİN:
 - ${market.totalMarkets} Binance Futures USDT çiftine erişim (BTC, ETH, TRB, LEVER, ve tüm diğerleri dahil)
@@ -392,7 +392,7 @@ ve 562 coin daha
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️ BU BİR YATIRIM TAVSİYESİ DEĞİLDİR
 Kendi araştırmanızı yapın ve riskinizi yönetin.
-SARDAG AI - 6 Strateji Birleşik Analiz
+AiLydian AI - 6 Strateji Birleşik Analiz
 ```
 
 ---

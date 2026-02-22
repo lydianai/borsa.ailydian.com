@@ -8,7 +8,7 @@
 
 ## 📋 EXECUTIVE SUMMARY
 
-On-chain whale movement tracking has been successfully integrated into SARDAG EMRAH as an **EXTRA enhancement layer** for existing trading strategies. The integration follows the exact same architecture pattern as Traditional Markets, ensuring consistency and reliability.
+On-chain whale movement tracking has been successfully integrated into AiLydian EMRAH as an **EXTRA enhancement layer** for existing trading strategies. The integration follows the exact same architecture pattern as Traditional Markets, ensuring consistency and reliability.
 
 ### ✅ Key Achievements
 
@@ -583,4 +583,4 @@ import { useWhaleActivity } from '@/hooks/useWhaleActivity';
 
 ---
 
-**🐋 Whale Analysis is now available as an optional enhancement to all trading strategies in SARDAG EMRAH!**
+**🐋 Whale Analysis is now available as an optional enhancement to all trading strategies in AiLydian EMRAH!**

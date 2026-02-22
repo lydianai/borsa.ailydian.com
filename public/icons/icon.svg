@@ -2,7 +2,7 @@
   <!-- Background -->
   <rect width="512" height="512" fill="#0a0a0a" rx="64"/>
 
-  <!-- Neon Green Lightning Bolt (SARDAG Logo) -->
+  <!-- Neon Green Lightning Bolt (AiLydian Logo) -->
   <g filter="url(#neon-glow)">
     <path d="M 280 100 L 200 260 L 260 260 L 220 400 L 340 220 L 280 220 L 320 100 Z"
           fill="#00ff00"
