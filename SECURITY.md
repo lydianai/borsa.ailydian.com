@@ -15,7 +15,7 @@ We take security seriously. If you discover a vulnerability, please report it re
 
 ### How to Report
 
-1. Open a **private security advisory** on GitHub: [Report a vulnerability](https://github.com/AiLydian/lytrade-scanner/security/advisories/new)
+1. Open a **private security advisory** on GitHub: [Report a vulnerability](https://github.com/lydianai/borsa.ailydian.com/security/advisories/new)
 2. Or email the maintainers directly (see GitHub profile)
 3. Include:
    - Description of the vulnerability
@@ -51,7 +51,7 @@ We support responsible disclosure. Security researchers acting in good faith wil
 
 ## Contact
 
-Report security issues via [GitHub Security Advisories](https://github.com/AiLydian/lytrade-scanner/security/advisories/new).
+Report security issues via [GitHub Security Advisories](https://github.com/lydianai/borsa.ailydian.com/security/advisories/new).
 
 ---
 

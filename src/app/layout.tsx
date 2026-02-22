@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     'risk management',
     'self-hosted trading',
   ],
-  authors: [{ name: 'LyTrade', url: 'https://github.com/AiLydian/lytrade-scanner' }],
+  authors: [{ name: 'LyTrade', url: 'https://github.com/lydianai/borsa.ailydian.com' }],
   creator: 'LyTrade',
   publisher: 'LyTrade',
   manifest: '/manifest.json',
@@ -206,7 +206,7 @@ export default function RootLayout({
               url: siteUrl,
               logo: `${siteUrl}/og-image-square.png`,
               sameAs: [
-                'https://github.com/AiLydian/lytrade-scanner',
+                'https://github.com/lydianai/borsa.ailydian.com',
               ]
             }),
           }}

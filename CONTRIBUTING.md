@@ -26,7 +26,7 @@ The app works with any OpenAI-compatible API. Free options:
 ## How to Contribute
 
 ### Reporting Bugs
-- Use [GitHub Issues](https://github.com/AiLydian/lytrade-scanner/issues)
+- Use [GitHub Issues](https://github.com/lydianai/borsa.ailydian.com/issues)
 - Include steps to reproduce, expected vs actual behavior
 - Include browser/OS/Node.js version
 
