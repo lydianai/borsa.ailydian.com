@@ -39,13 +39,13 @@ https://railway.app/project/540c5e10-1424-4227-9cb6-c7214a2363a8
 2. **Settings** tab'ına git
 
 3. **"Source"** bölümünü kontrol et:
-   - Repository: `sardagsoftware/borsa` ✅
+   - Repository: `lydiansoftware/borsa` ✅
    - Branch: **`main`** ← BU ÇOK ÖNEMLİ!
    - Root Directory: **`/`** (boş bırak veya `/`)
 
 4. Branch `main` değilse **DEĞİŞTİR**:
    - Disconnect Source
-   - Reconnect → sardagsoftware/borsa
+   - Reconnect → lydiansoftware/borsa
    - Branch: `main` seç
 
 ---
@@ -110,14 +110,14 @@ https://railway.app/project/540c5e10-1424-4227-9cb6-c7214a2363a8
 
 **HATA 2**: "Dockerfile not found"
 - **ÇÖZÜM**: Settings → Source → Branch: `main` olduğunu kontrol et
-- GitHub'da kontrol: https://github.com/sardagsoftware/borsa/blob/main/Dockerfile
+- GitHub'da kontrol: https://github.com/lydiansoftware/borsa/blob/main/Dockerfile
 
 **HATA 3**: "COPY failed: no such file or directory"
 - **ÇÖZÜM**: Root Directory ayarını kontrol et (boş olmalı veya `/`)
 
 **HATA 4**: "npm ci failed"
 - **ÇÖZÜM**: package.json doğru mu kontrol et
-- GitHub: https://github.com/sardagsoftware/borsa/blob/main/package.json
+- GitHub: https://github.com/lydiansoftware/borsa/blob/main/package.json
 
 ---
 

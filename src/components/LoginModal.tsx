@@ -104,7 +104,7 @@ export function LoginModal({ isOpen, onSuccess }: LoginModalProps) {
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}>
-            Ailydian EMRAH
+            Ailydian LYDIAN
           </h2>
           <p style={{ fontSize: '14px', color: COLORS.text.secondary }}>
             Sisteme giriş yapmak için lütfen kimlik bilgilerinizi girin

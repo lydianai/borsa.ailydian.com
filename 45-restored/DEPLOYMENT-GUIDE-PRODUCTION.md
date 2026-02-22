@@ -135,7 +135,7 @@ Expected response: `{"status": "healthy"}`
 
 ```bash
 # Go to project root
-cd /Users/sardag/Desktop/borsa
+cd /home/lydian/Masaüstü/PROJELER/borsa
 
 # Initialize git (if not already)
 git init

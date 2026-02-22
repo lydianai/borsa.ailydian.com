@@ -838,7 +838,7 @@ Professional trader'lar MUTLAKA multi-timeframe analysis yapar!`
                     fontFamily: '"Inter", "SF Pro Display", system-ui, -apple-system, sans-serif',
                     textShadow: '0 2px 4px rgba(16, 185, 129, 0.1)'
                   }}>
-                    ArnaVut SarDag
+                    ArnaVut LyTrade
                   </h1>
                   <span style={{
                     background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',

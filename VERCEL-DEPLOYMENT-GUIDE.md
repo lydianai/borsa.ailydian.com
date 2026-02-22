@@ -24,7 +24,7 @@ All 13 TypeScript errors have been fixed:
   - API caching headers
 
 ### 3. Git Repository ✅
-- Repository: `https://github.com/sardagsoftware/borsa.git`
+- Repository: `https://github.com/lydiansoftware/borsa.git`
 - Branch: `main`
 - All changes ready to push
 
@@ -38,7 +38,7 @@ This is the easiest and most automated method:
 
 #### Step 1: Push Changes to GitHub
 \`\`\`bash
-# From sardag-emrah directory
+# From lytrade directory
 git add .
 git commit -m "🚀 Production deployment ready - Zero errors
 
@@ -57,9 +57,9 @@ git push origin main
 #### Step 2: Import to Vercel
 1. Go to https://vercel.com/new
 2. Select "Import Git Repository"
-3. Choose `sardagsoftware/borsa` repository
+3. Choose `lydiansoftware/borsa` repository
 4. Configure:
-   - **Project Name**: `sardag-emrah` or `sea-ailydian`
+   - **Project Name**: `lytrade` or `sea-ailydian`
    - **Framework Preset**: Next.js
    - **Root Directory**: `./`
    - **Build Command**: `pnpm build`

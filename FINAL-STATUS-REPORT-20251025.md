@@ -1,6 +1,6 @@
-# 🚀 AiLydian EMRAH - FINAL STATUS REPORT
+# 🚀 AiLydian LYDIAN - FINAL STATUS REPORT
 **Tarih:** 25 Ekim 2025 - 14:23
-**Backup:** `AiLydian-EMRAH-COMPLETE-BACKUP-20251025-142355.tar.gz` (4.3MB)
+**Backup:** `AiLydian-LYDIAN-COMPLETE-BACKUP-20251025-142355.tar.gz` (4.3MB)
 
 ---
 
@@ -326,7 +326,7 @@ interface BacktestMetrics {
 ## 📁 PROJECT STRUCTURE
 
 ```
-sardag-emrah/
+lytrade/
 ├── src/
 │   ├── app/                    # Next.js 15 App Router
 │   │   ├── ai-signals/
@@ -479,4 +479,4 @@ pnpm dev
 
 **Last Updated:** 2025-10-25 14:23:55
 **Version:** 2.0.0
-**Backup:** AiLydian-EMRAH-COMPLETE-BACKUP-20251025-142355.tar.gz
+**Backup:** AiLydian-LYDIAN-COMPLETE-BACKUP-20251025-142355.tar.gz

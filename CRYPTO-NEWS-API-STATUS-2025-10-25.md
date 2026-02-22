@@ -368,5 +368,5 @@ Subscribe olduktan sonra:
 ---
 
 **Oluşturulma:** 25 Ekim 2025, 17:15
-**Yazar:** SarDag AI System
+**Yazar:** LyTrade AI System
 **Durum:** ⚠️ SUBSCRIBE BEKLİYOR

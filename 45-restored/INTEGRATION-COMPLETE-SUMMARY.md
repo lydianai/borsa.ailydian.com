@@ -330,7 +330,7 @@ Test:
 
 **INTEGRATION COMPLETE** ✅
 
-Made with ❤️ by Sardag
+Made with ❤️ by Lydian
 2025-10-02
 
 </div>

@@ -146,7 +146,7 @@ scrape_configs:
           - localhost
         labels:
           job: python-services
-          __path__: /Users/sardag/Documents/*/Phyton-Service/*/logs/*.log
+          __path__: /Users/lydian/Documents/*/Phyton-Service/*/logs/*.log
 ```
 
 **Shared Library Güncellemesi:**

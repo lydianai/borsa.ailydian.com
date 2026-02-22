@@ -3,7 +3,7 @@
  * Offline-First PWA with Smart Caching
  */
 
-const CACHE_VERSION = 'sardag-v1.0.0';
+const CACHE_VERSION = 'lydian-v1.0.0';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const API_CACHE = `${CACHE_VERSION}-api`;
@@ -52,7 +52,7 @@ self.addEventListener('activate', (event) => {
       .then((cacheNames) => {
         return Promise.all(
           cacheNames
-            .filter((name) => name.startsWith('sardag-') && name !== CACHE_VERSION)
+            .filter((name) => name.startsWith('lydian-') && name !== CACHE_VERSION)
             .map((name) => {
               console.log('[SW] Deleting old cache:', name);
               return caches.delete(name);

@@ -518,7 +518,7 @@ Validation: True
 ### Starting Services with PM2
 
 ```bash
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Phyton-Service
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Phyton-Service
 
 # Start all services
 pm2 start ecosystem.config.js

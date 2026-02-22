@@ -256,7 +256,7 @@ Deployment will be considered successful when:
 **🔗 Quick Links:**
 - Railway: https://railway.app/dashboard
 - Vercel: https://vercel.com/dashboard
-- GitHub: https://github.com/sardagsoftware/borsa
+- GitHub: https://github.com/lydiansoftware/borsa
 - Local: http://localhost:3000
 
 **Demo Credentials:**

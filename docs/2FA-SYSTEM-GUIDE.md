@@ -38,7 +38,7 @@ AiLydian Trading Scanner platformu artık **Google Authenticator** ile **İki Fa
 **Request:**
 ```json
 {
-  "username": "emrah"
+  "username": "lydian"
 }
 ```
 
@@ -66,7 +66,7 @@ AiLydian Trading Scanner platformu artık **Google Authenticator** ile **İki Fa
 **Request:**
 ```json
 {
-  "username": "emrah",
+  "username": "lydian",
   "token": "123456"
 }
 ```
@@ -85,7 +85,7 @@ AiLydian Trading Scanner platformu artık **Google Authenticator** ile **İki Fa
 **Request:**
 ```json
 {
-  "username": "emrah"
+  "username": "lydian"
 }
 ```
 
@@ -108,7 +108,7 @@ AiLydian Trading Scanner platformu artık **Google Authenticator** ile **İki Fa
 **Request:**
 ```json
 {
-  "username": "emrah"
+  "username": "lydian"
 }
 ```
 
@@ -133,7 +133,7 @@ Login akışı 3 adımda çalışır:
 **Login Request (2FA aktifken):**
 ```json
 {
-  "username": "emrah",
+  "username": "lydian",
   "password": "1234",
   "token": "123456"
 }
@@ -142,7 +142,7 @@ Login akışı 3 adımda çalışır:
 **veya yedek kod ile:**
 ```json
 {
-  "username": "emrah",
+  "username": "lydian",
   "password": "1234",
   "backupCode": "ABCD-EFGH"
 }
@@ -217,7 +217,7 @@ Login akışı 3 adımda çalışır:
 ```bash
 curl -s "http://localhost:3000/api/auth/login" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"emrah","password":"1234"}' \
+  -d '{"username":"lydian","password":"1234"}' \
   -c /tmp/2fa-cookies.txt
 ```
 
@@ -225,7 +225,7 @@ curl -s "http://localhost:3000/api/auth/login" \
 ```bash
 curl -s -b /tmp/2fa-cookies.txt "http://localhost:3000/api/auth/2fa/setup" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"emrah"}' | python3 -c "
+  -d '{"username":"lydian"}' | python3 -c "
 import sys, json
 data = json.load(sys.stdin)
 if data.get('success'):
@@ -241,14 +241,14 @@ else:
 ```bash
 curl -s -b /tmp/2fa-cookies.txt "http://localhost:3000/api/auth/2fa/verify" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"emrah","token":"YOUR_6_DIGIT_CODE"}'
+  -d '{"username":"lydian","token":"YOUR_6_DIGIT_CODE"}'
 ```
 
 ##### 4. Durum kontrolü
 ```bash
 curl -s -b /tmp/2fa-cookies.txt "http://localhost:3000/api/auth/2fa/status" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"emrah"}' | python3 -c "
+  -d '{"username":"lydian"}' | python3 -c "
 import sys, json
 data = json.load(sys.stdin)
 print('Enabled:', data['data']['enabled'])
@@ -261,12 +261,12 @@ print('Backup Codes:', data['data']['backupCodesRemaining'])
 # Normal login (2FA aktifse token gerekli)
 curl -s "http://localhost:3000/api/auth/login" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"emrah","password":"1234","token":"YOUR_6_DIGIT_CODE"}'
+  -d '{"username":"lydian","password":"1234","token":"YOUR_6_DIGIT_CODE"}'
 
 # Yedek kod ile login
 curl -s "http://localhost:3000/api/auth/login" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"emrah","password":"1234","backupCode":"ABCD-EFGH"}'
+  -d '{"username":"lydian","password":"1234","backupCode":"ABCD-EFGH"}'
 ```
 
 ## Güvenlik Özellikleri

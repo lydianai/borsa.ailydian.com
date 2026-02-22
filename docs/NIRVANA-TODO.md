@@ -23,7 +23,7 @@ Organizes the steps needed to stabilize and scale the trading platform to "alway
 ## 4. Notification & Mobile Delivery
 - [ ] Replace browser-only notifications with push provider (FCM/APNs) and store device tokens securely.
 - [ ] Build notification service that publishes alerts after deduplication + throttle + user preference checks.
-- [ ] Integrate SarDag Groq AI summary into notification payload when confidence ≥ threshold.
+- [ ] Integrate LyTrade Groq AI summary into notification payload when confidence ≥ threshold.
 - [ ] Provide fallback channels (email/SMS) for high-priority signals.
 
 ## 5. Monitoring, Security, Compliance
@@ -51,7 +51,7 @@ Organizes the steps needed to stabilize and scale the trading platform to "alway
 - [ ] **Roadmap-2:** Push sağlayıcı (FCM/APNs) entegrasyonunu yap, bildirim payload’larında AI özetlerini maskele ve kullanıcı izin yönetimini belgeye bağla.
 - [ ] **Roadmap-3:** Prometheus/Grafana tabanlı gözlemleme + alarm kurallarını ekle, veri gizliliği ve erişim kontrollü gösterge tabloları sağla.
 - [ ] **Roadmap-4:** Strateji doğrulama suite’ini fixture/snapshot destekli hale getir, Trend Reversal/Bollinger/ATR için pozitif senaryoları üret ve sonuçları raporla.
-- [ ] **Groq-Orchestrator:** SarDag AI Groq planlayıcısını VS Code + executor mimarisiyle entegre et; PLAN/EXECUTION ayrımını koru, signature ve pino loglama gerekliliklerini uygula.
+- [ ] **Groq-Orchestrator:** LyTrade AI Groq planlayıcısını VS Code + executor mimarisiyle entegre et; PLAN/EXECUTION ayrımını koru, signature ve pino loglama gerekliliklerini uygula.
 - [ ] **Groq-Executor:** Deterministik Binance USDT-M futures yürütücüsünü (undici/ws/zod) testnet ortamında devreye al; risk guardrail’leri, HMAC imzalama ve listen key keepalive’ı doğrula.
 - [ ] **Aggregator-WFA:** analyzeFromCandles tabanlı aggregator’ı Walk-Forward backtest metrik kapıları (Sharpe ≥ 1.5, Sortino ≥ 2.0, PF ≥ 1.4, MaxDD ≤ 0.15) ile CI’ye bağla; white-hat raporlama ve dökümantasyon hazırla.
 - [ ] **Real-Time Dashboard:** Groq orchestrator + executor + Nirvana aggregator çıktılarının tek panelde izlenmesi için gerçek zamanlı (localhost) durum izleyici oluştur; risk ve uyarıları maskele.

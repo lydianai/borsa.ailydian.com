@@ -442,7 +442,7 @@ src/
 - ✅ Build: Success (Zero errors)
 - ✅ Deploy: Automatic on git push
 - ✅ Environment: Production
-- ✅ URL: `https://borsa-80vqtcw19-emrahsardag-yandexcoms-projects.vercel.app`
+- ✅ URL: `https://borsa-80vqtcw19-lydianlydian-yandexcoms-projects.vercel.app`
 
 ### Git Commit
 ```

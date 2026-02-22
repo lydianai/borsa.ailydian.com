@@ -64,7 +64,7 @@ POST https://api.telegram.org/bot.../sendMessage
       "id": 8292640150,
       "is_bot": true,
       "first_name": "LyDian",
-      "username": "SardagTradingBot"
+      "username": "LydianTradingBot"
     },
     "chat": {
       "id": 7575640489,

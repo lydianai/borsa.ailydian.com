@@ -147,7 +147,7 @@ Quality Scoring:
 
 ### 1. Backend Başlatma
 ```bash
-cd /Users/sardag/Downloads/45-restored
+cd /Users/lydian/Downloads/45-restored
 pnpm install
 pnpm dev
 ```
@@ -240,7 +240,7 @@ curl http://localhost:3100/api/orchestrator/metrics
 ## 📁 Oluşturulan Dosyalar
 
 ```
-/Users/sardag/Downloads/45-restored/
+/Users/lydian/Downloads/45-restored/
 ├── src/
 │   ├── services/
 │   │   └── orchestrator/

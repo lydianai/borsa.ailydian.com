@@ -26,7 +26,7 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-PROJECT_ROOT="/Users/sardag/Documents/ailydian-signal"
+PROJECT_ROOT="/Users/lydian/Documents/ailydian-signal"
 PYTHON_SERVICE_DIR="$PROJECT_ROOT/Phyton-Service"
 
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

@@ -3,7 +3,7 @@
  * Güvenli authentication endpoint with Google Authenticator
  *
  * Credentials:
- * - Username: emrah
+ * - Username: lydian
  * - Password: 1234
  */
 
@@ -13,7 +13,7 @@ import speakeasy from 'speakeasy';
 import { get2FAData, verifyBackupCode } from '@/lib/2fa-store';
 
 // Güvenli credential check
-const VALID_USERNAME = 'emrah';
+const VALID_USERNAME = 'lydian';
 const VALID_PASSWORD = '1234';
 
 export async function POST(request: NextRequest) {

@@ -148,7 +148,7 @@ pkill -9 -f "pnpm dev"
 pkill -9 -f "next dev"
 
 # 2. Clear Turbopack cache
-rm -rf /Users/sardag/Desktop/sardag-emrah/.next
+rm -rf /home/lydian/Masaüstü/PROJELER/lytrade/.next
 
 # 3. Restart fresh dev server
 pnpm dev

@@ -20,7 +20,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: sardag-redis
+    container_name: lydian-redis
     ports:
       - "6379:6379"
     volumes:
@@ -33,27 +33,27 @@ services:
       retries: 5
     restart: unless-stopped
     networks:
-      - sardag-network
+      - lydian-network
 
   timescaledb:
     image: timescale/timescaledb:latest-pg15
-    container_name: sardag-timescaledb
+    container_name: lydian-timescaledb
     environment:
-      POSTGRES_DB: sardag_trading
-      POSTGRES_USER: sardag
+      POSTGRES_DB: lydian_trading
+      POSTGRES_USER: lydian
       POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     ports:
       - "5432:5432"
     volumes:
       - timescale-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sardag"]
+      test: ["CMD-SHELL", "pg_isready -U lydian"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
     networks:
-      - sardag-network
+      - lydian-network
 
   # ============================================
   # PYTHON MICROSERVICES
@@ -63,7 +63,7 @@ services:
     build:
       context: ./database-service
       dockerfile: Dockerfile
-    container_name: sardag-database-service
+    container_name: lydian-database-service
     ports:
       - "5020:5020"
     environment:
@@ -72,8 +72,8 @@ services:
       DB_ENABLED: "true"
       DB_HOST: timescaledb
       DB_PORT: 5432
-      DB_NAME: sardag_trading
-      DB_USER: sardag
+      DB_NAME: lydian_trading
+      DB_USER: lydian
       DB_PASSWORD: ${DB_PASSWORD:-changeme}
       REDIS_ENABLED: "true"
       REDIS_HOST: redis
@@ -88,7 +88,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     networks:
-      - sardag-network
+      - lydian-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5020/health"]
       interval: 30s
@@ -99,7 +99,7 @@ services:
     build:
       context: ./websocket-streaming
       dockerfile: Dockerfile
-    container_name: sardag-websocket-streaming
+    container_name: lydian-websocket-streaming
     ports:
       - "5021:5021"
     environment:
@@ -116,7 +116,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     networks:
-      - sardag-network
+      - lydian-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5021/health"]
       interval: 30s
@@ -129,7 +129,7 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: sardag-prometheus
+    container_name: lydian-prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -142,13 +142,13 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     restart: unless-stopped
     networks:
-      - sardag-network
+      - lydian-network
     profiles:
       - monitoring
 
   grafana:
     image: grafana/grafana:latest
-    container_name: sardag-grafana
+    container_name: lydian-grafana
     ports:
       - "3001:3000"
     environment:
@@ -162,7 +162,7 @@ services:
       - prometheus
     restart: unless-stopped
     networks:
-      - sardag-network
+      - lydian-network
     profiles:
       - monitoring
 
@@ -171,9 +171,9 @@ services:
 # ============================================
 
 networks:
-  sardag-network:
+  lydian-network:
     driver: bridge
-    name: sardag-network
+    name: lydian-network
 
 # ============================================
 # VOLUMES
@@ -181,10 +181,10 @@ networks:
 
 volumes:
   redis-data:
-    name: sardag-redis-data
+    name: lydian-redis-data
   timescale-data:
-    name: sardag-timescale-data
+    name: lydian-timescale-data
   prometheus-data:
-    name: sardag-prometheus-data
+    name: lydian-prometheus-data
   grafana-data:
-    name: sardag-grafana-data
+    name: lydian-grafana-data

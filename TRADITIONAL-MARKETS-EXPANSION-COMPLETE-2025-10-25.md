@@ -30,7 +30,7 @@ Kullanıcı mesajı:
 bunları ekleyelim geleneksel piyasalar içerisine
 zaten kripto var ona gerek yok beyaz şapkalı kuralları ile
 iterasyon entegrasyona giir ve aynı harem altın api de
-kullandığımız entegrasyon mantıgını sardag emrah projesi
+kullandığımız entegrasyon mantıgını lydian lydian projesi
 stratejileri ile birleştir ve gerçekleştir todo oluştur ve başla"
 ```
 
@@ -107,7 +107,7 @@ stratejileri ile birleştir ve gerçekleştir todo oluştur ve başla"
 ## 🔧 GÜNCELLENEN DOSYALAR
 
 ### 1. Environment Configuration
-**Dosya:** `/Users/sardag/Desktop/sardag-emrah/.env.local`
+**Dosya:** `/home/lydian/Masaüstü/PROJELER/lytrade/.env.local`
 
 **Eklenen API Keys:**
 ```env
@@ -492,5 +492,5 @@ Toplam eklenenler:
 ---
 
 **Oluşturulma:** 25 Ekim 2025, 19:00
-**Yazar:** SarDag AI System
+**Yazar:** LyTrade AI System
 **Durum:** ✅ BACKEND COMPLETE - UI PENDING

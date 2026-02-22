@@ -192,7 +192,7 @@ docs/
 
 ### 1. Test Edilmesi Gerekenler:
 ```bash
-cd /Users/sardag/Desktop/sardag-emrah
+cd /home/lydian/Masaüstü/PROJELER/lytrade
 
 # 1. Dev server çalışıyor mu?
 curl http://localhost:3000/api/health

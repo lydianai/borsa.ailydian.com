@@ -125,8 +125,8 @@ Password: demo123456
 ## 🔗 Quick Links
 
 - **Railway Dashboard:** https://railway.app/dashboard
-- **GitHub Repo:** https://github.com/sardagsoftware/borsa
-- **Latest Commit:** https://github.com/sardagsoftware/borsa/commit/39ab6fb
+- **GitHub Repo:** https://github.com/lydiansoftware/borsa
+- **Latest Commit:** https://github.com/lydiansoftware/borsa/commit/39ab6fb
 
 ---
 

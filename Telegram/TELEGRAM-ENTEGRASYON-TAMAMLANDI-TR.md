@@ -1,6 +1,6 @@
 # ✅ TELEGRAM BİRLEŞİK BİLDİRİM SİSTEMİ - TAMAMLANDI
 
-**AiLydian-EMRAH Trading Platform**
+**AiLydian-LYDIAN Trading Platform**
 **Tarih**: 26 Ekim 2025
 **Durum**: ✅ ENTEGRASYON TAMAMLANDI
 **Dil**: Türkçe
@@ -190,7 +190,7 @@ import { sendWebPushRedirect } from '@/lib/telegram/unified-notification-bridge'
 
 await sendWebPushRedirect('Yeni sinyal!', {
   title: 'STRONG BUY',
-  url: 'https://sardag.app/trading-signals',
+  url: 'https://lydian.app/trading-signals',
 });
 ```
 

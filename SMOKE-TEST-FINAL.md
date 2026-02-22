@@ -1,5 +1,5 @@
 # 🔥 FINAL SMOKE TEST REPORT
-## SarDag Trading Signals Platform
+## LyTrade Trading Signals Platform
 **Date**: October 25, 2025
 **Port**: 3001
 **Test Engineer**: Claude Code

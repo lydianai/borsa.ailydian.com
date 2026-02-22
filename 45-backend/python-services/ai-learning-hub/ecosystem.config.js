@@ -9,7 +9,7 @@ module.exports = {
     {
       name: 'ai-learning-orchestrator',
       script: 'orchestrator.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       exec_mode: 'fork',
@@ -38,7 +38,7 @@ module.exports = {
     {
       name: 'rl-agent-worker',
       script: 'workers/rl_agent_worker.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -56,7 +56,7 @@ module.exports = {
     {
       name: 'online-learning-worker',
       script: 'workers/online_learning_worker.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -74,7 +74,7 @@ module.exports = {
     {
       name: 'multi-agent-worker',
       script: 'workers/multi_agent_worker.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -92,7 +92,7 @@ module.exports = {
     {
       name: 'automl-optimizer-worker',
       script: 'workers/automl_worker.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -111,7 +111,7 @@ module.exports = {
     {
       name: 'nas-worker',
       script: 'workers/nas_worker.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -130,7 +130,7 @@ module.exports = {
     {
       name: 'meta-learning-worker',
       script: 'workers/meta_learning_worker.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -148,7 +148,7 @@ module.exports = {
     {
       name: 'federated-learning-worker',
       script: 'workers/federated_worker.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -166,7 +166,7 @@ module.exports = {
     {
       name: 'causal-ai-worker',
       script: 'workers/causal_ai_worker.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -183,7 +183,7 @@ module.exports = {
     {
       name: 'regime-detection-worker',
       script: 'workers/regime_detection_worker.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -201,7 +201,7 @@ module.exports = {
     {
       name: 'explainable-ai-worker',
       script: 'workers/explainable_ai_worker.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -220,7 +220,7 @@ module.exports = {
     {
       name: 'ai-learning-api',
       script: 'app.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       exec_mode: 'fork',
@@ -242,7 +242,7 @@ module.exports = {
     {
       name: 'data-collector',
       script: 'services/data_collector.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,
@@ -263,7 +263,7 @@ module.exports = {
     {
       name: 'service-integrator',
       script: 'services/service_integrator.py',
-      cwd: '/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
+      cwd: '/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub',
       interpreter: './venv/bin/python3',
       instances: 1,
       autorestart: true,

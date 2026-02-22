@@ -2,7 +2,7 @@
 
 **Tarih:** 25 Ekim 2025
 **Durum:** BAŞARILI - Production Ready
-**Dosya:** `/Users/sardag/Desktop/sardag-emrah/src/app/api/ai-assistant/route.ts`
+**Dosya:** `/home/lydian/Masaüstü/PROJELER/lytrade/src/app/api/ai-assistant/route.ts`
 
 ---
 
@@ -204,7 +204,7 @@ TÜM STRATEJİ SONUÇLARI (${analysis.totalStrategies} strateji analizi):
 ## DEĞİŞEN DOSYALAR
 
 ### Ana Dosya
-- **Path:** `/Users/sardag/Desktop/sardag-emrah/src/app/api/ai-assistant/route.ts`
+- **Path:** `/home/lydian/Masaüstü/PROJELER/lytrade/src/app/api/ai-assistant/route.ts`
 - **Satırlar:** 447 → 547 (100 satır artış)
 - **Değişiklikler:**
   - Satır 24-55: `getMarketOverview()` - allCoins eklendi

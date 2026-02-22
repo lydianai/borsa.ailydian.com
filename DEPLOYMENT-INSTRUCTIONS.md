@@ -10,7 +10,7 @@
 
 2. **Vercel CLI**: Kurulu ve giriş yapılmış
    - Version: 48.0.0
-   - Kullanıcı: emrahsardag-9142
+   - Kullanıcı: lydianlydian-9142
 
 3. **Deployment Script**: Hazır
    - Dosya: `borsa-ailydian-deploy.sh`
@@ -34,9 +34,9 @@ vercel --prod
 
 # 3. Sorulan sorulara cevaplar:
 # - Set up and deploy? Yes
-# - Which scope? emrahsardag-9142
+# - Which scope? lydianlydian-9142
 # - Link to existing project? No (yeni proje)
-# - Project name? sardag-emrah-borsa
+# - Project name? lytrade-borsa
 # - Directory? ./ 
 # - Override settings? No
 ```
@@ -47,10 +47,10 @@ vercel --prod
 
 1. **Vercel Dashboard'a git**:
    ```
-   https://vercel.com/emrahsardag-9142
+   https://vercel.com/lydianlydian-9142
    ```
 
-2. **Projenizi seçin** (sardag-emrah-borsa)
+2. **Projenizi seçin** (lytrade-borsa)
 
 3. **Settings > Domains**'e gidin
 

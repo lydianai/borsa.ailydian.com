@@ -9,7 +9,7 @@
 
 ## 📋 ÖZET
 
-Bu rapor, Sardag Trading sistemi Python mikroservisleri için yapılan tüm geliştirmeleri detaylı olarak açıklamaktadır. Tüm geliştirmeler beyaz şapkalı kurallar çerçevesinde, mevcut sisteme zarar vermeden, sıfır hata prensiple tamamlanmıştır.
+Bu rapor, Lydian Trading sistemi Python mikroservisleri için yapılan tüm geliştirmeleri detaylı olarak açıklamaktadır. Tüm geliştirmeler beyaz şapkalı kurallar çerçevesinde, mevcut sisteme zarar vermeden, sıfır hata prensiple tamamlanmıştır.
 
 ---
 
@@ -323,7 +323,7 @@ except Exception as e:
 
 **1. Servisleri Başlatmak:**
 ```bash
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Phyton-Service
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Phyton-Service
 
 # Tüm servisleri başlat
 docker-compose up -d

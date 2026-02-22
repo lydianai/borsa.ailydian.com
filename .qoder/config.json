@@ -1,5 +1,5 @@
 {
-  "projectRoot": "/Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900",
-  "includePaths": ["/Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/src", "/Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/public", "/Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/package.json", "/Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/tsconfig.json"],
-  "excludePaths": ["/Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/_themes_archive", "**/*backup*.ts", "**/*.bak.*", "/Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/apps", "/Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/themes", "/Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/templates"]
+  "projectRoot": "/Users/lydian/Documents/lytrade-final.bak-20251030-170900",
+  "includePaths": ["/Users/lydian/Documents/lytrade-final.bak-20251030-170900/src", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/public", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/package.json", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/tsconfig.json"],
+  "excludePaths": ["/Users/lydian/Documents/lytrade-final.bak-20251030-170900/_themes_archive", "**/*backup*.ts", "**/*.bak.*", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/apps", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/themes", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/templates"]
 }

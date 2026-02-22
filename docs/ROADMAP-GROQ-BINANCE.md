@@ -1,14 +1,14 @@
 # Groq + Binance Futures Entegrasyon Yol Haritası
 
 ## Amaç
-- Groq tabanlı planlayıcı (PLAN-only) ile deterministik Binance USDT-M yürütücüsünü (EXECUTOR) SarDag mimarisine entegre etmek.
+- Groq tabanlı planlayıcı (PLAN-only) ile deterministik Binance USDT-M yürütücüsünü (EXECUTOR) LyTrade mimarisine entegre etmek.
 - Nirvana aggregator’ı (analyzeFromCandles) koruyup Walk-Forward backtest kapılarıyla uyumlu hale getirmek.
 - Tüm bileşenleri white-hat güvenlik prensipleri, log maskeleme ve testnet doğrulama adımlarıyla güvence altına almak.
 
 ## Sprint Görevleri
 1. **Monorepo Hazırlığı**
    - `groq-binance-futures-stack/` pnpm monorepo iskeletini oluştur.
-   - `apps/orchestrator`, `apps/executor`, `packages/shared`, `ops` dizinlerini SarDag repo içinde `integrations/` altında template olarak tut.
+   - `apps/orchestrator`, `apps/executor`, `packages/shared`, `ops` dizinlerini LyTrade repo içinde `integrations/` altında template olarak tut.
    - Typescript, eslint, vitest, ts-node bağımlılıklarını ve scriptlerini (build/dev/typecheck/test/smoke/backtest) ekle.
 2. **Shared Paket**
    - `packages/shared` içinde fiyat/lot filtreleri, HMAC/Hash yardımcıları, `Plan` ve `RiskCaps` şemalarını tanımla.

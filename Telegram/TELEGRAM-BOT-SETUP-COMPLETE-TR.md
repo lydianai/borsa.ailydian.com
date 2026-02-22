@@ -1,6 +1,6 @@
 # 🤖 TELEGRAM BOT KURULUMU TAMAMLANDI
 
-**Proje:** AiLydian-EMRAH Trading Scanner
+**Proje:** AiLydian-LYDIAN Trading Scanner
 **Tarih:** 26 Ekim 2025
 **Durum:** ✅ TAMAMLANDI - 0 HATA
 **Süre:** ~30 dakika
@@ -166,7 +166,7 @@ TELEGRAM_BOT_WEBHOOK_SECRET=your-super-secret-webhook-key-here-min-32-chars
 1. Telegram'da **@BotFather** ile konuş
 2. `/newbot` komutunu gönder
 3. Bot adını gir: `AiLydian Trading Scanner`
-4. Bot kullanıcı adını gir: `SardagTradingBot` (veya benzeri)
+4. Bot kullanıcı adını gir: `LydianTradingBot` (veya benzeri)
 5. Bot token'ı kopyala
 
 **Örnek Token:**
@@ -191,7 +191,7 @@ Settings → Environment Variables → Add
 
 TELEGRAM_BOT_TOKEN=<token>
 TELEGRAM_BOT_WEBHOOK_SECRET=<secret>
-NEXT_PUBLIC_APP_URL=https://sardag.vercel.app
+NEXT_PUBLIC_APP_URL=https://lydian.vercel.app
 ```
 
 **Secret Key Oluşturma:**
@@ -221,7 +221,7 @@ Deploy tamamlandıktan sonra:
 curl -X POST "https://api.telegram.org/bot<YOUR_TOKEN>/setWebhook" \
   -H "Content-Type: application/json" \
   -d '{
-    "url": "https://sardag.vercel.app/api/telegram/webhook",
+    "url": "https://lydian.vercel.app/api/telegram/webhook",
     "secret_token": "<YOUR_WEBHOOK_SECRET>",
     "allowed_updates": ["message", "callback_query"]
   }'
@@ -238,14 +238,14 @@ curl -X POST "https://api.telegram.org/bot<YOUR_TOKEN>/setWebhook" \
 
 **Webhook Kontrolü:**
 ```bash
-curl "https://sardag.vercel.app/api/telegram/webhook"
+curl "https://lydian.vercel.app/api/telegram/webhook"
 ```
 
 ---
 
 ### Adım 5: Test Et! (1 dakika)
 
-1. Telegram'da botunuzu bulun: `@SardagTradingBot`
+1. Telegram'da botunuzu bulun: `@LydianTradingBot`
 2. `/start` komutunu gönderin
 3. Botun yanıt vermesini bekleyin
 4. `/signals` ve `/price BTCUSDT` komutlarını deneyin
@@ -315,15 +315,15 @@ export async function GET() {
 
 ```bash
 # Abone sayısını kontrol et
-curl https://sardag.vercel.app/api/telegram/subscribe
+curl https://lydian.vercel.app/api/telegram/subscribe
 
 # Kullanıcı abone et
-curl -X POST https://sardag.vercel.app/api/telegram/subscribe \
+curl -X POST https://lydian.vercel.app/api/telegram/subscribe \
   -H "Content-Type: application/json" \
   -d '{"chatId": 123456789}'
 
 # Webhook durumunu kontrol et
-curl https://sardag.vercel.app/api/telegram/webhook
+curl https://lydian.vercel.app/api/telegram/webhook
 ```
 
 ---
@@ -412,7 +412,7 @@ curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"
 
 # Webhook'u yeniden ayarla
 curl -X POST "https://api.telegram.org/bot<TOKEN>/setWebhook" \
-  -d '{"url": "https://sardag.vercel.app/api/telegram/webhook"}'
+  -d '{"url": "https://lydian.vercel.app/api/telegram/webhook"}'
 ```
 
 ### Problem 2: Build hatası

@@ -42,7 +42,7 @@ test_endpoint() {
 
 # Get Vercel deployment URL from GitHub API
 echo "📋 Step 1: Checking GitHub deployment status..."
-GITHUB_REPO="sardagsoftware/borsa"
+GITHUB_REPO="lydiansoftware/borsa"
 LATEST_COMMIT=$(git rev-parse HEAD)
 
 echo "   Latest commit: $LATEST_COMMIT"
@@ -58,10 +58,10 @@ fi
 
 # Try to get production URL from common patterns
 PRODUCTION_URLS=(
-  "https://borsa-sardagsoftware.vercel.app"
+  "https://borsa-lydiansoftware.vercel.app"
   "https://borsa.vercel.app"
   "https://lydian-trader.vercel.app"
-  "https://borsa-git-main-sardagsoftware.vercel.app"
+  "https://borsa-git-main-lydiansoftware.vercel.app"
 )
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

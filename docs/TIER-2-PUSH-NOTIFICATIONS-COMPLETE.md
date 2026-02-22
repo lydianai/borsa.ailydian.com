@@ -132,7 +132,7 @@ await pushNotificationService.sendSignalNotification({
 // Send to specific user
 await pushNotificationService.sendToUser('user123', {
   title: 'Test Notification',
-  body: 'Hello from Sardag AI!',
+  body: 'Hello from Lydian AI!',
   data: { type: 'custom' }
 });
 

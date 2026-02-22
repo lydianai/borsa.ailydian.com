@@ -150,7 +150,7 @@ ailydian-signal/
 
 ### 1. Start Python Backend
 ```bash
-cd /Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
+cd /Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
 ./start.sh
 ```
 
@@ -158,7 +158,7 @@ Service will be available at: **http://localhost:5020**
 
 ### 2. Start Next.js Frontend
 ```bash
-cd /Users/sardag/Documents/ailydian-signal
+cd /Users/lydian/Documents/ailydian-signal
 pnpm dev
 ```
 
