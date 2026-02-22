@@ -1,4 +1,6 @@
 <div align="center">
+  <img src="assets/logo/ailydian-banner.svg" alt="AiLydian" width="700">
+  <br><br>
 
 # LyTrade Scanner
 

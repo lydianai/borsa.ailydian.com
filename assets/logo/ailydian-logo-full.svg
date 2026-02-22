@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" width="400" height="100">
+  <title>AiLydian — Intelligent Solutions for Tomorrow</title>
+
+  <!--
+    HORIZONTAL LOCKUP: Icon (80x80) left-padded + wordmark + tagline
+    Transparent background for README use on any background.
+
+    Layout (400 wide, 100 tall):
+    - Icon zone:      x=10 to x=90   (80px square, centered y=10 to y=90)
+    - Wordmark:       x=100, y=62    (large "AiLydian" text)
+    - Tagline:        x=100, y=82    (smaller tagline)
+
+    Icon scale: original 200x200 → 80x80 (scale 0.4)
+    Transform: translate(10,10) scale(0.4)
+  -->
+
+  <!-- ─── ICON MARK (scaled 0.4×) ─── -->
+  <g transform="translate(10,10) scale(0.4)">
+
+    <!-- Icon background circle (dark, works on light/transparent bg) -->
+    <rect width="200" height="200" rx="36" fill="#0A0A0A"/>
+
+    <!-- Chevron body -->
+    <path
+      d="M 100 52 L 168 158 L 148 158 L 100 82 L 52 158 L 32 158 Z"
+      fill="#76B900"
+    />
+
+    <!-- Crossbar cutout -->
+    <rect x="64" y="112" width="72" height="16" fill="#0A0A0A"/>
+
+    <!-- Crossbar fill -->
+    <rect x="68" y="114" width="64" height="12" fill="#76B900"/>
+
+    <!-- Apex node outer ring -->
+    <circle cx="100" cy="50" r="11" fill="#76B900"/>
+    <!-- Apex node void -->
+    <circle cx="100" cy="50" r="6" fill="#0A0A0A"/>
+    <!-- Apex node pip -->
+    <circle cx="100" cy="50" r="3" fill="#76B900"/>
+
+  </g>
+
+  <!-- ─── WORDMARK ─── -->
+  <text
+    x="102"
+    y="58"
+    font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="36"
+    font-weight="700"
+    letter-spacing="-0.5"
+    fill="#FFFFFF"
+  >AiLydian</text>
+
+  <!-- ─── TAGLINE ─── -->
+  <text
+    x="103"
+    y="78"
+    font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif"
+    font-size="12"
+    font-weight="400"
+    letter-spacing="1.5"
+    fill="#76B900"
+  >INTELLIGENT SOLUTIONS FOR TOMORROW</text>
+
+</svg>

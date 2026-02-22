@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <title>AiLydian</title>
+
+  <!-- Dark background -->
+  <rect width="200" height="200" fill="#0A0A0A"/>
+
+  <!--
+    MARK: "Apex Node" — a bold upward chevron with a crossbar and circuit node at apex.
+
+    Concept:
+    - Chevron = the letter A (AiLydian), aspiration, upward motion, AI ascent
+    - Crossbar = the Lydian bar (referencing Lydian invention of standardized coinage)
+    - Node dot at apex = neural network node, AI intelligence point
+
+    Geometry (200x200 grid):
+    - Apex point:  (100, 52)
+    - Left foot:   (32, 158)
+    - Right foot:  (168, 158)
+    - Stroke width: 22px equivalent
+    - Crossbar at y=118, spanning x=66 to x=134
+  -->
+
+  <!-- Chevron — single polygon path. Two outer edges + bottom notch -->
+  <path
+    d="
+      M 100 52
+      L 168 158
+      L 148 158
+      L 100 82
+      L 52  158
+      L 32  158
+      Z
+    "
+    fill="#76B900"
+  />
+
+  <!-- Crossbar cutout (punched through with background color) -->
+  <rect x="64" y="112" width="72" height="16" fill="#0A0A0A"/>
+
+  <!-- Crossbar fill (slightly narrower, green) -->
+  <rect x="68" y="114" width="64" height="12" fill="#76B900"/>
+
+  <!-- Apex node: outer ring -->
+  <circle cx="100" cy="50" r="11" fill="#76B900"/>
+  <!-- Apex node: inner void -->
+  <circle cx="100" cy="50" r="6" fill="#0A0A0A"/>
+  <!-- Apex node: center pip -->
+  <circle cx="100" cy="50" r="3" fill="#76B900"/>
+
+</svg>
