@@ -1,5 +1,0 @@
-{
-  "projectRoot": "/Users/lydian/Documents/lytrade-final.bak-20251030-170900",
-  "includePaths": ["/Users/lydian/Documents/lytrade-final.bak-20251030-170900/src", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/public", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/package.json", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/tsconfig.json"],
-  "excludePaths": ["/Users/lydian/Documents/lytrade-final.bak-20251030-170900/_themes_archive", "**/*backup*.ts", "**/*.bak.*", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/apps", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/themes", "/Users/lydian/Documents/lytrade-final.bak-20251030-170900/templates"]
-}
