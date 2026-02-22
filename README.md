@@ -1,47 +1,68 @@
 <div align="center">
 
+<a href="https://github.com/lydianai/borsa.ailydian.com">
+  <img src="https://socialify.git.ci/lydianai/borsa.ailydian.com/image?description=1&font=Inter&forks=1&issues=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Flydianai%2Fborsa.ailydian.com%2Fmain%2Fpublic%2Ficon-512.png&name=1&pattern=Plus&pulls=1&stargazers=1&theme=Dark" alt="LyTrade Scanner" width="720">
+</a>
+
+<br><br>
+
 # LyTrade Scanner
 
-### Open-Source Crypto Trading Signal Platform
+**Open-source crypto trading signal platform for Binance Futures**
 
-**617 Markets | 13+ Strategies | Real-Time Binance WebSocket | Self-Hosted**
+Scan **617 markets** with **13+ strategies** in real-time. Self-hosted, free, no API keys needed.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](CONTRIBUTING.md)
+[![GitHub stars](https://img.shields.io/github/stars/lydianai/borsa.ailydian.com?style=for-the-badge&logo=github&color=yellow)](https://github.com/lydianai/borsa.ailydian.com/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/lydianai/borsa.ailydian.com?style=for-the-badge&logo=github&color=blue)](https://github.com/lydianai/borsa.ailydian.com/network/members)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/lydianai/borsa.ailydian.com?style=for-the-badge&color=purple)](https://github.com/lydianai/borsa.ailydian.com/commits/main)
 
-[Features](#features) | [Quick Start](#quick-start) | [Screenshots](#screenshots) | [Strategies](#trading-strategies) | [Contributing](#contributing)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Binance](https://img.shields.io/badge/Binance-WebSocket-F0B90B?style=flat-square&logo=binance&logoColor=black)](https://binance-docs.github.io/apidocs/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
+
+[Live Demo](https://borsa.ailydian.com) | [Quick Start](#quick-start) | [Features](#features) | [Strategies](#trading-strategies) | [Contributing](#contributing)
 
 </div>
 
 ---
 
-LyTrade Scanner is a self-hosted cryptocurrency trading signal platform that monitors **617 Binance USDT Perpetual Futures** markets in real-time. It runs 13+ independent trading strategies and delivers actionable signals with entry/exit levels, stop-loss, and take-profit targets through an interactive dashboard.
+<div align="center">
+  <img src="docs/screenshots/crypto-trading-grid.png" alt="LyTrade Scanner - Real-time crypto trading dashboard" width="900">
+  <br>
+  <sub>Real-time trading grid with 24+ cryptocurrencies, live prices, volume, and trend indicators</sub>
+</div>
 
-**No API keys required for basic use** -- Binance public endpoints are free. Just clone, install, and start scanning.
+<br>
+
+## Why LyTrade Scanner?
+
+Most crypto scanners are either **paid SaaS** tools with monthly fees, or **limited open-source** projects that scan a handful of coins. LyTrade Scanner gives you:
+
+- **Full market coverage** -- All 617 Binance USDT Perpetual Futures, not just the top 20
+- **No vendor lock-in** -- Self-hosted, your data stays on your machine
+- **No monthly fees** -- MIT licensed, free forever
+- **Plug-and-play AI** -- Bring your own LLM (Groq free tier, OpenAI, local Ollama)
+- **Production-ready** -- Not a weekend project; used daily for real trading analysis
+
+> **Zero API keys needed to start.** Binance public WebSocket endpoints are free. Clone, install, scan.
 
 ## Features
 
-- **617 Market Coverage** -- Monitors all Binance USDT Perpetual Futures simultaneously via WebSocket
+- **617 Market Coverage** -- All Binance USDT Perpetual Futures monitored simultaneously via WebSocket
 - **13+ Trading Strategies** -- Conservative Buy, Breakout-Retest, Momentum, RSI Divergence, Volume Surge, and more
 - **Real-Time Signals** -- Sub-100ms latency with direct Binance WebSocket feed
-- **Multi-Timeframe Analysis** -- Processes signals across multiple timeframes for higher confidence
+- **Multi-Timeframe Analysis** -- Signals processed across multiple timeframes for higher confidence
 - **Interactive Dashboard** -- ApexCharts candlestick charts + Recharts for portfolio visualization
 - **AI Market Commentary** -- Works with any OpenAI-compatible API (Groq free tier, OpenAI, local Ollama)
 - **Whale Tracking** -- Large transaction monitoring via on-chain data
 - **News Aggregation** -- Crypto news from multiple sources with sentiment analysis
 - **Traditional Markets** -- Forex, commodities, and indices alongside crypto
 - **Push Notifications** -- Telegram bot + browser push notifications for signals
-- **PWA Support** -- Install as a desktop/mobile app
-- **Dark Theme** -- Professional trading interface with dark mode
-
-## Screenshots
-
-<div align="center">
-  <img src="docs/screenshots/crypto-trading-grid.png" alt="LyTrade Scanner Dashboard" width="800">
-  <br><em>Real-time trading grid with 24+ cryptocurrencies, live prices, volume, and trend indicators</em>
-</div>
+- **PWA Support** -- Install as a desktop or mobile app
+- **Dark Theme** -- Professional trading interface optimized for extended use
 
 ## Quick Start
 
@@ -231,6 +252,19 @@ If you discover a security vulnerability, please report it responsibly via [GitH
 
 This platform is for **informational and educational purposes only**. Cryptocurrency trading carries significant financial risk. Never invest more than you can afford to lose. Past performance of trading signals does not guarantee future results. **This is not financial advice.**
 
+## Roadmap
+
+- [ ] TradingView Lightweight Charts integration
+- [ ] Strategy backtesting engine
+- [ ] Multi-exchange support (Bybit, OKX)
+- [ ] Docker Compose one-click deployment
+- [ ] Mobile-optimized trading view
+- [ ] Custom strategy builder (visual)
+- [ ] Webhook alerts (Discord, Slack)
+- [ ] Portfolio P&L tracking
+
+See [open issues](https://github.com/lydianai/borsa.ailydian.com/issues) for all planned features and known issues.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
@@ -239,6 +273,10 @@ This project is licensed under the [MIT License](LICENSE).
 
 <div align="center">
 
-If this project helps your trading workflow, consider giving it a star!
+**If LyTrade Scanner helps your trading workflow, please give it a star.**
+
+It helps others discover the project and motivates continued development.
+
+[![Star this repo](https://img.shields.io/github/stars/lydianai/borsa.ailydian.com?style=social)](https://github.com/lydianai/borsa.ailydian.com)
 
 </div>
