@@ -2,7 +2,7 @@
 
 ## Genel Bakış
 
-AiLydian Trading Scanner platformu artık **Google Authenticator** ile **İki Faktörlü Kimlik Doğrulama (2FA)** desteğine sahiptir. Bu sistem, hesap güvenliğini artırmak için TOTP (Time-based One-Time Password) standardını kullanır.
+LyTrade Scanner platformu artik **Google Authenticator** ile **İki Faktörlü Kimlik Doğrulama (2FA)** desteğine sahiptir. Bu sistem, hesap güvenliğini artırmak için TOTP (Time-based One-Time Password) standardını kullanır.
 
 ## Özellikler
 
@@ -38,7 +38,7 @@ AiLydian Trading Scanner platformu artık **Google Authenticator** ile **İki Fa
 **Request:**
 ```json
 {
-  "username": "lydian"
+  "username": "your_username"
 }
 ```
 
@@ -66,7 +66,7 @@ AiLydian Trading Scanner platformu artık **Google Authenticator** ile **İki Fa
 **Request:**
 ```json
 {
-  "username": "lydian",
+  "username": "your_username",
   "token": "123456"
 }
 ```
@@ -85,7 +85,7 @@ AiLydian Trading Scanner platformu artık **Google Authenticator** ile **İki Fa
 **Request:**
 ```json
 {
-  "username": "lydian"
+  "username": "your_username"
 }
 ```
 
@@ -108,7 +108,7 @@ AiLydian Trading Scanner platformu artık **Google Authenticator** ile **İki Fa
 **Request:**
 ```json
 {
-  "username": "lydian"
+  "username": "your_username"
 }
 ```
 
@@ -133,8 +133,8 @@ Login akışı 3 adımda çalışır:
 **Login Request (2FA aktifken):**
 ```json
 {
-  "username": "lydian",
-  "password": "1234",
+  "username": "your_username",
+  "password": "your_password",
   "token": "123456"
 }
 ```
@@ -142,8 +142,8 @@ Login akışı 3 adımda çalışır:
 **veya yedek kod ile:**
 ```json
 {
-  "username": "lydian",
-  "password": "1234",
+  "username": "your_username",
+  "password": "your_password",
   "backupCode": "ABCD-EFGH"
 }
 ```
@@ -197,7 +197,7 @@ Login akışı 3 adımda çalışır:
 1. **Login sayfasında** kullanıcı adı ve şifreni gir
 2. **6 haneli kodu gir**
    - Google Authenticator uygulamasını aç
-   - AiLydian hesabının yanındaki 6 haneli kodu kopyala
+   - LyTrade hesabinin yanindaki 6 haneli kodu kopyala
 3. **Giriş Yap** butonuna tıkla
 
 #### Telefonu Kaybettiysen: Yedek Kod Kullanımı
@@ -217,7 +217,7 @@ Login akışı 3 adımda çalışır:
 ```bash
 curl -s "http://localhost:3000/api/auth/login" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"lydian","password":"1234"}' \
+  -d '{"username":"admin","password":"your_password"}' \
   -c /tmp/2fa-cookies.txt
 ```
 
@@ -225,7 +225,7 @@ curl -s "http://localhost:3000/api/auth/login" \
 ```bash
 curl -s -b /tmp/2fa-cookies.txt "http://localhost:3000/api/auth/2fa/setup" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"lydian"}' | python3 -c "
+  -d '{"username":"admin"}' | python3 -c "
 import sys, json
 data = json.load(sys.stdin)
 if data.get('success'):
@@ -241,14 +241,14 @@ else:
 ```bash
 curl -s -b /tmp/2fa-cookies.txt "http://localhost:3000/api/auth/2fa/verify" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"lydian","token":"YOUR_6_DIGIT_CODE"}'
+  -d '{"username":"admin","token":"YOUR_6_DIGIT_CODE"}'
 ```
 
 ##### 4. Durum kontrolü
 ```bash
 curl -s -b /tmp/2fa-cookies.txt "http://localhost:3000/api/auth/2fa/status" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"lydian"}' | python3 -c "
+  -d '{"username":"admin"}' | python3 -c "
 import sys, json
 data = json.load(sys.stdin)
 print('Enabled:', data['data']['enabled'])
@@ -261,12 +261,12 @@ print('Backup Codes:', data['data']['backupCodesRemaining'])
 # Normal login (2FA aktifse token gerekli)
 curl -s "http://localhost:3000/api/auth/login" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"lydian","password":"1234","token":"YOUR_6_DIGIT_CODE"}'
+  -d '{"username":"admin","password":"your_password","token":"YOUR_6_DIGIT_CODE"}'
 
 # Yedek kod ile login
 curl -s "http://localhost:3000/api/auth/login" \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"lydian","password":"1234","backupCode":"ABCD-EFGH"}'
+  -d '{"username":"admin","password":"your_password","backupCode":"ABCD-EFGH"}'
 ```
 
 ## Güvenlik Özellikleri
@@ -368,7 +368,7 @@ curl -s "http://localhost:3000/api/auth/login" \
 
 ## İletişim ve Destek
 
-Bu 2FA sistemi AiLydian Trading Scanner platformu için özel olarak geliştirilmiştir.
+Bu 2FA sistemi LyTrade Scanner platformu icin gelistirilmistir.
 
 **Özellikler:**
 - ✅ Production-ready

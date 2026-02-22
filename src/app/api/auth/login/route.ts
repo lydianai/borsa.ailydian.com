@@ -1,10 +1,10 @@
 /**
- * 🔐 LOGIN API ENDPOINT with 2FA Support
- * Güvenli authentication endpoint with Google Authenticator
+ * LOGIN API ENDPOINT with 2FA Support
+ * Authentication endpoint with Google Authenticator
  *
- * Credentials:
- * - Username: lydian
- * - Password: 1234
+ * Set credentials via environment variables:
+ * - ADMIN_USERNAME (default: admin)
+ * - ADMIN_PASSWORD (required in production)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,9 +12,8 @@ import { cookies } from 'next/headers';
 import speakeasy from 'speakeasy';
 import { get2FAData, verifyBackupCode } from '@/lib/2fa-store';
 
-// Güvenli credential check
-const VALID_USERNAME = 'lydian';
-const VALID_PASSWORD = '1234';
+const VALID_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const VALID_PASSWORD = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === 'development' ? 'admin' : '');
 
 export async function POST(request: NextRequest) {
   try {

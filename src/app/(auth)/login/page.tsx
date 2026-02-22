@@ -50,14 +50,7 @@ export default function LoginPage() {
         }
       }
 
-      // Demo account fallback
-      if (email === 'demo@demo.com' && password === 'demo123') {
-        localStorage.setItem('user-session', JSON.stringify({ email, loggedIn: true, loginTime: new Date().toISOString() }));
-        localStorage.setItem('user-role', 'admin'); // Demo user is admin
-        router.push('/');
-      } else {
-        setError('Email veya şifre hatalı. Demo hesap: demo@demo.com / demo123');
-      }
+      setError('Email veya şifre hatalı.');
     } catch (error) {
       setError('Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {

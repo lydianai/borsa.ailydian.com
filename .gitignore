@@ -125,3 +125,13 @@ test-*.ts
 *.future
 *.orig
 *.old
+
+# Internal development session docs
+docs/SESSION-COMPLETE-*.md
+docs/FINAL-SYSTEM-STATUS-*.md
+docs/TIER-*-COMPLETE.md
+docs/TIER-*-*-COMPLETE.md
+docs/ROADMAP-*.md
+docs/NIRVANA-TODO.md
+docs/GROQ-PLAN-*.md
+docs/QUEUE-PUSH-*.md

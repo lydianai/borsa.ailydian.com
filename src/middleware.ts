@@ -198,7 +198,7 @@ export function middleware(req: NextRequest) {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https: blob:",
     "font-src 'self' data:",
-    "connect-src 'self' https://api.binance.com https://fapi.binance.com https://*.anthropic.com wss://stream.binance.com wss://fstream.binance.com",
+    "connect-src 'self' https://api.binance.com https://fapi.binance.com https://*.groq.com wss://stream.binance.com wss://fstream.binance.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
