@@ -26,6 +26,7 @@ interface AzureAnalysis {
 }
 
 export default function AzureAIPage() {
+  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
   const [analysis, setAnalysis] = useState<AzureAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

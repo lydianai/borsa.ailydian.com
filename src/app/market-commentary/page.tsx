@@ -89,6 +89,7 @@ interface MarketCommentary {
 }
 
 export default function MarketCommentaryPage() {
+  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
   const [data, setData] = useState<MarketCommentary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

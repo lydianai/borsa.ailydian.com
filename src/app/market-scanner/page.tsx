@@ -53,6 +53,7 @@ type MarketCapFilter = 'all' | 'large' | 'mid' | 'small';
 type PerformanceFilter = 'all' | 'gainers' | 'losers' | 'volatile';
 
 export default function MarketScannerPage() {
+  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
   const [coins, setCoins] = useState<MarketCoin[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

@@ -105,6 +105,8 @@ const getQualityTurkish = (quality: string) => {
 const POPULAR_SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'ADAUSDT', 'XRPUSDT', 'DOGEUSDT', 'DOTUSDT'];
 
 export default function BotAnalysisPage() {
+  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+
   // Helper function to check if a coin is bull ready
   const isBullReady = (symbol: string, bullReadyData: any): boolean => {
     if (!bullReadyData || !bullReadyData.bullReadySignals) return false;

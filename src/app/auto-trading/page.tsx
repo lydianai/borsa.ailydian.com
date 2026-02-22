@@ -28,6 +28,7 @@ interface OtomatikTicaretIstatistik {
 }
 
 export default function OtomatikTicaretSayfasi() {
+  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
   const [istatistik, setIstatistik] = useState<OtomatikTicaretIstatistik | null>(null);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState<string | null>(null);
