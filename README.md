@@ -49,6 +49,23 @@ Most crypto scanners are either **paid SaaS** tools with monthly fees, or **limi
 
 > **Zero API keys needed to start.** Binance public WebSocket endpoints are free. Clone, install, scan.
 
+### How does it compare?
+
+| Feature | LyTrade Scanner | Freqtrade | Hummingbot | 3Commas |
+|---------|:--------------:|:---------:|:----------:|:-------:|
+| Open Source (MIT) | Yes | Yes | Yes | No |
+| Self-Hosted | Yes | Yes | Yes | No |
+| Web Dashboard | Yes | Limited | No | Yes |
+| Markets Scanned | 617 | Custom | Custom | Custom |
+| Built-in Strategies | 13+ | 5 | 4 | 20+ |
+| AI Commentary | Yes | No | No | No |
+| Whale Tracking | Yes | No | No | No |
+| News + Sentiment | Yes | No | No | No |
+| Push Notifications | Yes | Telegram | No | Yes |
+| No API Key Required | Yes | No | No | No |
+| Language | TypeScript | Python | Python | N/A |
+| Monthly Cost | **Free** | Free | Free | $49-99 |
+
 ## Features
 
 - **617 Market Coverage** -- All Binance USDT Perpetual Futures monitored simultaneously via WebSocket
