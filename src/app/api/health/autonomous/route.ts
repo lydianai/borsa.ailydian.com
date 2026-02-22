@@ -29,7 +29,7 @@ export async function GET() {
     const [
       redisHealth,
       queueHealth,
-      claudeHealth,
+      aiEngineHealth,
       learningHealth,
       memoryHealth,
       cronStatus,
@@ -52,7 +52,7 @@ export async function GET() {
       services: {
         redis: redisHealth.status === 'fulfilled' ? redisHealth.value : { status: 'unhealthy', error: 'Failed to check' },
         queue: queueHealth.status === 'fulfilled' ? queueHealth.value : { status: 'unhealthy', error: 'Failed to check' },
-        claudeAI: claudeHealth.status === 'fulfilled' ? claudeHealth.value : { status: 'unhealthy', error: 'Failed to check' },
+        aiEngine: aiEngineHealth.status === 'fulfilled' ? aiEngineHealth.value : { status: 'unhealthy', error: 'Failed to check' },
         learningSystem: learningHealth.status === 'fulfilled' ? learningHealth.value : { status: 'unhealthy', error: 'Failed to check' },
         memoryStore: memoryHealth.status === 'fulfilled' ? memoryHealth.value : { status: 'unhealthy', error: 'Failed to check' },
         cronJobs: cronStatus.status === 'fulfilled' ? { status: 'healthy', ...cronStatus.value } : { status: 'unhealthy', error: 'Failed to check' },
