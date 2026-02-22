@@ -9,7 +9,7 @@
 
 ## 📋 ÖZet
 
-AiLydian-EMRAH trading scanner için **ultra-premium Telegram bildirim sistemi** başarıyla kuruldu ve entegre edildi.
+AiLydian-LYDIAN trading scanner için **ultra-premium Telegram bildirim sistemi** başarıyla kuruldu ve entegre edildi.
 
 ### ✨ Özellikler
 
@@ -86,7 +86,7 @@ AiLydian-EMRAH trading scanner için **ultra-premium Telegram bildirim sistemi**
 
 ⚠️ Eğitim amaçlıdır, finansal tavsiye değildir.
 
-🔗 [Detaylı Analiz →](https://sardag.app/trading-signals)
+🔗 [Detaylı Analiz →](https://lydian.app/trading-signals)
 
 ░▒▓ AiLydian Trading Scanner ▓▒░
 ```
@@ -125,7 +125,7 @@ AiLydian-EMRAH trading scanner için **ultra-premium Telegram bildirim sistemi**
 
 ⚠️ Eğitim amaçlıdır, finansal tavsiye değildir.
 
-🔗 [Tüm Sinyaller →](https://sardag.app)
+🔗 [Tüm Sinyaller →](https://lydian.app)
 
 ░▒▓ AiLydian Trading Scanner ▓▒░
 ```
@@ -239,7 +239,7 @@ TELEGRAM-BOT-SETUP-COMPLETE-TR.md (350+ satır)
 ```env
 TELEGRAM_BOT_TOKEN=your_bot_token_here
 TELEGRAM_BOT_WEBHOOK_SECRET=your_webhook_secret_here
-NEXT_PUBLIC_APP_URL=https://sardag.app
+NEXT_PUBLIC_APP_URL=https://lydian.app
 ```
 
 ### ✅ Package Dependencies
@@ -274,7 +274,7 @@ vercel --prod
 curl -X POST "https://api.telegram.org/bot<YOUR_TOKEN>/setWebhook" \
   -H "Content-Type: application/json" \
   -d '{
-    "url": "https://sardag.app/api/telegram/webhook",
+    "url": "https://lydian.app/api/telegram/webhook",
     "secret_token": "your_webhook_secret_here"
   }'
 ```
@@ -283,12 +283,12 @@ curl -X POST "https://api.telegram.org/bot<YOUR_TOKEN>/setWebhook" \
 
 #### a) Admin Endpoint ile Sistem Durumu
 ```bash
-curl https://sardag.app/api/telegram/admin
+curl https://lydian.app/api/telegram/admin
 ```
 
 #### b) Test Bildirimi Gönder
 ```bash
-curl -X POST https://sardag.app/api/telegram/test \
+curl -X POST https://lydian.app/api/telegram/test \
   -H "Content-Type: application/json" \
   -d '{"type": "strong_buy"}'
 ```
@@ -450,7 +450,7 @@ Total Lines: 2,500+
 📊 Son Sinyaller - Son sinyalleri getir
 💰 Fiyat Sorgula - Fiyat sorgulamaya yönlendir
 ❓ Yardım - Yardım menüsünü aç
-🌐 Web Sitesi - sardag.app'a git
+🌐 Web Sitesi - lydian.app'a git
 ```
 
 ---
@@ -503,10 +503,10 @@ export async function subscribe(chatId: number) {
 ### Test Endpoints
 ```bash
 # Admin durumu
-GET https://sardag.app/api/telegram/admin
+GET https://lydian.app/api/telegram/admin
 
 # Test bildirimi
-POST https://sardag.app/api/telegram/test
+POST https://lydian.app/api/telegram/test
 Content-Type: application/json
 {"type": "strong_buy"}
 
@@ -524,7 +524,7 @@ curl -X POST "https://api.telegram.org/bot<YOUR_TOKEN>/deleteWebhook"
 
 # Webhook'u yeniden kur
 curl -X POST "https://api.telegram.org/bot<YOUR_TOKEN>/setWebhook" \
-  -d "url=https://sardag.app/api/telegram/webhook" \
+  -d "url=https://lydian.app/api/telegram/webhook" \
   -d "secret_token=your_secret"
 ```
 
@@ -532,7 +532,7 @@ curl -X POST "https://api.telegram.org/bot<YOUR_TOKEN>/setWebhook" \
 
 ## 🎉 SONUÇ
 
-✅ **AiLydian-EMRAH Telegram Premium Bildirim Sistemi başarıyla kuruldu!**
+✅ **AiLydian-LYDIAN Telegram Premium Bildirim Sistemi başarıyla kuruldu!**
 
 ### Öne Çıkan Başarılar:
 1. 🎨 **Telegram'da hiç görülmemiş benzersiz ultra-premium tasarım**

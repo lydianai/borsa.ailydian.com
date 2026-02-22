@@ -7,7 +7,7 @@
 
 ## ✅ Vercel Deployment - COMPLETE
 
-**Frontend URL:** https://borsa-h1uu9pk5l-emrahsardag-yandexcoms-projects.vercel.app
+**Frontend URL:** https://borsa-h1uu9pk5l-lydianlydian-yandexcoms-projects.vercel.app
 **Status:** ✅ Ready
 **Build Time:** 43 seconds
 **Deployment:** Production
@@ -83,7 +83,7 @@ After both services deploy successfully:
 
 #### 4. **Configure Vercel Environment Variables**
 
-1. Go to https://vercel.com/emrahsardag-yandexcoms-projects/borsa/settings/environment-variables
+1. Go to https://vercel.com/lydianlydian-yandexcoms-projects/borsa/settings/environment-variables
 2. Add these variables:
 
    ```bash
@@ -113,7 +113,7 @@ After both services deploy successfully:
 - [x] Deployed to production
 - [x] 36 routes generated
 - [x] 28 API routes active
-- [x] URL: https://borsa-h1uu9pk5l-emrahsardag-yandexcoms-projects.vercel.app
+- [x] URL: https://borsa-h1uu9pk5l-lydianlydian-yandexcoms-projects.vercel.app
 
 ### Railway (Backend Services)
 - [ ] Create `ai-models` service in dashboard
@@ -196,10 +196,10 @@ railway logs --service talib-service --tail
 ### Vercel Logs
 ```bash
 # View deployment logs
-vercel logs https://borsa-h1uu9pk5l-emrahsardag-yandexcoms-projects.vercel.app
+vercel logs https://borsa-h1uu9pk5l-lydianlydian-yandexcoms-projects.vercel.app
 
 # View specific function logs
-vercel logs https://borsa-h1uu9pk5l-emrahsardag-yandexcoms-projects.vercel.app --output=function
+vercel logs https://borsa-h1uu9pk5l-lydianlydian-yandexcoms-projects.vercel.app --output=function
 ```
 
 ---
@@ -263,7 +263,7 @@ All systems are ready when:
 
 **Railway Dashboard:** https://railway.app
 **Vercel Dashboard:** https://vercel.com
-**Project Status:** https://borsa-h1uu9pk5l-emrahsardag-yandexcoms-projects.vercel.app
+**Project Status:** https://borsa-h1uu9pk5l-lydianlydian-yandexcoms-projects.vercel.app
 
 **Created by:** Claude Code
 **Date:** 2025-10-02

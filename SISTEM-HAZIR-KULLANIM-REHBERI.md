@@ -45,7 +45,7 @@
 
 ### 1. Sunucuyu Başlat
 ```bash
-cd /Users/sardag/Desktop/sardag-emrah
+cd /home/lydian/Masaüstü/PROJELER/lytrade
 pnpm dev
 ```
 
@@ -76,7 +76,7 @@ Tarayıcıda: `http://localhost:3000`
 **Herhangi bir coin kartına tıklayın** → Popup açılacak:
 
 **Popup İçeriği:**
-- 🤖 **Groq AI Sardag Analizi** (API key gerekli)
+- 🤖 **Groq AI Lydian Analizi** (API key gerekli)
 - 🎯 **Genel Sonuç**:
   - Toplam skor (0-100)
   - Öneri: AL / BEKLE / SAT
@@ -106,7 +106,7 @@ Tarayıcıda: `http://localhost:3000`
 
 2. **`.env.local` Dosyasını Düzenleyin**:
 ```bash
-# Dosya: /Users/sardag/Desktop/sardag-emrah/.env.local
+# Dosya: /home/lydian/Masaüstü/PROJELER/lytrade/.env.local
 
 # Groq AI API Key
 GROQ_API_KEY=gsk-xxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -242,7 +242,7 @@ GET /api/quantum-signals  # Quantum sinyaller (mevcut)
 ## 📂 DOSYA YAPISI
 
 ```
-sardag-emrah/
+lytrade/
 ├── apps/
 │   └── signal-engine/
 │       ├── strategies/
@@ -381,7 +381,7 @@ Tüm sistem çalışır durumda! 617 coin, 13 strateji, gerçek zamanlı veri, n
 
 ---
 
-**Geliştirici**: Claude Code x Sardag
+**Geliştirici**: Claude Code x Lydian
 **Tarih**: 24 Ekim 2025
 **Versiyon**: v2.0-market-scanner
 **Durum**: %100 PRODUCTION-READY ✅

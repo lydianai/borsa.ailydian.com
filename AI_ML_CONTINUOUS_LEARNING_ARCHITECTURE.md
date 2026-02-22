@@ -244,7 +244,7 @@ Her AI sistemi için ayrı bir PM2 job:
     {
       "name": "ai-learning-orchestrator",
       "script": "orchestrator.py",
-      "cwd": "/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub",
+      "cwd": "/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub",
       "interpreter": "./venv/bin/python3",
       "instances": 1,
       "exec_mode": "fork",
@@ -260,7 +260,7 @@ Her AI sistemi için ayrı bir PM2 job:
     {
       "name": "rl-agent-worker",
       "script": "workers/rl_agent_worker.py",
-      "cwd": "/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub",
+      "cwd": "/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub",
       "interpreter": "./venv/bin/python3",
       "instances": 1,
       "autorestart": true
@@ -268,7 +268,7 @@ Her AI sistemi için ayrı bir PM2 job:
     {
       "name": "online-learning-worker",
       "script": "workers/online_learning_worker.py",
-      "cwd": "/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub",
+      "cwd": "/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub",
       "interpreter": "./venv/bin/python3",
       "instances": 1,
       "autorestart": true
@@ -276,7 +276,7 @@ Her AI sistemi için ayrı bir PM2 job:
     {
       "name": "multi-agent-worker",
       "script": "workers/multi_agent_worker.py",
-      "cwd": "/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub",
+      "cwd": "/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub",
       "interpreter": "./venv/bin/python3",
       "instances": 1,
       "autorestart": true
@@ -284,7 +284,7 @@ Her AI sistemi için ayrı bir PM2 job:
     {
       "name": "automl-optimizer-worker",
       "script": "workers/automl_worker.py",
-      "cwd": "/Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub",
+      "cwd": "/Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub",
       "interpreter": "./venv/bin/python3",
       "instances": 1,
       "autorestart": true,
@@ -296,7 +296,7 @@ Her AI sistemi için ayrı bir PM2 job:
 
 ### PM2 Başlatma:
 ```bash
-cd /Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
+cd /Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
 pm2 start ecosystem.config.js
 pm2 save
 pm2 startup  # Boot'ta otomatik başlat

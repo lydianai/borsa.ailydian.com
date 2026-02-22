@@ -16,7 +16,7 @@ TELEGRAM_BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
 TELEGRAM_BOT_WEBHOOK_SECRET=super-gizli-webhook-anahtari-buraya-32-karakter-olmali
 
 # App URL (zaten var)
-NEXT_PUBLIC_APP_URL=https://sardag.app
+NEXT_PUBLIC_APP_URL=https://lydian.app
 ```
 
 **✅ Tamamlandı!** Vercel otomatik redeploy yapacak.
@@ -36,7 +36,7 @@ WEBHOOK_SECRET="super-gizli-webhook-anahtari-buraya"
 curl -X POST "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook" \
   -H "Content-Type: application/json" \
   -d "{
-    \"url\": \"https://sardag.app/api/telegram/webhook\",
+    \"url\": \"https://lydian.app/api/telegram/webhook\",
     \"secret_token\": \"${WEBHOOK_SECRET}\"
   }"
 ```
@@ -70,12 +70,12 @@ curl "https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo"
 
 ```bash
 # Simple test
-curl -X POST "https://sardag.app/api/telegram/test" \
+curl -X POST "https://lydian.app/api/telegram/test" \
   -H "Content-Type: application/json" \
   -d '{"type": "simple"}'
 
 # STRONG_BUY test (premium format)
-curl -X POST "https://sardag.app/api/telegram/test" \
+curl -X POST "https://lydian.app/api/telegram/test" \
   -H "Content-Type: application/json" \
   -d '{"type": "strong_buy"}'
 ```
@@ -86,7 +86,7 @@ curl -X POST "https://sardag.app/api/telegram/test" \
 
 ```bash
 # Sistem durumunu kontrol et
-curl "https://sardag.app/api/telegram/admin"
+curl "https://lydian.app/api/telegram/admin"
 ```
 
 Yanıt:
@@ -196,7 +196,7 @@ Telegram'da /start gönderin
 curl "https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo"
 ```
 
-Yanıt `"url": "https://sardag.app/api/telegram/webhook"` içermeli.
+Yanıt `"url": "https://lydian.app/api/telegram/webhook"` içermeli.
 
 **3. Vercel environment variables kontrol:**
 - TELEGRAM_BOT_TOKEN doğru mu?
@@ -204,7 +204,7 @@ Yanıt `"url": "https://sardag.app/api/telegram/webhook"` içermeli.
 
 **4. Test bildirimi gönderin:**
 ```bash
-curl -X POST "https://sardag.app/api/telegram/test" \
+curl -X POST "https://lydian.app/api/telegram/test" \
   -H "Content-Type: application/json" \
   -d '{"type": "simple"}'
 ```
@@ -220,7 +220,7 @@ curl -X POST "https://api.telegram.org/bot${BOT_TOKEN}/deleteWebhook"
 curl -X POST "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook" \
   -H "Content-Type: application/json" \
   -d "{
-    \"url\": \"https://sardag.app/api/telegram/webhook\",
+    \"url\": \"https://lydian.app/api/telegram/webhook\",
     \"secret_token\": \"${WEBHOOK_SECRET}\"
   }"
 ```
@@ -307,25 +307,25 @@ BOT_TOKEN="YOUR_TOKEN_HERE"
 curl "https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo"
 
 # 2. Admin paneli
-curl "https://sardag.app/api/telegram/admin"
+curl "https://lydian.app/api/telegram/admin"
 
 # 3. Simple test
-curl -X POST "https://sardag.app/api/telegram/test" \
+curl -X POST "https://lydian.app/api/telegram/test" \
   -H "Content-Type: application/json" \
   -d '{"type": "simple"}'
 
 # 4. Strong buy test
-curl -X POST "https://sardag.app/api/telegram/test" \
+curl -X POST "https://lydian.app/api/telegram/test" \
   -H "Content-Type: application/json" \
   -d '{"type": "strong_buy"}'
 
 # 5. Sell test
-curl -X POST "https://sardag.app/api/telegram/test" \
+curl -X POST "https://lydian.app/api/telegram/test" \
   -H "Content-Type: application/json" \
   -d '{"type": "sell"}'
 
 # 6. Wait test
-curl -X POST "https://sardag.app/api/telegram/test" \
+curl -X POST "https://lydian.app/api/telegram/test" \
   -H "Content-Type: application/json" \
   -d '{"type": "wait"}'
 ```

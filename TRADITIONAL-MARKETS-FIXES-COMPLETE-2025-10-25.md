@@ -254,5 +254,5 @@ Tüm fiyatlar doğru şekilde görüntüleniyor:
 ---
 
 **Oluşturulma:** 25 Ekim 2025, 18:00
-**Yazar:** SarDag AI System
+**Yazar:** LyTrade AI System
 **Durum:** ✅ TAMAMLANDI

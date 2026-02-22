@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: SarDag Trading Signals API
+  title: LyTrade Trading Signals API
   description: |
     Production-ready trading signals API powered by 18 strategies, AI analysis, and real-time data.
 

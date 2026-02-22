@@ -114,7 +114,7 @@ jobs:
     if: needs.pre-deploy.outputs.should_deploy == 'true'
     environment:
       name: canary
-      url: https://sardag-emrah-canary.vercel.app
+      url: https://lytrade-canary.vercel.app
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -136,7 +136,7 @@ jobs:
 
       - name: 🕊️ Deploy to canary
         run: |
-          vercel --name sardag-emrah-canary --confirm --token ${{ secrets.VERCEL_TOKEN }}
+          vercel --name lytrade-canary --confirm --token ${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -156,7 +156,7 @@ jobs:
       - name: 🏥 Check canary health
         id: health
         run: |
-          CANARY_URL="https://sardag-emrah-canary.vercel.app"
+          CANARY_URL="https://lytrade-canary.vercel.app"
           MAX_RETRIES=5
           RETRY_DELAY=10
           HEALTH_STATUS="unhealthy"
@@ -211,13 +211,13 @@ jobs:
     if: needs.health-check.outputs.health_status == 'healthy'
     environment:
       name: production
-      url: https://sardag-emrah.vercel.app
+      url: https://lytrade.vercel.app
     steps:
       - name: 📈 Execute gradual rollout
         run: |
           ROLLOUT_PERCENTAGE="${{ needs.pre-deploy.outputs.rollout_percentage }}"
-          CANARY_URL="https://sardag-emrah-canary.vercel.app"
-          PROD_URL="https://sardag-emrah.vercel.app"
+          CANARY_URL="https://lytrade-canary.vercel.app"
+          PROD_URL="https://lytrade.vercel.app"
           
           echo "🚀 Starting gradual rollout to $ROLLOUT_PERCENTAGE% traffic"
           
@@ -261,7 +261,7 @@ jobs:
     if: needs.pre-deploy.outputs.rollout_percentage == '100'
     environment:
       name: production
-      url: https://sardag-emrah.vercel.app
+      url: https://lytrade.vercel.app
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -293,7 +293,7 @@ jobs:
           if [[ -n "$OPS_WEBHOOK_URL" ]]; then
             curl -X POST "$OPS_WEBHOOK_URL" \
               -H 'Content-type: application/json' \
-              --data "{\"text\":\"🎉 **Canary Deployment Successful**\n\n*Repository*: ${{ github.repository }}\n*Commit*: ${{ github.sha }}\n*Rollout*: 100%\n*URL*: https://sardag-emrah.vercel.app\"}"
+              --data "{\"text\":\"🎉 **Canary Deployment Successful**\n\n*Repository*: ${{ github.repository }}\n*Commit*: ${{ github.sha }}\n*Rollout*: 100%\n*URL*: https://lytrade.vercel.app\"}"
           fi
 
   # Rollback on failure
@@ -304,7 +304,7 @@ jobs:
     if: failure() && needs.health-check.outputs.health_status != 'healthy'
     environment:
       name: production
-      url: https://sardag-emrah.vercel.app
+      url: https://lytrade.vercel.app
     steps:
       - name: 🔄 Execute rollback
         run: |
@@ -355,7 +355,7 @@ jobs:
           
           if [[ "${{ needs.pre-deploy.outputs.rollout_percentage }}" != "100" ]]; then
             echo "Removing canary deployment (partial rollout)"
-            # vercel remove sardag-emrah-canary --token ${{ secrets.VERCEL_TOKEN }}
+            # vercel remove lytrade-canary --token ${{ secrets.VERCEL_TOKEN }}
           else
             echo "Canary promoted to production - no cleanup needed"
           fi

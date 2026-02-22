@@ -1,6 +1,6 @@
 # 🤖 TELEGRAM BOT ENTEGRASYONU - KAPSAMLI BRIEF
 
-**Proje:** AiLydian-EMRAH Trading Scanner
+**Proje:** AiLydian-LYDIAN Trading Scanner
 **Tarih:** 26 Ekim 2025
 **Hedef:** Minimal manuel kurulum ile Telegram bot entegrasyonu
 **Süre:** ~1 saat kurulum + otomatik çalışma
@@ -10,7 +10,7 @@
 ## 📋 İÇİNDEKİLER
 
 1. [Telegram Bot Nedir?](#telegram-bot-nedir)
-2. [AiLydian-EMRAH İçin Kullanım Senaryoları](#kullanım-senaryoları)
+2. [AiLydian-LYDIAN İçin Kullanım Senaryoları](#kullanım-senaryoları)
 3. [Minimal Kurulum (5 Adım)](#minimal-kurulum)
 4. [Teknik Mimari](#teknik-mimari)
 5. [Kod İmplementasyonu](#kod-implementasyonu)
@@ -27,7 +27,7 @@
 
 Telegram bot, Telegram platformu üzerinde çalışan otomatik programlardır. Kullanıcılara mesaj gönderebilir, komutları yanıtlayabilir ve bildirimler yapabilirler.
 
-### AiLydian-EMRAH İçin Neden Telegram?
+### AiLydian-LYDIAN İçin Neden Telegram?
 
 ✅ **Gerçek Zamanlı Bildirimler**
 - Trading sinyalleri anında iletilir
@@ -71,7 +71,7 @@ Telegram bot, Telegram platformu üzerinde çalışan otomatik programlardır. K
 🎯 Güven: %85
 ⏰ 26 Ekim 2025 - 14:35
 
-Detay: https://sardag.app/trading-signals
+Detay: https://lydian.app/trading-signals
 ```
 
 ---
@@ -116,7 +116,7 @@ En Çok Düşen:
 Toplam Sinyal: 47
 BUY: 28 | SELL: 19
 
-Detay: https://sardag.app
+Detay: https://lydian.app
 ```
 
 ---
@@ -151,7 +151,7 @@ Detay: https://sardag.app
 **Telegram Kanalı:**
 - Herkesin katılabileceği herkese açık kanal
 - Sadece bot sinyal gönderir (kullanıcılar mesaj atamaz)
-- Örnek: `@SardagTradingSignals`
+- Örnek: `@LydianTradingSignals`
 
 **Telegram Grubu:**
 - Kullanıcılar birbirleriyle konuşabilir
@@ -175,7 +175,7 @@ Telegram'da `@BotFather` hesabını aç ve şu komutları gönder:
 AiLydian Trading Scanner
 → BotFather: "Good. Now let's choose a username for your bot."
 
-SardagTradingBot
+LydianTradingBot
 → BotFather: "Done! Congratulations on your new bot."
 ```
 
@@ -438,7 +438,7 @@ bot.command('start', async (ctx) => {
     .text('💰 Fiyat Sorgula', 'price')
     .row()
     .text('⚙️ Ayarlar', 'settings')
-    .url('🌐 Web Sitesi', 'https://sardag.app');
+    .url('🌐 Web Sitesi', 'https://lydian.app');
 
   await ctx.reply(
     `👋 Hoş geldin, ${ctx.from?.first_name}!
@@ -470,7 +470,7 @@ Komutlar:
 bot.command('signals', async (ctx) => {
   try {
     // AiLydian API'den sinyalleri çek
-    const response = await fetch('https://sardag.app/api/signals');
+    const response = await fetch('https://lydian.app/api/signals');
     const data = await response.json();
 
     if (!data.signals || data.signals.length === 0) {
@@ -507,7 +507,7 @@ bot.command('price', async (ctx) => {
 
   try {
     const response = await fetch(
-      `https://sardag.app/api/binance/futures?symbols=${symbol}`
+      `https://lydian.app/api/binance/futures?symbols=${symbol}`
     );
     const data = await response.json();
 
@@ -559,7 +559,7 @@ bot.command('help', async (ctx) => {
 
 **Diğer:**
 /help - Bu yardım menüsü
-🌐 Web: https://sardag.app`,
+🌐 Web: https://lydian.app`,
     { parse_mode: 'Markdown' }
   );
 });
@@ -665,7 +665,7 @@ ${emoji} Trend: **${signal.action}**
 🎯 Güven: **${signal.confidence}%**
 ⏰ ${new Date(signal.timestamp).toLocaleString('tr-TR')}
 
-${signal.reason ? `📝 ${signal.reason}\n\n` : ''}Detay: https://sardag.app/trading-signals`;
+${signal.reason ? `📝 ${signal.reason}\n\n` : ''}Detay: https://lydian.app/trading-signals`;
 
   // Tüm abonelere gönder
   const sendPromises = Array.from(subscribers).map((chatId) =>
@@ -687,7 +687,7 @@ ${signal.reason ? `📝 ${signal.reason}\n\n` : ''}Detay: https://sardag.app/tra
  */
 export async function sendDailySummary(): Promise<void> {
   try {
-    const response = await fetch('https://sardag.app/api/signals');
+    const response = await fetch('https://lydian.app/api/signals');
     const data = await response.json();
 
     // İstatistikleri hesapla
@@ -709,7 +709,7 @@ ${data.signals
 
 ⏰ ${new Date().toLocaleString('tr-TR')}
 
-Detay: https://sardag.app`;
+Detay: https://lydian.app`;
 
     const sendPromises = Array.from(subscribers).map((chatId) =>
       bot.api.sendMessage(chatId, message, { parse_mode: 'Markdown' })
@@ -907,7 +907,7 @@ Deploy tamamlandıktan sonra:
 curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
   -H "Content-Type: application/json" \
   -d '{
-    "url": "https://sardag.vercel.app/api/telegram/webhook",
+    "url": "https://lydian.vercel.app/api/telegram/webhook",
     "secret_token": "your-super-secret-webhook-key-here-min-32-chars",
     "allowed_updates": ["message", "callback_query"]
   }'
@@ -1111,7 +1111,7 @@ CREATE TABLE telegram_subscribers (
 
 ```bash
 # 1. Webhook status kontrol
-curl https://sardag.vercel.app/api/telegram/webhook
+curl https://lydian.vercel.app/api/telegram/webhook
 
 # 2. Telegram'da test
 /start
@@ -1140,7 +1140,7 @@ import { InlineKeyboard } from 'grammy';
 
 const keyboard = new InlineKeyboard()
   .text('Detay Gör', 'view_details')
-  .url('Web Sitesi', 'https://sardag.app');
+  .url('Web Sitesi', 'https://lydian.app');
 
 await ctx.reply('Mesaj', { reply_markup: keyboard });
 ```
@@ -1193,7 +1193,7 @@ await ctx.reply('Mesaj', { reply_markup: keyboard });
 
 ## ✅ SONUÇ
 
-Telegram bot entegrasyonu ile AiLydian-EMRAH projesi:
+Telegram bot entegrasyonu ile AiLydian-LYDIAN projesi:
 
 ✅ **Gerçek zamanlı bildirimler** - Kullanıcılar anında sinyal alır
 ✅ **Minimal kurulum** - 5 adım, 15 dakika

@@ -9,7 +9,7 @@ echo "🤖 TELEGRAM SCHEDULER BAŞLATILIYOR..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Working directory
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Telegram/schedulers
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Telegram/schedulers
 
 # PM2 kontrol
 if ! command -v pm2 &> /dev/null; then

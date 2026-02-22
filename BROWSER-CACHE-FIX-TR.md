@@ -87,7 +87,7 @@ pkill -9 -f "pnpm dev"
 pkill -9 -f "next dev"
 
 # Cache'i temizle
-cd /Users/sardag/Desktop/sardag-emrah
+cd /home/lydian/Masaüstü/PROJELER/lytrade
 rm -rf .next
 
 # Yeni server başlat

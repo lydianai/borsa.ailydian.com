@@ -266,7 +266,7 @@ GET /api/security/device-fingerprint → Device tracking
 ## 📦 DOSYA YAPISI (HEDEF)
 
 ```
-sardag-emrah-final.bak-20251030-170900/
+lytrade-final.bak-20251030-170900/
 ├── src/
 │   └── app/
 │       └── api/

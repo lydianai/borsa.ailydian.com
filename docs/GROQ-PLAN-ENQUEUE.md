@@ -29,7 +29,7 @@ curl -X POST http://localhost:3002/api/queue/enqueue \
     "signature": { ... },
     "meta": {
       "source": "groq-planner",
-      "orchestrator": "sardag-groq",
+      "orchestrator": "lydian-groq",
       "priority": "high",
       "timeframe": "4h"
     }

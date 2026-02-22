@@ -1,5 +1,5 @@
 /**
- * 🧠 AI MEMORY STORE - LyTrade EMRAH ÖĞRENME SİSTEMİ
+ * 🧠 AI MEMORY STORE - LyTrade LYDIAN ÖĞRENME SİSTEMİ
  *
  * Redis'te her coin ve strateji için performans geçmişi saklar.
  * Otonom AI Agent'ın geçmişten öğrenmesini sağlar.

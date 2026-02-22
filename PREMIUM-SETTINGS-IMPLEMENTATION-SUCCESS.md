@@ -124,8 +124,8 @@
 ✅ Load settings on mount
 ✅ Save settings on change
 ✅ Auto-save (instant)
-✅ Theme persistence (sardag_theme key)
-✅ Settings persistence (sardag_settings key)
+✅ Theme persistence (lydian_theme key)
+✅ Settings persistence (lydian_settings key)
 ```
 
 ### Backend Integration
@@ -527,7 +527,7 @@ ON:  ────────────⚫ (green)
 ### Export/Import
 ```
 [📥 Ayarları Dışa Aktar] [📤 Ayarları İçe Aktar]
-└─ sardag-settings-2025-10-24.json
+└─ lydian-settings-2025-10-24.json
 ```
 
 ---

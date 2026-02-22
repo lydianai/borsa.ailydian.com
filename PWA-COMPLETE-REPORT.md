@@ -282,7 +282,7 @@ export const viewport: Viewport = {
 ### Install Flow
 
 ```
-1. User visits https://sardag.com
+1. User visits https://lydian.com
    ↓
 2. Service Worker registers in background
    ↓
@@ -530,7 +530,7 @@ Status Bar: black-translucent (iOS)
 - [ ] **Periodic Sync**: Auto-refresh market data (Chrome only)
 - [ ] **Share Target**: Share coins to AiLydian
 - [ ] **File Handler**: Open CSV/JSON trading data
-- [ ] **Protocol Handler**: sardag:// URL scheme
+- [ ] **Protocol Handler**: lydian:// URL scheme
 
 ### Phase 3 (Advanced)
 

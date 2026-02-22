@@ -259,5 +259,5 @@ The Harem Altın API integration is **COMPLETE** and **PRODUCTION READY**. All u
 ---
 
 **Generated:** 25 Ekim 2025, 17:00
-**Author:** SarDag AI System
+**Author:** LyTrade AI System
 **Status:** ✅ VERIFIED & TESTED

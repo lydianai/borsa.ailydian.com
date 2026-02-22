@@ -65,7 +65,7 @@ cat > ecosystem.config.js << 'EOF'
 module.exports = {
   apps: [
     {
-      name: 'sardag-emrah-web',
+      name: 'lytrade-web',
       script: 'pnpm',
       args: 'start',
       cwd: './',
@@ -136,7 +136,7 @@ if curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
     echo "[$(date)] ✅ Next.js server: HEALTHY" >> "$LOG_FILE"
 else
     echo "[$(date)] ❌ Next.js server: DOWN - Restarting..." >> "$LOG_FILE"
-    pm2 restart sardag-emrah-web
+    pm2 restart lytrade-web
 fi
 
 # Check if ngrok tunnel is active
@@ -244,10 +244,10 @@ echo ""
 echo "📋 Step 6: Setting up cron jobs..."
 
 # Create crontab entries
-CRON_FILE="/tmp/sardag-cron"
+CRON_FILE="/tmp/lydian-cron"
 
 cat > "$CRON_FILE" << EOF
-# AiLydian-EMRAH Telegram System - Health Check (Every 5 minutes)
+# AiLydian-LYDIAN Telegram System - Health Check (Every 5 minutes)
 */5 * * * * cd $(pwd) && bash scripts/health-check.sh
 
 # Save subscribers (Every hour)
@@ -345,7 +345,7 @@ echo ""
 echo "🎯 Useful commands:"
 echo "   pm2 list                  - List all processes"
 echo "   pm2 logs                  - View all logs"
-echo "   pm2 logs sardag-emrah-web - View Next.js logs"
+echo "   pm2 logs lytrade-web - View Next.js logs"
 echo "   pm2 logs ngrok-tunnel     - View ngrok logs"
 echo "   pm2 restart all           - Restart all processes"
 echo "   pm2 stop all              - Stop all processes"

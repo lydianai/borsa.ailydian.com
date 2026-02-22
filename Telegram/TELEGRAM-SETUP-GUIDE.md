@@ -63,7 +63,7 @@ Sistem 7/24 çalışıyor! 🚀
 
 ### Durumu Kontrol Et
 ```bash
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Telegram/schedulers
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Telegram/schedulers
 pm2 list
 pm2 info telegram-scheduler
 ```
@@ -112,7 +112,7 @@ pm2 jlist
 Terminal'de şu komutu çalıştırın:
 
 ```bash
-sudo env PATH=$PATH:/opt/homebrew/Cellar/node/24.10.0/bin /opt/homebrew/lib/node_modules/pm2/bin/pm2 startup launchd -u sardag --hp /Users/sardag
+sudo env PATH=$PATH:/opt/homebrew/Cellar/node/24.10.0/bin /opt/homebrew/lib/node_modules/pm2/bin/pm2 startup launchd -u lydian --hp /Users/lydian
 ```
 
 **Not**: Bu komut sudo şifresi isteyecek. Şifrenizi girin.
@@ -173,7 +173,7 @@ pm2 flush all
 
 ### Manuel Test Mesajı Gönder
 ```bash
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Telegram
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Telegram
 node test-telegram-scheduler.js
 ```
 
@@ -220,7 +220,7 @@ pm2 restart telegram-scheduler
 ### Problem: Telegram mesajı gönderilmiyor
 **Kontrol 1**: Bot Token ve Chat ID doğru mu?
 ```bash
-cat /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/.env.local | grep TELEGRAM
+cat /Users/lydian/Documents/lytrade-final.bak-20251030-170900/.env.local | grep TELEGRAM
 ```
 
 **Kontrol 2**: PM2 log'larına bak
@@ -230,7 +230,7 @@ pm2 logs telegram-scheduler --lines 50
 
 **Kontrol 3**: Manuel test yap
 ```bash
-node /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Telegram/test-telegram-scheduler.js
+node /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Telegram/test-telegram-scheduler.js
 ```
 
 ### Problem: PM2 servisi sürekli restart oluyor

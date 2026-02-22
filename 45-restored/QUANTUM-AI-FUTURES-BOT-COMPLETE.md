@@ -388,7 +388,7 @@ Piyasa Rejimi: TRENDING
 ## 📁 DOSYA YAPISI
 
 ```
-/Users/sardag/Desktop/borsa/
+/home/lydian/Masaüstü/PROJELER/borsa/
 │
 ├── src/
 │   ├── app/

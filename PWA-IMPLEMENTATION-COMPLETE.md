@@ -166,7 +166,7 @@
 
 ### Service Worker Cache
 ```javascript
-CACHE_VERSION: 'sardag-v1.0.0'
+CACHE_VERSION: 'lydian-v1.0.0'
 - Static: 7 days
 - Dynamic: 24 hours
 - API: 1 minute

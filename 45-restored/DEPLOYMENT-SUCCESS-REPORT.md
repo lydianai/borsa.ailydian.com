@@ -10,10 +10,10 @@
 ### 🔵 Vercel Deployment - SUCCESSFUL ✅
 
 **Status:** ✅ DEPLOYED
-**URL:** https://borsa-hh6j1c8uj-emrahsardag-yandexcoms-projects.vercel.app
+**URL:** https://borsa-hh6j1c8uj-lydianlydian-yandexcoms-projects.vercel.app
 **Build:** ✅ Success (0 errors, 0 warnings)
 **Routes:** 40 routes deployed
-**Inspect:** https://vercel.com/emrahsardag-yandexcoms-projects/borsa/EjxkHNLuFNs6vTMTJ1nP5QdLkfPh
+**Inspect:** https://vercel.com/lydianlydian-yandexcoms-projects/borsa/EjxkHNLuFNs6vTMTJ1nP5QdLkfPh
 
 ### 🟣 Railway Deployment - CONFIG READY ✅
 
@@ -141,7 +141,7 @@ AZURE_EVENTHUB_CONN=your_connection
 
 ### 1. Health Check ✅
 ```bash
-curl https://borsa-hh6j1c8uj-emrahsardag-yandexcoms-projects.vercel.app
+curl https://borsa-hh6j1c8uj-lydianlydian-yandexcoms-projects.vercel.app
 ```
 **Expected:** Homepage loads successfully
 
@@ -341,7 +341,7 @@ vercel --prod --with-analytics
 
 **Production (Vercel):**
 ```
-https://borsa-hh6j1c8uj-emrahsardag-yandexcoms-projects.vercel.app
+https://borsa-hh6j1c8uj-lydianlydian-yandexcoms-projects.vercel.app
 ```
 
 **Custom Domain (Setup Required):**
@@ -383,7 +383,7 @@ railway up
 1. Open: https://vercel.com/dashboard
 2. Configure environment variables
 3. Setup custom domain: borsa.ailydian.com
-4. Test live: https://borsa-hh6j1c8uj-emrahsardag-yandexcoms-projects.vercel.app
+4. Test live: https://borsa-hh6j1c8uj-lydianlydian-yandexcoms-projects.vercel.app
 
 ---
 

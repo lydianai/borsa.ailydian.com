@@ -257,7 +257,7 @@ export function formatPremiumSignal(signal: TradingSignal): string {
 
     // ═══════ LINK & DISCLAIMER ═══════
     '',
-    `<a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://sardag.app'}/trading-signals">⟫ Detaylı Analiz</a>`,
+    `<a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://lydian.app'}/trading-signals">⟫ Detaylı Analiz</a>`,
     `<i>※ Eğitim amaçlı</i>`,
   ];
 
@@ -317,7 +317,7 @@ export function formatPremiumDailySummary(summary: {
     // Footer
     '╰━━━━━━━━━━━━━━━━━━━╯',
     '',
-    `<a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://sardag.app'}">⟫ Tüm Sinyaller</a>`,
+    `<a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://lydian.app'}">⟫ Tüm Sinyaller</a>`,
     '<i>※ Eğitim amaçlı</i>',
   ];
 

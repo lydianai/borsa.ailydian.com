@@ -1,4 +1,4 @@
-# AiLydian EMRAH - MOBİL UYUMLULUK VE YAN MENÜ FİX RAPORU
+# AiLydian LYDIAN - MOBİL UYUMLULUK VE YAN MENÜ FİX RAPORU
 **Tarih:** 2025-10-25  
 **Developer:** Claude (Anthropic)  
 **Proje:** AiLydian Trading Dashboard

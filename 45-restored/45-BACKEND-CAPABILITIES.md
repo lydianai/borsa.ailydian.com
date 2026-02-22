@@ -303,7 +303,7 @@ POOR:      <60% consensus
 
 ```bash
 # 1. Backend
-cd /Users/sardag/Downloads/45-restored
+cd /Users/lydian/Downloads/45-restored
 pnpm dev
 
 # 2. Python Servisleri (3 terminal)

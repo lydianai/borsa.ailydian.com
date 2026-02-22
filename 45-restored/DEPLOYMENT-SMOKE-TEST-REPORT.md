@@ -187,7 +187,7 @@ First Load JS shared by all: 106 kB
 ### Dashboard Links
 - **Railway:** https://railway.app/dashboard
 - **Vercel:** https://vercel.com/dashboard
-- **GitHub:** https://github.com/sardagsoftware/borsa
+- **GitHub:** https://github.com/lydiansoftware/borsa
 
 ---
 

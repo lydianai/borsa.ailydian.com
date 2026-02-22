@@ -327,12 +327,12 @@ Metrics endpoint `/api/queue/metrics` Prometheus için hazır:
 ```yaml
 # prometheus.yml
 scrape_configs:
-  - job_name: 'sardag-queue'
+  - job_name: 'lydian-queue'
     scrape_interval: 15s
     metrics_path: '/api/queue/metrics'
     bearer_token: '<INTERNAL_SERVICE_TOKEN>'
     static_configs:
-      - targets: ['sardag-emrah.vercel.app']
+      - targets: ['lytrade.vercel.app']
 ```
 
 ---

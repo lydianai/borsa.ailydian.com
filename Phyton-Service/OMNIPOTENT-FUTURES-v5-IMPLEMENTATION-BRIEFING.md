@@ -167,7 +167,7 @@ curl http://localhost:5014/analyze/BTCUSDT
 ### Adım 1: Python Virtual Environment Kurulumu
 
 ```bash
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Phyton-Service
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Phyton-Service
 
 # Liquidation Heatmap venv
 cd liquidation-heatmap

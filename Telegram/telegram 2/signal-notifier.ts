@@ -196,7 +196,7 @@ ${signal.strategy ? `⚙️ ${signal.strategy}\n` : ''}⏰ ${new Date(signal.tim
 
 ${signal.reason ? `📝 **En Güçlü Stratejiler:**\n${signal.reason}\n\n` : ''}⚠️ *Eğitim amaçlıdır, finansal tavsiye değildir.*
 
-Detay: ${process.env.NEXT_PUBLIC_APP_URL || 'https://sardag.app'}/trading-signals`;
+Detay: ${process.env.NEXT_PUBLIC_APP_URL || 'https://lydian.app'}/trading-signals`;
 }
 
 export default {

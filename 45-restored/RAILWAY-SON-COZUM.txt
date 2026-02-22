@@ -9,8 +9,8 @@
 
 SORUN: Railway Dockerfile'ı bulamıyordu çünkü:
 
-1. Git repository root: /Users/sardag (HOME dizini!)
-2. Dockerfile konumu: /Users/sardag/Desktop/borsa/Dockerfile
+1. Git repository root: /Users/lydian (HOME dizini!)
+2. Dockerfile konumu: /home/lydian/Masaüstü/PROJELER/borsa/Dockerfile
 3. Railway default root: / (repository root)
 4. Railway bakıyor: /Dockerfile ← BURADA YOK!
 5. Gerçek konum: /Desktop/borsa/Dockerfile ← BURADA!
@@ -125,8 +125,8 @@ Settings → Source → Root Directory → "Desktop/borsa" yaz!
 GitHub Dosya Konumları (Doğrulandı ✅):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✅ https://github.com/sardagsoftware/borsa/blob/main/Desktop/borsa/Dockerfile
-✅ https://github.com/sardagsoftware/borsa/blob/main/Desktop/borsa/package.json
-✅ https://github.com/sardagsoftware/borsa/blob/main/Desktop/borsa/ai-worker-src/server.js
+✅ https://github.com/lydiansoftware/borsa/blob/main/Desktop/borsa/Dockerfile
+✅ https://github.com/lydiansoftware/borsa/blob/main/Desktop/borsa/package.json
+✅ https://github.com/lydiansoftware/borsa/blob/main/Desktop/borsa/ai-worker-src/server.js
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

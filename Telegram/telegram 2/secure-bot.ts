@@ -236,7 +236,7 @@ bot.command('start', async (ctx) => {
   const chatId = ctx.chat.id;
 
   await ctx.reply(
-    `👋 *Welcome to Sardag-Emrah Trading Bot!*\n\n` +
+    `👋 *Welcome to LyTrade Trading Bot!*\n\n` +
     `Your Chat ID: \`${chatId}\`\n` +
     `Username: @${user?.username || 'N/A'}\n\n` +
     `*Available Commands:*\n` +
@@ -253,7 +253,7 @@ bot.command('start', async (ctx) => {
  */
 bot.command('help', async (ctx) => {
   await ctx.reply(
-    '*Sardag-Emrah Trading Bot - Help*\n\n' +
+    '*LyTrade Trading Bot - Help*\n\n' +
     '*Commands:*\n' +
     '• `/start` - Initialize bot\n' +
     '• `/help` - Show this help message\n' +

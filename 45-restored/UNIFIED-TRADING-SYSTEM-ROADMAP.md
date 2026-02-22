@@ -229,7 +229,7 @@ class PortfolioManager:
 
 #### **Service 1: Signal Generator** (NEW)
 ```bash
-/Users/sardag/Desktop/borsa/python-services/signal-generator/
+/home/lydian/Masaüstü/PROJELER/borsa/python-services/signal-generator/
 ├── app.py                    # Flask API
 ├── consensus_engine.py       # 14 model aggregation
 ├── signal_quality.py         # Signal validation
@@ -238,7 +238,7 @@ class PortfolioManager:
 
 #### **Service 2: Trade Executor** (NEW)
 ```bash
-/Users/sardag/Desktop/borsa/python-services/trade-executor/
+/home/lydian/Masaüstü/PROJELER/borsa/python-services/trade-executor/
 ├── app.py                    # Flask API
 ├── binance_client.py         # Binance integration
 ├── risk_manager.py           # Risk management
@@ -248,7 +248,7 @@ class PortfolioManager:
 
 #### **Service 3: Portfolio Manager** (NEW)
 ```bash
-/Users/sardag/Desktop/borsa/python-services/portfolio-manager/
+/home/lydian/Masaüstü/PROJELER/borsa/python-services/portfolio-manager/
 ├── app.py                    # Flask API
 ├── position_sizer.py         # Kelly criterion
 ├── exposure_checker.py       # Risk limits

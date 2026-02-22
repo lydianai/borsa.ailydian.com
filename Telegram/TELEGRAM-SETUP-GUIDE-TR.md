@@ -47,7 +47,7 @@
 ### Adım 1: Dependencies Yükleme
 
 ```bash
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900
 
 # Node-cron ve dependencies
 pnpm add node-cron @types/node-cron ts-node -D
@@ -90,7 +90,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ### Adım 3: PM2 Servislerini Başlatma
 
 ```bash
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Telegram/schedulers
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Telegram/schedulers
 
 # Servisleri başlat
 pm2 start ecosystem.config.js
@@ -127,7 +127,7 @@ pm2 logs telegram-scheduler --err
 ### Manuel Test (Scheduler'sız)
 
 ```bash
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Telegram/schedulers
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Telegram/schedulers
 
 # Test scheduler fonksiyonunu çalıştır
 ts-node -e "import('./telegram-signal-scheduler').then(m => m.testAllSchedulers())"
@@ -237,7 +237,7 @@ pm2 monit
 Eğer PM2 kullanmak istemezseniz:
 
 ```bash
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Telegram/schedulers
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Telegram/schedulers
 
 # Manuel başlat
 ts-node cron-service.ts
@@ -359,7 +359,7 @@ TELEGRAM_BOT_TOKEN=xxx
 TELEGRAM_ALLOWED_CHAT_IDS=123456789
 
 # 3. PM2 Başlat
-cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Telegram/schedulers
+cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Telegram/schedulers
 pm2 start ecosystem.config.js
 pm2 startup
 pm2 save

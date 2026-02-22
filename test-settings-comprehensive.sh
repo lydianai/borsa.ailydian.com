@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "=================================================="
-echo "🔍 AiLydian EMRAH - SETTINGS COMPREHENSIVE SMOKE TEST"
+echo "🔍 AiLydian LYDIAN - SETTINGS COMPREHENSIVE SMOKE TEST"
 echo "=================================================="
 echo ""
 

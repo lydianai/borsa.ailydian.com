@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROD_URL="https://borsa-80vqtcw19-emrahsardag-yandexcoms-projects.vercel.app"
+PROD_URL="https://borsa-80vqtcw19-lydianlydian-yandexcoms-projects.vercel.app"
 
 echo "🧪 Production Smoke Test - Beyaz Şapkalı Compliance"
 echo "=================================================="

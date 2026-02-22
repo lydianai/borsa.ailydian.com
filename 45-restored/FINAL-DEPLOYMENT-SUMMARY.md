@@ -8,7 +8,7 @@
 ## ✅ SUCCESSFULLY DEPLOYED
 
 ### Vercel (Frontend) - LIVE
-**URL:** https://borsa-h1uu9pk5l-emrahsardag-yandexcoms-projects.vercel.app
+**URL:** https://borsa-h1uu9pk5l-lydianlydian-yandexcoms-projects.vercel.app
 
 **Deployed Features:**
 - ✅ 36 pages (all working)
@@ -116,7 +116,7 @@
 
 Test the live deployment:
 
-1. **Main Dashboard:** https://borsa-h1uu9pk5l-emrahsardag-yandexcoms-projects.vercel.app
+1. **Main Dashboard:** https://borsa-h1uu9pk5l-lydianlydian-yandexcoms-projects.vercel.app
 2. **Live Trading:** /live-trading
 3. **AI Chat:** /ai-chat
 4. **Quantum Pro:** /quantum-pro

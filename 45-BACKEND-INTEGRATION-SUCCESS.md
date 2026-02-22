@@ -3,7 +3,7 @@
 **Date:** 2025-11-18
 **Status:** ✅ SUCCESSFULLY COMPLETED
 **Project:** ailydian-signal
-**Integration Source:** sardag-emrah/backend/45-backend
+**Integration Source:** lytrade/backend/45-backend
 
 ---
 

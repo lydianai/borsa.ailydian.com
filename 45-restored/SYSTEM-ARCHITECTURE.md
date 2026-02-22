@@ -571,7 +571,7 @@ curl -X POST http://localhost:3000/api/bot \
 
 ## 📞 Destek ve İletişim
 
-**Proje Sahibi**: Sardag
+**Proje Sahibi**: Lydian
 **Tarih**: 2025-10-02
 **Versiyon**: 2.1.0
 **Lisans**: Eğitim Amaçlı / White-Hat Only

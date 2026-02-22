@@ -1,4 +1,4 @@
-# 📚 SarDag Trading Signals API Documentation
+# 📚 LyTrade Trading Signals API Documentation
 
 Production-ready RESTful API for cryptocurrency trading signals powered by 18 advanced strategies, AI analysis, and real-time market data.
 

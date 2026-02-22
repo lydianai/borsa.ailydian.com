@@ -86,4 +86,4 @@ Yeni ekran görüntüsü gönder - logs'un tamamını göster!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 GitHub'da doğrulandı ✅:
-https://github.com/sardagsoftware/borsa/blob/main/Desktop/borsa/package-lock.json
+https://github.com/lydiansoftware/borsa/blob/main/Desktop/borsa/package-lock.json

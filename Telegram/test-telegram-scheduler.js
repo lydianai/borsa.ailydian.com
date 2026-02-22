@@ -87,7 +87,7 @@ async function testAllAPIs() {
     console.log('🎉 TÜM TESTLERden GEÇTI!\n');
     console.log('✨ Telegram Scheduler kullanıma hazır!\n');
     console.log('🚀 Başlatmak için:');
-    console.log('   cd /Users/sardag/Documents/sardag-emrah-final.bak-20251030-170900/Telegram/schedulers');
+    console.log('   cd /Users/lydian/Documents/lytrade-final.bak-20251030-170900/Telegram/schedulers');
     console.log('   pm2 start ecosystem.config.js\n');
   } else {
     console.log('⚠️  Bazı testler başarısız oldu. Lütfen API\'leri kontrol edin.\n');

@@ -4,12 +4,12 @@
     "id": "a3f77064d426",
     "name": "borsa.ailydian.com",
     "type": "node",
-    "path": "/Users/sardag/Desktop/PROJELER/borsa.ailydian.com"
+    "path": "/home/lydian/Masaüstü/PROJELER/PROJELER/borsa.ailydian.com"
   },
   "ailydian": {
     "enabled": true,
-    "base_path": "/Users/sardag/Desktop/AILYDIAN-AGENT-ORCHESTRATOR",
-    "agents_path": "/Users/sardag/Desktop/AILYDIAN-AGENT-ORCHESTRATOR/agents",
+    "base_path": "/home/lydian/Masaüstü/PROJELER/AILYDIAN-AGENT-ORCHESTRATOR",
+    "agents_path": "/home/lydian/Masaüstü/PROJELER/AILYDIAN-AGENT-ORCHESTRATOR/agents",
     "integration_date": "2025-12-29T12:46:35.111530"
   },
   "agents": {

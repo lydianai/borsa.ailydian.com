@@ -146,7 +146,7 @@ curl -X POST http://localhost:3000/api/ai-assistant \
 ## PRODUCTION TEST URL
 
 ```
-https://sardag-emrah.vercel.app/api/ai-assistant
+https://lytrade.vercel.app/api/ai-assistant
 ```
 
 **POST Request Body:**

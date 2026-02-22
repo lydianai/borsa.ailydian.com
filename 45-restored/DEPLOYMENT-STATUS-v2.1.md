@@ -15,7 +15,7 @@
 ```
 Commit: bb21eea
 Branch: main → main
-Repository: https://github.com/sardagsoftware/borsa.git
+Repository: https://github.com/lydiansoftware/borsa.git
 ```
 
 **Auto-Deploy Trigger:**
@@ -53,7 +53,7 @@ railway up
 # Option 2: GitHub Integration
 1. Go to Railway dashboard
 2. New Project → Deploy from GitHub
-3. Select: sardagsoftware/borsa
+3. Select: lydiansoftware/borsa
 4. Branch: main
 5. Deploy
 ```
@@ -315,7 +315,7 @@ shasum -a 256 AiLydian-BORSA-V2.1-20251002_012253.tar.gz
 ## 📞 DEPLOYMENT CONTACT
 
 **Project Owner:** AiLydian
-**Repository:** https://github.com/sardagsoftware/borsa.git
+**Repository:** https://github.com/lydiansoftware/borsa.git
 **Version:** 2.1 - BORSA
 **Security Level:** NIRVANA
 **Compliance:** WHITE-HAT CERTIFIED

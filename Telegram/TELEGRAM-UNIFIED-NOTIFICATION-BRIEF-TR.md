@@ -1,6 +1,6 @@
 # 📱 TELEGRAM BİRLEŞİK BİLDİRİM SİSTEMİ - DETAYLI BRIEF
 
-**AiLydian-EMRAH Trading Platform**
+**AiLydian-LYDIAN Trading Platform**
 **Tarih**: 26 Ekim 2025
 **Durum**: Planlama - Entegrasyon Hazır
 **Dil**: Türkçe
@@ -9,7 +9,7 @@
 
 ## 🎯 PROJE AMACI
 
-AiLydian-EMRAH platformundaki **tüm bildirim sistemlerini** Telegram'a yönlendir:
+AiLydian-LYDIAN platformundaki **tüm bildirim sistemlerini** Telegram'a yönlendir:
 
 ✅ Web push notifications → **Telegram'a yönlendir**
 ✅ Header bildirimleri → **Telegram'a yönlendir**
@@ -792,7 +792,7 @@ await notifyNewSignal(signal);
 ## 📞 DESTEK VE İLETİŞİM
 
 **Developer**: Claude Code
-**Platform**: AiLydian-EMRAH Trading Scanner
+**Platform**: AiLydian-LYDIAN Trading Scanner
 **Bot**: @ailydian
 **Durum**: Beta - Aktif Test
 
@@ -810,7 +810,7 @@ Bu entegrasyon ile:
 ✅ **Instant** bildirimler
 ✅ **Sıfır maliyet** (Telegram API ücretsiz)
 
-**AiLydian-EMRAH platformu artık enterprise-grade bildirim sistemine sahip!** 🚀
+**AiLydian-LYDIAN platformu artık enterprise-grade bildirim sistemine sahip!** 🚀
 
 ---
 

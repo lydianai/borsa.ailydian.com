@@ -16,14 +16,14 @@ pm2 --version
 npm install -g pm2
 
 # Python bağımlılıkları yüklü mü?
-cd /Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
+cd /Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
 ./venv/bin/pip list
 ```
 
 ### 2. Tek Komut ile Tüm Sistemi Başlat
 
 ```bash
-cd /Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
+cd /Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
 
 # PM2 ile tüm servisleri başlat
 pm2 start ecosystem.config.js
@@ -57,7 +57,7 @@ pm2 monit
 ### Adım 1: Data Collector'ı Başlat
 
 ```bash
-cd /Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
+cd /Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
 
 # Arka planda çalıştır
 ./venv/bin/python3 services/data_collector.py > logs/data-collector-manual.log 2>&1 &
@@ -353,7 +353,7 @@ pm2 status
 pm2 logs <worker-name> --err
 
 # 3. Manuel başlat ve hata mesajını gör
-cd /Users/sardag/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
+cd /Users/lydian/Documents/ailydian-signal/45-backend/python-services/ai-learning-hub
 ./venv/bin/python3 workers/rl_agent_worker.py
 
 # 4. Worker'ı restart et

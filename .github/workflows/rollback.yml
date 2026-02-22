@@ -168,7 +168,7 @@ jobs:
     if: needs.validate-rollback.outputs.should_rollback == 'true'
     environment:
       name: production
-      url: https://sardag-emrah.vercel.app
+      url: https://lytrade.vercel.app
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -239,7 +239,7 @@ jobs:
       - name: ✅ Verify rollback health
         id: verify
         run: |
-          PROD_URL="https://sardag-emrah.vercel.app"
+          PROD_URL="https://lytrade.vercel.app"
           MAX_RETRIES=10
           RETRY_DELAY=15
           ROLLBACK_SUCCESS="false"
@@ -316,7 +316,7 @@ jobs:
           
           if [[ "${{ needs.verify-rollback.outputs.rollback_success }}" == "true" ]]; then
             echo "✅ Rollback completed successfully" >> rollback-report.md
-            echo "- Production URL: https://sardag-emrah.vercel.app" >> rollback-report.md
+            echo "- Production URL: https://lytrade.vercel.app" >> rollback-report.md
             echo "- All health checks passing" >> rollback-report.md
           else
             echo "❌ Rollback verification failed" >> rollback-report.md

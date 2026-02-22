@@ -62,7 +62,7 @@ Bot sahibiyseniz bu Chat ID'yi .env dosyasına ekleyin:
     .text('💰 Fiyat Sorgula', 'price')
     .row()
     .text('❓ Yardım', 'help')
-    .url('🌐 Web Sitesi', process.env.NEXT_PUBLIC_APP_URL || 'https://sardag.app');
+    .url('🌐 Web Sitesi', process.env.NEXT_PUBLIC_APP_URL || 'https://lydian.app');
 
   await ctx.reply(
     `👋 Hoş geldin, ${ctx.from?.first_name || 'Trader'}!
@@ -127,7 +127,7 @@ ${emoji} Sinyal: **${signal.action}**
 
     const keyboard = new InlineKeyboard().url(
       '🌐 Detaylı Görüntüle',
-      `${process.env.NEXT_PUBLIC_APP_URL || 'https://sardag.app'}/trading-signals`
+      `${process.env.NEXT_PUBLIC_APP_URL || 'https://lydian.app'}/trading-signals`
     );
 
     await ctx.reply(
@@ -181,7 +181,7 @@ bot.command('price', async (ctx) => {
 
     const keyboard = new InlineKeyboard().url(
       '📊 Analiz Görüntüle',
-      `${process.env.NEXT_PUBLIC_APP_URL || 'https://sardag.app'}/trading-signals`
+      `${process.env.NEXT_PUBLIC_APP_URL || 'https://lydian.app'}/trading-signals`
     );
 
     await ctx.reply(
@@ -216,7 +216,7 @@ bot.command('help', async (ctx) => {
     .text('📊 Sinyaller', 'signals')
     .text('💰 Fiyat', 'price')
     .row()
-    .url('🌐 Web Sitesi', process.env.NEXT_PUBLIC_APP_URL || 'https://sardag.app');
+    .url('🌐 Web Sitesi', process.env.NEXT_PUBLIC_APP_URL || 'https://lydian.app');
 
   await ctx.reply(
     `❓ **YARDIM MENÜSÜ**
@@ -236,7 +236,7 @@ bot.command('help', async (ctx) => {
 ⚠️ Gerçek para ile işlem yapmayın
 ⚠️ Kendi araştırmanızı yapın
 
-🌐 Web: ${process.env.NEXT_PUBLIC_APP_URL || 'https://sardag.app'}`,
+🌐 Web: ${process.env.NEXT_PUBLIC_APP_URL || 'https://lydian.app'}`,
     {
       parse_mode: 'Markdown',
       reply_markup: keyboard,

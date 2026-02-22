@@ -53,7 +53,7 @@ vercel --prod
 curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
   -H "Content-Type: application/json" \
   -d '{
-    "url": "https://sardag.app/api/telegram/webhook",
+    "url": "https://lydian.app/api/telegram/webhook",
     "secret_token": "your_webhook_secret"
   }'
 
@@ -101,7 +101,7 @@ Bot şu an **iki modda** çalışabiliyor:
 2. Bot'a `/start` gönder
 3. Admin API'sini çağır:
    ```bash
-   curl https://sardag.app/api/telegram/admin
+   curl https://lydian.app/api/telegram/admin
    ```
 4. `subscribers` listesinde chat ID'ni göreceksin
 
@@ -186,7 +186,7 @@ vercel --prod
 
 ```bash
 # Sadece senin chat ID'ne gider
-curl -X POST "https://sardag.app/api/telegram/test" \
+curl -X POST "https://lydian.app/api/telegram/test" \
   -H "Content-Type: application/json" \
   -d '{"type":"strong_buy"}'
 
@@ -214,7 +214,7 @@ curl -X POST "https://sardag.app/api/telegram/test" \
 **Çözüm:**
 1. Admin API'sini çağır:
    ```bash
-   curl https://sardag.app/api/telegram/admin
+   curl https://lydian.app/api/telegram/admin
    ```
 2. `config.allowedChatIds` listesini kontrol et
 3. Chat ID'nin doğru olduğundan emin ol
@@ -264,7 +264,7 @@ pnpm dev
 
 ```bash
 # Sistem durumunu ve config'i görüntüle
-curl https://sardag.app/api/telegram/admin
+curl https://lydian.app/api/telegram/admin
 
 # Örnek Yanıt:
 {
@@ -286,12 +286,12 @@ curl https://sardag.app/api/telegram/admin
 
 ```bash
 # Simple test
-curl -X POST "https://sardag.app/api/telegram/test" \
+curl -X POST "https://lydian.app/api/telegram/test" \
   -H "Content-Type: application/json" \
   -d '{"type":"simple"}'
 
 # Strong buy test
-curl -X POST "https://sardag.app/api/telegram/test" \
+curl -X POST "https://lydian.app/api/telegram/test" \
   -H "Content-Type: application/json" \
   -d '{"type":"strong_buy"}'
 ```

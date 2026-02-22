@@ -1,6 +1,6 @@
 # =á Branch Protection & Quality Gates
 
-This document describes the recommended branch protection rules and quality gates for the Sardag Trading AI repository.
+This document describes the recommended branch protection rules and quality gates for the Lydian Trading AI repository.
 
 ## =Ë Branch Protection Rules
 
