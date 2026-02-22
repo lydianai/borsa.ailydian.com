@@ -25,6 +25,8 @@ dist/
 *.pfx
 secrets/
 keys/
+data/2fa-secrets.json
+**/2fa-secrets.json
 Telegram/*.json
 Telegram/*.env
 
