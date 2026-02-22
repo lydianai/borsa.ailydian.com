@@ -16,7 +16,7 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.67.0",
+    "@anthropic-ai/sdk": "^0.78.0",
     "@auth/prisma-adapter": "^2.11.1",
     "@ixjb94/indicators": "^1.2.4",
     "@prisma/client": "^6.19.0",
