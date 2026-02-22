@@ -1,31 +1,55 @@
-Copyright (c) 2024-2026 Lydian (AiLydian). All Rights Reserved.
+AiLydian Proprietary Software License
+Version 2.0 - Effective January 2025
 
-PROPRIETARY SOFTWARE LICENSE
+Copyright (c) 2025-2026 AiLydian. All Rights Reserved.
 
-This software and associated documentation files (the "Software") are the
-exclusive property of Lydian, operating under AiLydian.
+TERMS AND CONDITIONS
 
-RESTRICTIONS:
+1. GRANT OF LICENSE
+   This software is provided for viewing and evaluation purposes only
+   through the GitHub platform. No other rights are granted.
 
-1. You may NOT copy, modify, merge, publish, distribute, sublicense, or sell
-   copies of the Software.
-2. You may NOT use the Software for any commercial or non-commercial purpose
-   without prior written permission from the copyright holder.
-3. You may NOT reverse engineer, decompile, or disassemble the Software.
-4. You may NOT create derivative works based on the Software.
-5. Viewing the source code on GitHub does not grant any license or right to
-   use, copy, modify, or distribute the Software.
+2. RESTRICTIONS
+   You may NOT, without express written permission from AiLydian:
+   a) Copy, reproduce, or duplicate any portion of this software
+   b) Modify, adapt, or create derivative works
+   c) Distribute, sublicense, sell, or transfer this software
+   d) Reverse engineer, decompile, or disassemble this software
+   e) Use any algorithms, methods, or techniques in other projects
+   f) Remove or alter any proprietary notices or watermarks
+   g) Use this software for commercial purposes
+   h) Train machine learning models using this codebase
 
-PERMITTED:
+3. INTELLECTUAL PROPERTY
+   All intellectual property rights, including patents, copyrights,
+   trade secrets, and trademarks, remain exclusively with AiLydian.
 
-1. You may view the source code for educational and reference purposes only.
-2. You may report security vulnerabilities following the SECURITY.md policy.
+4. MONITORING AND ENFORCEMENT
+   This repository is actively monitored. Unauthorized use will be
+   pursued under applicable intellectual property laws including:
+   - Digital Millennium Copyright Act (DMCA)
+   - Computer Fraud and Abuse Act (CFAA)
+   - Defend Trade Secrets Act (DTSA)
+   - International IP treaties (Berne Convention, TRIPS)
 
-DISCLAIMER:
+5. NO WARRANTY
+   THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY.
+6. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL AILYDIAN BE LIABLE FOR ANY DAMAGES ARISING
+   FROM THE USE OR INABILITY TO USE THIS SOFTWARE.
 
-For licensing inquiries: licensing@ailydian.com
-Website: https://www.ailydian.com
+7. TERMINATION
+   Any breach of these terms immediately terminates your viewing rights.
+
+8. GOVERNING LAW
+   This license is governed by the laws of the Republic of Turkey
+   and applicable international treaties.
+
+9. CONTACT
+   Licensing: info@ailydian.com
+   Security: security@ailydian.com
+   Business: ailydian@ailydian.com
+   Web: https://ailydian.com
+
+AiLydian - Intelligent Solutions for Tomorrow
