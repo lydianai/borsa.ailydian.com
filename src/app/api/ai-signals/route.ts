@@ -3,10 +3,9 @@ import { aiMemorySystem } from "@/lib/ai-memory-system";
 import { fetchBinanceFuturesData } from "@/lib/binance-data-fetcher";
 import { batchAnalyzeWithAITaLib } from "@/lib/ai-talib-analyzer";
 
-// Obfuscated API key access
-const _k = Buffer.from('R1JPUV9BUElfS0VZ', 'base64').toString('utf-8');
-// Obfuscated API endpoint
-const _apiUrl = Buffer.from('aHR0cHM6Ly9hcGkuZ3JvcS5jb20vb3BlbmFpL3YxL2NoYXQvY29tcGxldGlvbnM=', 'base64').toString('utf-8');
+// AI Configuration (provider-agnostic)
+const AI_API_URL = process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions';
+const AI_API_KEY = process.env.AI_API_KEY || process.env.GROQ_API_KEY || '';
 
 // 5 dakika cache - ENOMEM önleme
 const AI_SIGNALS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -97,9 +96,7 @@ async function analyzeWithStrategyEngineA(
   marketData: any[],
   signals: any[],
 ): Promise<any[]> {
-  const aiApiKey = process.env[_k];
-
-  if (!aiApiKey || aiApiKey === "gsk_your_actual_api_key_here") {
+  if (!AI_API_KEY) {
     console.log("[Strategy Engine A] API key not configured, using fallback analysis");
     return signals;
   }
@@ -152,11 +149,11 @@ Respond with JSON format:
     const aiModel = process.env.STRATEGY_AI_MODEL || "llama-3.3-70b-versatile";
 
     const response = await fetch(
-      _apiUrl,
+      AI_API_URL,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${aiApiKey}`,
+          Authorization: `Bearer ${AI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

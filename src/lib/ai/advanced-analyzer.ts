@@ -1,48 +1,79 @@
 /**
- * 🧠 ADVANCED AI ANALYZER - LyTrade LYDIAN OTONOM SİSTEM
+ * Advanced AI Analyzer - LyTrade
  *
- * Strategy Engine C (Premium AI) ile gelişmiş piyasa analizi.
- * Strategy Engine A'ya ek olarak daha derinlemesine analiz için kullanılır.
+ * Provider-agnostic AI market analysis engine.
+ * Supports any OpenAI-compatible API (Groq, OpenAI, Ollama, etc.)
  *
- * Kullanım Alanları:
- * - Market sentiment analizi
- * - Strateji performans değerlendirmesi
- * - Yeni parametre önerileri
- * - Coin-bazlı adaptif ağırlıklandırma
- * - Doğal dil raporları
+ * Configure via environment variables:
+ * - AI_API_KEY: Your API key
+ * - AI_API_URL: API endpoint (default: https://api.groq.com/openai/v1/chat/completions)
+ * - AI_MODEL: Model name (default: llama-3.3-70b-versatile)
  */
 
-import Anthropic from '@anthropic-ai/sdk';
-
-// Singleton AI instance
-let aiClient: Anthropic | null = null;
-
-// Model configuration from environment
-const AI_MODEL = process.env.ADVANCED_AI_MODEL || 'claude-3-5-sonnet-20241022';
+// Configuration from environment
+const AI_API_URL = process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions';
+const AI_MODEL = process.env.AI_MODEL || 'llama-3.3-70b-versatile';
+const AI_API_KEY = process.env.AI_API_KEY || process.env.GROQ_API_KEY || '';
 
 /**
- * Advanced AI client'ını başlat
+ * Send a chat completion request to any OpenAI-compatible API
  */
-export function getAdvancedAIClient(): Anthropic {
-  if (aiClient) {
-    return aiClient;
+async function chatCompletion(
+  messages: Array<{ role: string; content: string }>,
+  options: { maxTokens?: number; temperature?: number } = {}
+): Promise<string> {
+  if (!AI_API_KEY) {
+    throw new Error(
+      'AI_API_KEY (or GROQ_API_KEY) environment variable is required. ' +
+      'Get a free key from https://console.groq.com'
+    );
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY environment variable is required');
-  }
-
-  aiClient = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY,
+  const response = await fetch(AI_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${AI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      messages,
+      max_tokens: options.maxTokens || 4096,
+      temperature: options.temperature || 0.3,
+    }),
   });
 
-  console.log('✅ Advanced AI Engine: Client initialized');
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => 'Unknown error');
+    throw new Error(`AI API error (${response.status}): ${errorText}`);
+  }
 
-  return aiClient;
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || '';
 }
 
 /**
- * Market datasını Advanced AI ile analiz et
+ * Extract JSON from AI response text
+ */
+function extractJSON(text: string): Record<string, unknown> | null {
+  const jsonMatch = text.match(/```json\n([\s\S]+?)\n```/);
+  if (jsonMatch && jsonMatch[1]) {
+    try {
+      return JSON.parse(jsonMatch[1]);
+    } catch {
+      return null;
+    }
+  }
+  // Try parsing the entire response as JSON
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Analyze market data with AI
  */
 export async function analyzeMarketWithAdvancedAI(marketData: {
   symbol?: string;
@@ -58,49 +89,29 @@ export async function analyzeMarketWithAdvancedAI(marketData: {
     confidence: number;
   }>;
 }) {
-  const client = getAdvancedAIClient();
-
-  const prompt = `LyTrade LYDIAN Otonom AI Agent olarak şu market datasını analiz et:
+  const prompt = `You are a trading strategy analyzer. Analyze this market data:
 
 ${JSON.stringify(marketData, null, 2)}
 
-Görevlerin:
-1. **Mevcut 15 stratejinin performansını değerlendir**
-   - Hangi stratejiler en güçlü sinyaller veriyor?
-   - Hangileri tutarsız veya zayıf?
+Tasks:
+1. Evaluate the performance of each strategy
+2. Suggest the best strategy combination for each coin
+3. Suggest parameter improvements
+4. Calculate risk scores (0-100) for each coin
+5. Return a detailed JSON report
 
-2. **Her coin için en uygun strateji kombinasyonunu öner**
-   - Coin'in volatilitesine göre
-   - Hacim profiline göre
-   - Market fazına göre
+DISCLAIMER: This analysis is for informational purposes only. Not financial advice.
 
-3. **Yeni parametre önerileri sun**
-   - MA periyotları optimize edilebilir mi?
-   - RSI seviyeleri ayarlanmalı mı?
-   - Volume threshold'ları değiştirilmeli mi?
-
-4. **Risk skorları hesapla**
-   - Her coin için 0-100 risk skoru
-   - Faktörleri açıkla
-
-5. **JSON formatında detaylı rapor oluştur**
-
-BEYAZ ŞAPKA KURALLARI:
-- Sadece bilgilendirme amaçlı analiz
-- Yatırım tavsiyesi değil
-- Kullanıcının kendi araştırmasını yapması gerektiğini vurgula
-- Geçmiş performans garantisi değil
-
-Lütfen yanıtını şu JSON formatında ver:
+Return your response in this JSON format:
 
 \`\`\`json
 {
-  "summary": "Genel market özeti (1-2 paragraf)",
+  "summary": "Overall market summary (1-2 paragraphs)",
   "topStrategies": [
     {
       "name": "Conservative Buy Signal",
       "performance": "excellent|good|moderate|poor",
-      "reason": "Neden bu performansı gösteriyor"
+      "reason": "Why this performance"
     }
   ],
   "coinAnalysis": [
@@ -109,7 +120,7 @@ Lütfen yanıtını şu JSON formatında ver:
       "recommendedStrategies": ["Conservative Buy Signal", "Volume Spike"],
       "weights": { "Conservative Buy Signal": 1.5, "Volume Spike": 1.2 },
       "riskScore": 35,
-      "riskFactors": ["Yüksek volatilite", "Güçlü destek seviyesi"]
+      "riskFactors": ["High volatility", "Strong support level"]
     }
   ],
   "parameterSuggestions": [
@@ -118,49 +129,31 @@ Lütfen yanıtını şu JSON formatında ver:
       "parameter": "fastMA",
       "currentValue": 10,
       "suggestedValue": 12,
-      "reason": "Daha az yanlış sinyal için"
+      "reason": "Fewer false signals"
     }
   ],
-  "disclaimer": "Bu analiz sadece bilgilendirme amaçlıdır. Yatırım tavsiyesi değildir."
+  "disclaimer": "This analysis is for informational purposes only. Not financial advice."
 }
 \`\`\``;
 
   try {
-    const message = await client.messages.create({
-      model: AI_MODEL,
-      max_tokens: 4096,
-      temperature: 0.3, // Düşük temperature = daha tutarlı
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    });
+    const responseText = await chatCompletion(
+      [{ role: 'user', content: prompt }],
+      { maxTokens: 4096, temperature: 0.3 }
+    );
 
-    // Yanıtı parse et
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+    const parsed = extractJSON(responseText);
+    if (parsed) return parsed;
 
-    // JSON'u çıkar
-    const jsonMatch = responseText.match(/```json\n([\s\S]+?)\n```/);
-    if (jsonMatch && jsonMatch[1]) {
-      return JSON.parse(jsonMatch[1]);
-    }
-
-    // Eğer JSON bulunamazsa ham metni döndür
-    return {
-      summary: responseText,
-      raw: true,
-    };
+    return { summary: responseText, raw: true };
   } catch (error: any) {
-    console.error('❌ Advanced AI Error:', error.message);
-
+    console.error('Advanced AI Error:', error.message);
     throw new Error(`Advanced AI analysis failed: ${error.message}`);
   }
 }
 
 /**
- * Strateji performansını Advanced AI ile değerlendir
+ * Evaluate strategy performance with AI
  */
 export async function evaluateStrategyPerformance(strategyData: {
   strategyName: string;
@@ -173,26 +166,16 @@ export async function evaluateStrategyPerformance(strategyData: {
   successRate: number;
   avgConfidence: number;
 }) {
-  const client = getAdvancedAIClient();
+  const prompt = `Evaluate this trading strategy:
 
-  const prompt = `LyTrade LYDIAN Trading Strategy Performance Evaluator olarak şu stratejiyi analiz et:
+**Strategy**: ${strategyData.strategyName}
+**Success Rate**: ${strategyData.successRate}%
+**Avg Confidence**: ${strategyData.avgConfidence}%
 
-**Strateji**: ${strategyData.strategyName}
-**Başarı Oranı**: ${strategyData.successRate}%
-**Ortalama Güven**: ${strategyData.avgConfidence}%
-
-**Son Sinyaller**:
+**Recent Signals**:
 ${JSON.stringify(strategyData.recentSignals, null, 2)}
 
-Görevlerin:
-1. Stratejinin genel performansını değerlendir
-2. Güçlü ve zayıf yönlerini belirle
-3. İyileştirme önerileri sun
-4. Bu stratejiyi hangi coin'lerde kullanmalıyız?
-5. Ağırlık önerisi (0.5 - 2.0 arası)
-
-JSON formatında yanıt ver:
-
+Return JSON:
 \`\`\`json
 {
   "overall": "excellent|good|moderate|poor",
@@ -206,29 +189,23 @@ JSON formatında yanıt ver:
 \`\`\``;
 
   try {
-    const message = await client.messages.create({
-      model: AI_MODEL,
-      max_tokens: 2048,
-      temperature: 0.3,
-      messages: [{ role: 'user', content: prompt }],
-    });
+    const responseText = await chatCompletion(
+      [{ role: 'user', content: prompt }],
+      { maxTokens: 2048, temperature: 0.3 }
+    );
 
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
-
-    const jsonMatch = responseText.match(/```json\n([\s\S]+?)\n```/);
-    if (jsonMatch && jsonMatch[1]) {
-      return JSON.parse(jsonMatch[1]);
-    }
+    const parsed = extractJSON(responseText);
+    if (parsed) return parsed;
 
     return { raw: responseText };
   } catch (error: any) {
-    console.error('❌ Advanced AI Strategy Evaluation Error:', error.message);
+    console.error('Strategy Evaluation Error:', error.message);
     throw error;
   }
 }
 
 /**
- * Coin-bazlı adaptif ağırlıklar öner
+ * Suggest adaptive coin weights using AI
  */
 export async function suggestCoinWeights(coinData: {
   symbol: string;
@@ -244,80 +221,55 @@ export async function suggestCoinWeights(coinData: {
     trend: string;
   };
 }) {
-  const client = getAdvancedAIClient();
+  const prompt = `Suggest strategy weights for ${coinData.symbol}:
 
-  const prompt = `LyTrade LYDIAN Adaptive Weight Calculator olarak şu coin için strateji ağırlıkları öner:
-
-**Coin**: ${coinData.symbol}
-
-**Geçmiş Performans**:
+**Historical Performance**:
 ${JSON.stringify(coinData.historicalPerformance, null, 2)}
 
-**Mevcut Market**:
-- Volatilite: ${coinData.currentMarket.volatility}%
-- 24h Hacim: $${coinData.currentMarket.volume24h.toLocaleString()}
+**Current Market**:
+- Volatility: ${coinData.currentMarket.volatility}%
+- 24h Volume: $${coinData.currentMarket.volume24h.toLocaleString()}
 - Trend: ${coinData.currentMarket.trend}
 
-Her strateji için 0.5 - 2.0 arası ağırlık belirle.
-Başarı oranına ve mevcut market koşullarına göre karar ver.
-
-JSON formatı:
-
+Return weights (0.5-2.0) for each strategy as JSON:
 \`\`\`json
 {
-  "weights": {
-    "Conservative Buy Signal": 1.5,
-    "Breakout-Retest": 1.2,
-    "Volume Spike": 0.8
-  },
-  "reasoning": {
-    "Conservative Buy Signal": "Yüksek başarı oranı bu coin'de",
-    "Breakout-Retest": "Orta performans, tutarlı",
-    "Volume Spike": "Düşük başarı, ağırlığı azalt"
-  }
+  "weights": { "Strategy Name": 1.5 },
+  "reasoning": { "Strategy Name": "Reason for weight" }
 }
 \`\`\``;
 
   try {
-    const message = await client.messages.create({
-      model: AI_MODEL,
-      max_tokens: 1536,
-      temperature: 0.2,
-      messages: [{ role: 'user', content: prompt }],
-    });
+    const responseText = await chatCompletion(
+      [{ role: 'user', content: prompt }],
+      { maxTokens: 1536, temperature: 0.2 }
+    );
 
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
-
-    const jsonMatch = responseText.match(/```json\n([\s\S]+?)\n```/);
-    if (jsonMatch && jsonMatch[1]) {
-      return JSON.parse(jsonMatch[1]);
-    }
+    const parsed = extractJSON(responseText);
+    if (parsed) return parsed;
 
     return { weights: {}, reasoning: {} };
   } catch (error: any) {
-    console.error('❌ Advanced AI Weight Suggestion Error:', error.message);
+    console.error('Weight Suggestion Error:', error.message);
     throw error;
   }
 }
 
 /**
- * Sağlık kontrolü
+ * Health check for AI service
  */
 export async function checkAdvancedAIHealth() {
   try {
-    const client = getAdvancedAIClient();
-
-    // Basit test mesajı
-    const message = await client.messages.create({
-      model: AI_MODEL,
-      max_tokens: 50,
-      messages: [{ role: 'user', content: 'Test: Respond with "OK"' }],
-    });
+    const responseText = await chatCompletion(
+      [{ role: 'user', content: 'Test: Respond with "OK"' }],
+      { maxTokens: 50 }
+    );
 
     return {
       status: 'healthy',
       model: AI_MODEL,
-      response: message.content[0].type === 'text' ? message.content[0].text : '',
+      provider: new URL(AI_API_URL).hostname,
+      response: responseText.trim(),
     };
   } catch (error: any) {
     return {
@@ -327,19 +279,9 @@ export async function checkAdvancedAIHealth() {
   }
 }
 
-// Backward compatibility aliases
-export const getClaudeClient = getAdvancedAIClient;
-export const analyzeMarketWithClaude = analyzeMarketWithAdvancedAI;
-export const checkClaudeHealth = checkAdvancedAIHealth;
-
 export default {
-  getAdvancedAIClient,
   analyzeMarketWithAdvancedAI,
   evaluateStrategyPerformance,
   suggestCoinWeights,
   checkAdvancedAIHealth,
-  // Legacy exports for backward compatibility
-  getClaudeClient,
-  analyzeMarketWithClaude,
-  checkClaudeHealth,
 };

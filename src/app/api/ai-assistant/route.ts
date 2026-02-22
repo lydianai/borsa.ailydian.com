@@ -1,20 +1,22 @@
 /**
  * LyTrade AI ASSISTANT API
  * Unified AI endpoint combining:
- * - Advanced AI Model Alpha
- * - AI Model Beta (Quantum-Enhanced)
+ * - Provider-agnostic AI (any OpenAI-compatible API)
  * - All Trading Strategies
  * - Real-time Market Data
+ *
+ * Configure via environment variables:
+ * - AI_API_KEY or GROQ_API_KEY: Your API key
+ * - AI_API_URL: API endpoint (default: Groq)
+ * - AI_CHAT_MODEL: Model name (default: llama-3.3-70b-versatile)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
 
-// Obfuscated API key access
-const _apiKey = Buffer.from('R1JPUV9BUElfS0VZ', 'base64').toString('utf-8'); // GROQ_API_KEY encoded
-const groq = new Groq({
-  apiKey: process.env[_apiKey] || '',
-});
+// AI Configuration
+const AI_API_URL = process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions';
+const AI_CHAT_MODEL = process.env.AI_CHAT_MODEL || 'llama-3.3-70b-versatile';
+const AI_API_KEY = process.env.AI_API_KEY || process.env.GROQ_API_KEY || '';
 
 export const dynamic = 'force-dynamic';
 
@@ -683,7 +685,7 @@ export async function POST(request: NextRequest) {
     const availableCoins = market.allCoins.map((c: any) => c.symbol);
 
     // Check if AI API is configured
-    if (!process.env[_apiKey]) {
+    if (!AI_API_KEY) {
       // Fallback response without AI enhancement - use detailed formatter
       const symbol = extractSymbol(message, availableCoins);
 
@@ -868,25 +870,61 @@ ${contextData}`;
           // Small delay to ensure message is sent
           await new Promise(resolve => setTimeout(resolve, 100));
 
-          // PHASE 2: Call Groq AI with streaming after data is ready
-          const stream = await groq.chat.completions.create({
-            model: 'llama-3.3-70b-versatile',
-            messages: [
-              { role: 'system', content: systemPrompt },
-              ...conversationHistory,
-              { role: 'user', content: message },
-            ],
-            temperature: 0.7,
-            max_tokens: 1500,
-            stream: true,
+          // PHASE 2: Call AI API with streaming after data is ready
+          const aiResponse = await fetch(AI_API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${AI_API_KEY}`,
+            },
+            body: JSON.stringify({
+              model: AI_CHAT_MODEL,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                ...conversationHistory,
+                { role: 'user', content: message },
+              ],
+              temperature: 0.7,
+              max_tokens: 1500,
+              stream: true,
+            }),
           });
 
-          // Stream AI response chunks in real-time
-          for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content || '';
-            if (content) {
-              const data = `data: ${JSON.stringify({ content })}\n\n`;
-              controller.enqueue(encoder.encode(data));
+          if (!aiResponse.ok) {
+            throw new Error(`AI API error: ${aiResponse.status}`);
+          }
+
+          // Stream AI response chunks in real-time (SSE parsing)
+          const reader = aiResponse.body?.getReader();
+          if (!reader) throw new Error('No response body');
+
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed || !trimmed.startsWith('data: ')) continue;
+              const payload = trimmed.slice(6);
+              if (payload === '[DONE]') continue;
+
+              try {
+                const parsed = JSON.parse(payload);
+                const content = parsed.choices?.[0]?.delta?.content || '';
+                if (content) {
+                  const data = `data: ${JSON.stringify({ content })}\n\n`;
+                  controller.enqueue(encoder.encode(data));
+                }
+              } catch {
+                // Skip malformed JSON chunks
+              }
             }
           }
 

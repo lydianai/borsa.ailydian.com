@@ -64,14 +64,13 @@ export function getMockDataStatusMessage(): string {
     return 'Using mock data: Explicitly enabled via environment variable';
   }
 
-  const requiredKeys = ['GROQ_API_KEY', 'ANTHROPIC_API_KEY'];
-  const missingKeys = requiredKeys.filter((key) => !process.env[key]);
+  const hasApiKey = !!(process.env.AI_API_KEY || process.env.GROQ_API_KEY);
 
-  if (missingKeys.length > 0) {
-    return `Using mock data: Missing API keys (${missingKeys.join(', ')})`;
+  if (!hasApiKey) {
+    return 'Using mock data: Missing AI_API_KEY';
   }
 
-  return 'Using real data: All API keys configured';
+  return 'Using real data: AI API key configured';
 }
 
 /**
