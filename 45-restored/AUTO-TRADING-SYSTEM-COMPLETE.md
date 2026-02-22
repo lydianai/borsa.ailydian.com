@@ -568,7 +568,7 @@ Navigasyon: AI Botlar → ⚡ Auto Trading
 ---
 
 **Geliştirici**: Claude Code (Anthropic)
-**Proje Sahibi**: Emrah Sardag
+**Proje Sahibi**: Lydian
 **Tarih**: 2 Ekim 2025
 **Versiyon**: 2.0 - Auto Trading Complete
 
