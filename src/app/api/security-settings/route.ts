@@ -284,7 +284,7 @@ export async function POST(request: NextRequest) {
         message: '2FA enabled successfully',
         data: {
           backupCodes: currentSettings.twoFactorAuth.backupCodes,
-          qrCode: 'otpauth://totp/SARDAG?secret=' + currentSettings.twoFactorAuth.secret,
+          qrCode: 'otpauth://totp/LyTrade?secret=' + currentSettings.twoFactorAuth.secret,
         },
       });
     }

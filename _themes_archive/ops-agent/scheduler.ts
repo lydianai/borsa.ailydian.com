@@ -1,5 +1,5 @@
 /**
- * 🧠 SARDAG-EMRAH OPS AGENT - Main Scheduler
+ * 🧠 LyTrade-EMRAH OPS AGENT - Main Scheduler
  * 
  * 7×24 çalışan otonom operasyon ajanı
  * Her 5 dakikada bir sistem sağlığını kontrol eder, otomatik düzeltme yapar
@@ -53,7 +53,7 @@ export class OpsAgent {
    * - Kritik event'lerde anında tetiklenir
    */
   async start(): Promise<void> {
-    this.logger.info('🧠 SARDAG-EMRAH Otonom OPS Agent başlatılıyor...');
+    this.logger.info('🧠 LyTrade-EMRAH Otonom OPS Agent başlatılıyor...');
 
     // Ana scheduler - her 5 dakikada bir
     cron.schedule('*/5 * * * *', async () => {

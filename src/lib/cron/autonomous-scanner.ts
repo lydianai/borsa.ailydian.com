@@ -1,5 +1,5 @@
 /**
- * ⏰ OTONOM TARAMA ZAMANLAYICI - SARDAG EMRAH 24/7
+ * ⏰ OTONOM TARAMA ZAMANLAYICI - LyTrade EMRAH 24/7
  *
  * Node-cron ile otomatik tarama işlerini başlatır.
  * Redis + BullMQ kuyruğuna job ekler.

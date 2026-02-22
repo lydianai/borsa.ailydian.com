@@ -19,7 +19,7 @@ interface VerificationResult {
 }
 
 class TwoFactorAuthService {
-  private readonly appName = 'SARDAG Trading';
+  private readonly appName = 'LyTrade Trading';
   private readonly window = 1;
 
   constructor() {

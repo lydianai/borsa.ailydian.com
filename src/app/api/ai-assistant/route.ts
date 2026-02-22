@@ -1,5 +1,5 @@
 /**
- * SARDAG AI ASSISTANT API
+ * LyTrade AI ASSISTANT API
  * Unified AI endpoint combining:
  * - Advanced AI Model Alpha
  * - AI Model Beta (Quantum-Enhanced)
@@ -649,7 +649,7 @@ function formatDetailedAnalysis(analysis: any): string {
   response += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
   response += `⚠️ BU BİR YATIRIM TAVSİYESİ DEĞİLDİR\n`;
   response += `Kendi araştırmanızı yapın ve riskinizi yönetin.\n`;
-  response += `🧠 SARDAG UNIFIED INTELLIGENCE - 11 Strategy Consensus\n`;
+  response += `🧠 LyTrade UNIFIED INTELLIGENCE - 11 Strategy Consensus\n`;
   response += `🔥 Powered by: Ta-Lib 158 + Wyckoff + Quantum + 18+ Unified Strategies\n`;
 
   return response;
@@ -780,7 +780,7 @@ export async function POST(request: NextRequest) {
       : [];
 
     // System prompt with 600+ coins and 11 unified strategies + MULTI-TIMEFRAME awareness
-    const systemPrompt = `Sen SARDAG Trading Scanner'ın UNIFIED INTELLIGENCE AI asistanısın.
+    const systemPrompt = `Sen LyTrade Trading Scanner'ın UNIFIED INTELLIGENCE AI asistanısın.
 
 🚨 KRİTİK KURAL - MUTLAKA UYULMASI GEREKEN:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,5 +1,5 @@
 /**
- * 📊 SARDAG TRADING STRATEGIES - Type Definitions
+ * 📊 LyTrade TRADING STRATEGIES - Type Definitions
  * 13 Strategy Modules for Real-Time Analysis
  */
 

@@ -8,7 +8,7 @@ We take security seriously. If you discover a security vulnerability, please rep
 
 ### How to Report
 
-1. Email: sardagemrah@gmail.com
+1. Email: security@ailydian.com
 2. Include a detailed description of the vulnerability
 3. Steps to reproduce (if applicable)
 4. Expected response time: **48 hours**

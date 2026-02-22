@@ -1,17 +1,58 @@
-# SARDAG Trading Scanner
+<div align="center">
 
-> Advanced Crypto Trading Signal Platform with 13+ Strategies and 617 Market Analysis
+# LyTrade Scanner - Advanced Crypto Trading Signal Platform
 
-[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-15.x-black.svg)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
-[![Binance](https://img.shields.io/badge/Binance-617%20Markets-yellow.svg)](https://binance.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791.svg)](https://www.postgresql.org/)
-[![Redis](https://img.shields.io/badge/Redis-7.x-DC382D.svg)](https://redis.io/)
+<p><em>Real-Time Monitoring of 617 Binance USDT Perpetual Futures with 13+ Independent Trading Strategies</em></p>
+
+<p>
+  <a href="#overview"><img src="https://img.shields.io/badge/Docs-Overview-blue?style=for-the-badge" alt="Overview"></a>
+  <a href="#platform-architecture"><img src="https://img.shields.io/badge/Docs-Architecture-purple?style=for-the-badge" alt="Architecture"></a>
+  <a href="#key-features"><img src="https://img.shields.io/badge/Docs-Features-green?style=for-the-badge" alt="Features"></a>
+  <a href="#getting-started"><img src="https://img.shields.io/badge/Docs-Setup-orange?style=for-the-badge" alt="Setup"></a>
+</p>
+
+<p>
+  <img src="https://img.shields.io/badge/Status-Active-success?style=flat-square" alt="Status">
+  <img src="https://img.shields.io/badge/License-Proprietary-red?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/Next.js-15.x-black?style=flat-square&logo=next.js&logoColor=white" alt="Next.js">
+  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Binance-617_Markets-F0B90B?style=flat-square" alt="Binance">
+  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Redis-7.x-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis">
+</p>
+
+<br>
+
+<table>
+<tr>
+<td width="50%">
+
+**Platform Highlights**
+- 617 Binance USDT Perpetual Futures monitored in real-time
+- 13+ independent trading strategies running simultaneously
+- High-confidence signal surfacing with multi-timeframe analysis
+- Top Gainers and Top Volume intelligent filtering system
+
+</td>
+<td width="50%">
+
+**Technical Excellence**
+- Advanced charting via ApexCharts and Recharts libraries
+- Binance WebSocket API for live price, volume, and order book data
+- Turborepo monorepo with pnpm workspace management
+- PostgreSQL + Redis for persistent signals and real-time caching
+
+</td>
+</tr>
+</table>
+
+</div>
+
+---
 
 ## Overview
 
-SARDAG Trading Scanner is a professional cryptocurrency trading signal platform that monitors 617 Binance USDT Perpetual Futures markets in real-time. It runs 13+ independent trading strategies simultaneously and surfaces high-confidence signals through an advanced dashboard with multiple charting libraries.
+LyTrade Scanner is a professional cryptocurrency trading signal platform that monitors 617 Binance USDT Perpetual Futures markets in real-time. It runs 13+ independent trading strategies simultaneously and surfaces high-confidence signals through an advanced dashboard with multiple charting libraries.
 
 ## Platform Architecture
 
@@ -65,18 +106,18 @@ graph TD
 | Funding Rate Extreme | Contrarian | Extreme sentiment reversal |
 | Open Interest Spike | Long/Short | Unusual futures positioning |
 
-## Technology Stack
+## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js 15, TypeScript |
-| Styling | Tailwind CSS |
-| Charting | ApexCharts, Recharts |
-| Market Data | Binance WebSocket API |
-| Database | PostgreSQL, Prisma ORM |
-| Cache | Redis 7 |
-| Package Manager | pnpm (Turborepo monorepo) |
-| Container | Docker |
+| Layer | Technology | Badge |
+|:------|:-----------|:------|
+| Frontend | Next.js 15, TypeScript | ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white) |
+| Styling | Tailwind CSS | ![Tailwind](https://img.shields.io/badge/Tailwind-latest-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) |
+| Charting | ApexCharts, Recharts | ![ApexCharts](https://img.shields.io/badge/ApexCharts-latest-FF4560?style=flat-square) |
+| Market Data | Binance WebSocket API | ![Binance](https://img.shields.io/badge/Binance-WebSocket-F0B90B?style=flat-square) |
+| Database | PostgreSQL, Prisma ORM | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white) |
+| Cache | Redis 7 | ![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&logo=redis&logoColor=white) |
+| Package Manager | pnpm (Turborepo monorepo) | ![pnpm](https://img.shields.io/badge/pnpm-Turborepo-F69220?style=flat-square&logo=pnpm&logoColor=white) |
+| Container | Docker | ![Docker](https://img.shields.io/badge/Docker-latest-2496ED?style=flat-square&logo=docker&logoColor=white) |
 
 ## Project Structure
 

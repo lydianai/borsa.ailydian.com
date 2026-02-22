@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     // 4. Send test notification
     const testPayload = {
       title: '🎉 Test Notification',
-      body: 'Bildirimler başarıyla aktif! SARDAG Trading Scanner hazır.',
+      body: 'Bildirimler başarıyla aktif! LyTrade Trading Scanner hazır.',
       icon: '/icons/icon-192x192.png',
       badge: '/icons/icon-96x96.png',
       tag: 'test-notification',

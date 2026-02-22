@@ -1,5 +1,5 @@
 /**
- * SARDAG Trading Scanner - Service Worker
+ * LyTrade Trading Scanner - Service Worker
  * Offline-First PWA with Smart Caching
  */
 
@@ -192,7 +192,7 @@ self.addEventListener('push', (event) => {
   console.log('[SW] 🔔 Push notification received');
 
   let data = {
-    title: 'SARDAG Trading Scanner',
+    title: 'LyTrade Trading Scanner',
     body: 'Yeni sinyal tespit edildi!',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-96x96.png',

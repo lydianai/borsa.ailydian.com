@@ -93,7 +93,7 @@ const DEFAULT_NOTIFICATION_CHANNELS: NotificationChannels = {
     notifyOnSell: true,
     notifyOnAlerts: true,
     minConfidence: 70,
-    username: 'SARDAG Trading Bot',
+    username: 'LyTrade Trading Bot',
     avatarUrl: '',
   },
   email: {
@@ -211,7 +211,7 @@ async function testTelegram(botToken: string, chatId: string): Promise<{ success
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: '✅ SARDAG İşlem Tarayıcı\n\nTelegram bildirimleri başarıyla aktif edildi!\n\nGüçlü sinyaller için anlık bildirimler alacaksınız.',
+        text: '✅ LyTrade İşlem Tarayıcı\n\nTelegram bildirimleri başarıyla aktif edildi!\n\nGüçlü sinyaller için anlık bildirimler alacaksınız.',
         parse_mode: 'HTML',
       }),
     });
@@ -236,11 +236,11 @@ async function testDiscord(webhookUrl: string, username: string): Promise<{ succ
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        username: username || 'SARDAG Trading Bot',
+        username: username || 'LyTrade Trading Bot',
         embeds: [
           {
             title: '✅ Discord Notifications Activated',
-            description: 'SARDAG İşlem Tarayıcı notifications are now active!',
+            description: 'LyTrade İşlem Tarayıcı notifications are now active!',
             color: 0x00ff00,
             fields: [
               { name: 'Status', value: 'Connected', inline: true },
@@ -329,7 +329,7 @@ export async function POST(request: NextRequest) {
         const result = await testTelegram(body.botToken, body.chatId);
         return NextResponse.json(result);
       } else if (channel === 'discord') {
-        const result = await testDiscord(body.webhookUrl, body.username || 'SARDAG Trading Bot');
+        const result = await testDiscord(body.webhookUrl, body.username || 'LyTrade Trading Bot');
         return NextResponse.json(result);
       }
 

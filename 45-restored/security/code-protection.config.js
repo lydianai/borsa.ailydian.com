@@ -1,7 +1,7 @@
 /**
  * 🔐 CODE PROTECTION & OBFUSCATION CONFIG
  * NIRVANA LEVEL SECURITY - WHITE HAT COMPLIANT
- * borsa.ailydian.com - SARDAG PROTECTED
+ * borsa.ailydian.com - LyTrade PROTECTED
  */
 
 module.exports = {
@@ -43,7 +43,7 @@ module.exports = {
     banner: `
 /**
  * 🔒 PROTECTED SOURCE CODE
- * © 2025 SARDAG - borsa.ailydian.com
+ * © 2025 LyTrade - borsa.ailydian.com
  * ALL RIGHTS RESERVED - PROPRIETARY & CONFIDENTIAL
  *
  * This code is protected by international copyright law.
@@ -54,7 +54,7 @@ module.exports = {
  * Algorithms: ENCRYPTED & PROTECTED
  * AI Models: PROPRIETARY
  *
- * Licensed to: SARDAG
+ * Licensed to: LyTrade
  * White-Hat Security Certified
  * Penetration Tested & Hardened
  */
@@ -73,7 +73,7 @@ module.exports = {
     customHeaders: {
       'X-Powered-By': 'CLASSIFIED',
       'X-Framework': 'PROTECTED',
-      'Server': 'SARDAG-SECURE'
+      'Server': 'LyTrade-SECURE'
     }
   },
 
