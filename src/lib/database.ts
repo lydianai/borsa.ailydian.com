@@ -9,7 +9,7 @@ import path from 'path';
 import crypto from 'crypto';
 
 const DATA_DIR = path.join(process.cwd(), '.data');
-const ENCRYPTION_KEY = process.env.DATABASE_ENCRYPTION_KEY || 'default-key-change-in-production';
+const ENCRYPTION_KEY = process.env.DATABASE_ENCRYPTION_KEY || 'dev-only-key-do-not-use-in-production';
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {

@@ -1,127 +1,128 @@
 <div align="center">
-  <img src="assets/logo/ailydian-banner.svg" alt="AiLydian" width="700">
-  <br><br>
 
 # LyTrade Scanner
 
-### Advanced Crypto Trading Signal Platform -- 617 Markets, 13+ Strategies, Real-Time Analysis Engine
-### Gelismis Kripto Ticaret Sinyal Platformu -- 617 Piyasa, 13+ Strateji, Gercek Zamanli Analiz Motoru
+### Open-Source Crypto Trading Signal Platform
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-00ff00?style=for-the-badge)](https://borsa.ailydian.com)
-[![License](https://img.shields.io/badge/License-Proprietary-blue?style=for-the-badge)]()
-[![Status](https://img.shields.io/badge/Status-Production-brightgreen?style=for-the-badge)]()
+**617 Markets | 13+ Strategies | Real-Time Binance WebSocket | Self-Hosted**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](CONTRIBUTING.md)
+
+[Features](#features) | [Quick Start](#quick-start) | [Screenshots](#screenshots) | [Strategies](#trading-strategies) | [Contributing](#contributing)
 
 </div>
 
 ---
 
-## Preview
+LyTrade Scanner is a self-hosted cryptocurrency trading signal platform that monitors **617 Binance USDT Perpetual Futures** markets in real-time. It runs 13+ independent trading strategies and delivers actionable signals with entry/exit levels, stop-loss, and take-profit targets through an interactive dashboard.
+
+**No API keys required for basic use** -- Binance public endpoints are free. Just clone, install, and start scanning.
+
+## Features
+
+- **617 Market Coverage** -- Monitors all Binance USDT Perpetual Futures simultaneously via WebSocket
+- **13+ Trading Strategies** -- Conservative Buy, Breakout-Retest, Momentum, RSI Divergence, Volume Surge, and more
+- **Real-Time Signals** -- Sub-100ms latency with direct Binance WebSocket feed
+- **Multi-Timeframe Analysis** -- Processes signals across multiple timeframes for higher confidence
+- **Interactive Dashboard** -- ApexCharts candlestick charts + Recharts for portfolio visualization
+- **AI Market Commentary** -- Works with any OpenAI-compatible API (Groq free tier, OpenAI, local Ollama)
+- **Whale Tracking** -- Large transaction monitoring via on-chain data
+- **News Aggregation** -- Crypto news from multiple sources with sentiment analysis
+- **Traditional Markets** -- Forex, commodities, and indices alongside crypto
+- **Push Notifications** -- Telegram bot + browser push notifications for signals
+- **PWA Support** -- Install as a desktop/mobile app
+- **Dark Theme** -- Professional trading interface with dark mode
+
+## Screenshots
 
 <div align="center">
-  <img src="docs/screenshots/crypto-trading-grid.png" alt="LyTrade Scanner - Real-Time Crypto Trading Grid with 24+ Coins" width="800">
-  <br><em>Real-time trading grid showing 24+ cryptocurrencies with live prices, volume data, highs/lows, and trend indicators (BTC, ETH, SOL, XRP, BNB, DOGE, and more)</em>
+  <img src="docs/screenshots/crypto-trading-grid.png" alt="LyTrade Scanner Dashboard" width="800">
+  <br><em>Real-time trading grid with 24+ cryptocurrencies, live prices, volume, and trend indicators</em>
 </div>
 
----
+## Quick Start
 
-## Executive Summary
+### Prerequisites
 
-LyTrade Scanner is a professional-grade cryptocurrency trading signal platform that monitors 617 Binance USDT Perpetual Futures markets simultaneously in real-time. The platform runs 13+ independent proprietary trading strategies -- including Conservative Buy, Breakout-Retest, Momentum, Downtrend Reversal, Volume Surge, RSI Divergence, and more -- and surfaces high-confidence signals through an advanced dashboard with multiple charting libraries (ApexCharts + Recharts).
+- **Node.js** 20+ and **pnpm** 8+
+- **PostgreSQL** (optional -- works without it using file-based storage)
+- **Redis** (optional -- for caching in production)
 
-The platform ingests live price, volume, and order book data via Binance WebSocket API, processes it through a multi-timeframe technical analysis engine, and delivers actionable trading signals with entry/exit levels, stop-loss, and take-profit targets. The Turborepo monorepo architecture with pnpm workspace management ensures code quality and development velocity across the full stack.
+### 1. Clone and Install
 
-Built on Next.js 15 with TypeScript, PostgreSQL 16, and Redis 7, LyTrade Scanner targets the rapidly growing retail crypto trading tools market. The freemium-to-enterprise subscription model (Free / Pro $49/mo / Enterprise $199/mo) captures users across all segments with strong conversion economics.
+```bash
+git clone https://github.com/AiLydian/lytrade-scanner.git
+cd lytrade-scanner
 
-## Yonetici Ozeti
+pnpm install
+```
 
-LyTrade Scanner, 617 Binance USDT Vadeli Islemler piyasasini esanli olarak gercek zamanli izleyen profesyonel sinif bir kripto para ticaret sinyal platformudur. Platform, Muhafazakar Alis, Kirilim-Yeniden Test, Momentum, Dusus Trend Donusu, Hacim Artisi, RSI Sapma ve daha fazlasini iceren 13+ bagimsiz tescilli ticaret stratejisi calistirir ve gelismis gosterge paneli araciligiyla yuksek guvenilirlikli sinyaller sunar.
+### 2. Configure Environment
 
-Platform, Binance WebSocket API araciligiyla canli fiyat, hacim ve emir defteri verilerini alir, cok zaman dilimli teknik analiz motorundan gecirir ve giris/cikis seviyeleri, zarar durdur ve kar al hedefleri ile uygulanabilir ticaret sinyalleri sunar.
+```bash
+cp .env.example .env.local
+```
 
----
+Edit `.env.local` with your settings. **Minimum required:**
 
-## Key Metrics
+```env
+# App URL (keep as-is for local development)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-| Metric | Value |
-|--------|-------|
-| Markets Monitored | 617 Binance USDT Perpetual Futures |
-| Trading Strategies | 13+ independent algorithms |
-| Data Feed | Real-time Binance WebSocket API |
-| Charting Libraries | ApexCharts + Recharts |
-| Signal Types | Long, Short, Contrarian |
-| Timeframes | Multi-timeframe analysis |
-| Database | PostgreSQL 16 + Redis 7 |
-| Architecture | Turborepo monorepo (pnpm) |
+# AI Provider (optional -- for market commentary feature)
+# Option A: Groq (free) - https://console.groq.com
+AI_API_URL=https://api.groq.com/openai/v1/chat/completions
+AI_API_KEY=your_groq_key
+AI_MODEL=llama-3.3-70b-versatile
 
----
+# Option B: Local Ollama (free, private)
+# AI_API_URL=http://localhost:11434/v1/chat/completions
+# AI_API_KEY=ollama
+# AI_MODEL=llama3.2
+```
 
-## Revenue Model & Projections
+> **Note:** Binance market data works without any API key. AI features are optional.
 
-### Business Model
+### 3. Run
 
-LyTrade Scanner operates on a **freemium subscription model**: Free tier (limited signals, 15-min delay), Pro at $49/month (real-time signals, all 13+ strategies, custom alerts), and Enterprise at $199/month (API access, priority signals, custom strategies, dedicated support).
+```bash
+pnpm dev
+```
 
-### 5-Year Revenue Forecast
+Open [http://localhost:3000](http://localhost:3000) and start scanning.
 
-| Year | Total Users | Paid Subscribers | ARR | Growth |
-|------|-------------|-----------------|-----|--------|
-| Y1 | 10,000 | 500 | $100K | -- |
-| Y2 | 50,000 | 2,000 | $400K | 300% |
-| Y3 | 200,000 | 8,000 | $1.8M | 350% |
-| Y4 | 500,000 | 20,000 | $5M | 178% |
-| Y5 | 1,200,000 | 50,000 | $12M | 140% |
+### Optional: Database Setup
 
----
+For signal history and user accounts:
 
-## Market Opportunity
+```bash
+# Set DATABASE_URL in .env.local
+# Example: postgresql://user:password@localhost:5432/lytrade
 
-| Segment | Size |
-|---------|------|
-| **TAM** (Global Crypto Trading Tools Market) | $25B by 2030 |
-| **SAM** (Retail Crypto Signal + Analytics Platforms) | $5B |
-| **SOM** (Turkish + MENA crypto traders) | $500M |
+npx prisma generate
+npx prisma db push
+```
 
-**Key Differentiators:** 617 markets monitored simultaneously (competitors typically cover 50-100). 13+ independent strategies providing signal diversity. Real-time WebSocket feed with < 100ms latency. Turborepo monorepo for rapid feature development. Free tier creates massive funnel for paid conversion.
+## Trading Strategies
 
----
-
-## Tech Stack
-
-<div align="center">
-
-![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=next.js&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)
-![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 15 + TypeScript 5 |
-| Styling | Tailwind CSS |
-| Charting | ApexCharts + Recharts |
-| Market Data | Binance WebSocket API (real-time) |
-| Database | PostgreSQL 16 + Prisma ORM |
-| Cache | Redis 7 |
-| State | Zustand |
-| Monorepo | Turborepo + pnpm workspace |
-| Container | Docker |
-| Analysis Engine | Proprietary multi-strategy signal processor |
-
-</div>
-
----
-
-## Competitive Advantages
-
-- **617 Market Coverage** -- Monitors all Binance USDT Perpetual Futures simultaneously; competitors typically cover 50-100 markets
-- **13+ Independent Strategies** -- Signal diversity reduces false positive rate and covers all market conditions (trending, ranging, volatile)
-- **Sub-100ms Latency** -- Direct Binance WebSocket feed ensures signals arrive before slower competitors
-- **Freemium Funnel** -- Free tier creates massive user acquisition at near-zero CAC; 5%+ conversion to paid tiers
-- **Monorepo Architecture** -- Turborepo enables rapid iteration with shared types, utilities, and consistent quality across the stack
-
----
+| # | Strategy | Signal Type | Market Condition |
+|---|----------|------------|-----------------|
+| 1 | Conservative Buy | Long | Oversold with strong support |
+| 2 | Breakout-Retest | Long | Resistance broken and retested |
+| 3 | Momentum | Long/Short | Strong directional movement |
+| 4 | Downtrend Reversal | Long | Exhausted sellers, accumulation zone |
+| 5 | Volume Surge | Long/Short | Abnormal volume spike detection |
+| 6 | RSI Divergence | Long/Short | Price/momentum divergence |
+| 7 | Moving Average Cross | Long/Short | MA crossover systems (EMA/SMA) |
+| 8 | Bollinger Squeeze | Long/Short | Volatility contraction breakout |
+| 9 | MACD Signal | Long/Short | Histogram crossovers |
+| 10 | Fibonacci Retracement | Long | Golden ratio support levels |
+| 11 | Order Book Imbalance | Long/Short | Liquidity analysis |
+| 12 | Funding Rate Extreme | Contrarian | Extreme sentiment reversal |
+| 13 | Open Interest Spike | Long/Short | Unusual futures positioning |
 
 ## Architecture
 
@@ -149,90 +150,95 @@ graph TD
         J --> N[Top Gainers/Volume]
     end
     subgraph "Persistence"
-        I --> O[PostgreSQL 16 - Signal History]
-        I --> P[Redis 7 - Real-time Cache]
+        I --> O[PostgreSQL - Signal History]
+        I --> P[Redis - Real-time Cache]
     end
 ```
 
----
+## Tech Stack
 
-## Trading Strategies
+| Layer | Technology |
+|-------|-----------|
+| Framework | [Next.js 16](https://nextjs.org) + [TypeScript 5](https://www.typescriptlang.org) |
+| Styling | [Tailwind CSS](https://tailwindcss.com) |
+| Charting | [ApexCharts](https://apexcharts.com) + [Recharts](https://recharts.org) |
+| Market Data | [Binance WebSocket API](https://binance-docs.github.io/apidocs/) (real-time) |
+| Database | [PostgreSQL](https://www.postgresql.org) + [Prisma ORM](https://www.prisma.io) |
+| Cache | [Redis](https://redis.io) / [Upstash](https://upstash.com) |
+| State | [Zustand](https://zustand-demo.pmnd.rs) |
+| Auth | [NextAuth.js](https://next-auth.js.org) |
+| Icons | [Lucide React](https://lucide.dev) |
+| Validation | [Zod](https://zod.dev) |
 
-| Strategy | Signal Type | Market Condition |
-|----------|------------|-----------------|
-| Conservative Buy | Long | Oversold with strong support |
-| Breakout-Retest | Long | Resistance broken and retested |
-| Momentum | Long/Short | Strong directional momentum |
-| Downtrend Reversal | Long | Exhausted sellers, accumulation |
-| Volume Surge | Long/Short | Abnormal volume spike |
-| RSI Divergence | Long/Short | Price/momentum divergence |
-| Moving Average Cross | Long/Short | MA crossover systems |
-| Bollinger Squeeze | Long/Short | Volatility contraction breakout |
-| MACD Signal | Long/Short | Histogram crossovers |
-| Fibonacci Retracement | Long | Golden ratio support levels |
-| Order Book Imbalance | Long/Short | Liquidity analysis |
-| Funding Rate Extreme | Contrarian | Extreme sentiment reversal |
-| Open Interest Spike | Long/Short | Unusual futures positioning |
+## Project Structure
 
----
-
-## Getting Started
-
-```bash
-# Clone the repository
-git clone https://github.com/lydianai/borsa.ailydian.com.git
-cd borsa.ailydian.com
-
-# Install dependencies
-pnpm install
-
-# Configure environment variables
-cp .env.example .env.local
-# Set DATABASE_URL, REDIS_URL, BINANCE_API_KEY, BINANCE_SECRET_KEY
-
-# Run database migrations
-pnpm db:migrate
-
-# Start development server
-pnpm dev
-# Dashboard available at http://localhost:3000
+```
+src/
+  app/                  # Next.js App Router pages and API routes
+    (auth)/             # Login, register, forgot password
+    api/                # REST API endpoints
+    market-scanner/     # Scanner dashboard
+    market-commentary/  # AI-powered market analysis
+    traditional-markets/# Forex, commodities, indices
+    haberler/           # Crypto news aggregator
+    pricing/            # Subscription plans
+  components/           # React components
+    settings/           # User settings panels
+  lib/                  # Utility libraries
+    strategies/         # Trading strategy implementations
+    adapters/           # Data source adapters
+    email/              # Email notification service
+    push/               # Push notification service
+    stripe/             # Payment integration
+  types/                # TypeScript type definitions
+prisma/                 # Database schema
+public/                 # Static assets
 ```
 
----
+## Environment Variables
 
-## Security & Compliance
+See [`.env.example`](.env.example) for all available configuration options. Key categories:
 
-| Standard | Implementation |
-|----------|---------------|
-| API Keys | Read-only Binance permissions; no trading access |
-| Encryption | TLS 1.3 for all API communications |
-| Authentication | NextAuth with session management |
-| Rate Limiting | Per-IP and per-user throttling |
-| OWASP | Top 10 2025 mitigations applied |
-| Secrets | All credentials stored as environment variables |
-| KVKK/GDPR | Personal data protection compliant |
+| Category | Required | Description |
+|----------|----------|-------------|
+| Core | Yes | `NEXT_PUBLIC_APP_URL` |
+| AI Services | No | Any OpenAI-compatible API (Groq, OpenAI, Ollama) |
+| Market Data | No | CoinGlass, Alpha Vantage, MetalpriceAPI |
+| Notifications | No | Telegram bot, VAPID keys for push |
+| Database | No | PostgreSQL connection string |
+| Cache | No | Redis/Upstash for production caching |
+| Monitoring | No | Sentry DSN for error tracking |
 
----
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+```bash
+# Fork the repo, then:
+git clone https://github.com/YOUR_USERNAME/lytrade-scanner.git
+cd lytrade-scanner
+pnpm install
+pnpm dev
+
+# Make changes, then submit a PR
+```
+
+## Security
+
+If you discover a security vulnerability, please report it responsibly via [GitHub Security Advisories](https://github.com/AiLydian/lytrade-scanner/security/advisories/new). See [SECURITY.md](SECURITY.md) for details.
 
 ## Disclaimer
 
-This platform is for informational and educational purposes only. Trading cryptocurrency carries significant financial risk. Never invest more than you can afford to lose. Past performance of trading signals does not guarantee future results. This is not financial advice.
-
----
-
-## Contact
-
-| | |
-|---|---|
-| **Email** | info@ailydian.com |
-| **Email** | ailydian@ailydian.com |
-| **Web** | [https://ailydian.com](https://ailydian.com) |
-| **Platform** | [https://borsa.ailydian.com](https://borsa.ailydian.com) |
-
----
+This platform is for **informational and educational purposes only**. Cryptocurrency trading carries significant financial risk. Never invest more than you can afford to lose. Past performance of trading signals does not guarantee future results. **This is not financial advice.**
 
 ## License
 
-Copyright (c) 2025-2026 AiLydian. All Rights Reserved.
+This project is licensed under the [MIT License](LICENSE).
 
-This software is proprietary and confidential. Unauthorized copying, distribution, or modification is strictly prohibited.
+---
+
+<div align="center">
+
+If this project helps your trading workflow, consider giving it a star!
+
+</div>

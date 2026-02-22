@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     try {
       const geoResponse = await fetch(`https://ipapi.co/${ip}/json/`, {
         headers: {
-          'User-Agent': 'LyDian-Trader-Security/1.0'
+          'User-Agent': 'LyTrade-Scanner/1.0'
         }
       });
 
