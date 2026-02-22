@@ -51,12 +51,12 @@ export default function LoginPage() {
       }
 
       // Demo account fallback
-      if (email === 'demo@ailydian.com' && password === 'demo123') {
+      if (email === 'demo@demo.com' && password === 'demo123') {
         localStorage.setItem('user-session', JSON.stringify({ email, loggedIn: true, loginTime: new Date().toISOString() }));
         localStorage.setItem('user-role', 'admin'); // Demo user is admin
         router.push('/');
       } else {
-        setError('Email veya şifre hatalı. Demo hesap: demo@ailydian.com / demo123');
+        setError('Email veya şifre hatalı. Demo hesap: demo@demo.com / demo123');
       }
     } catch (error) {
       setError('Bir hata oluştu. Lütfen tekrar deneyin.');
@@ -85,7 +85,7 @@ export default function LoginPage() {
                   <TrendingUp className="w-8 h-8" />
                 </div>
                 <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-500 text-transparent bg-clip-text">
-                  Ailydian Signal
+                  LyTrade Scanner
                 </h1>
               </div>
               <p className="text-xl text-gray-300 leading-relaxed">
@@ -136,7 +136,7 @@ export default function LoginPage() {
                   <TrendingUp className="w-6 h-6" />
                 </div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
-                  Ailydian Signal
+                  LyTrade Scanner
                 </h1>
               </div>
               <p className="text-gray-400">Hesabınıza giriş yapın</p>

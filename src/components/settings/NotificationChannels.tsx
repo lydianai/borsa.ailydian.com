@@ -380,7 +380,7 @@ export default function NotificationChannels({ onSave }: NotificationChannelsPro
                   type="text"
                   value={settings.discord.username}
                   onChange={(e) => updateSettings("discord", "username", e.target.value)}
-                  placeholder="Ailydian Trading Bot"
+                  placeholder="LyTrade Trading Bot"
                   className="settings-input-premium"
                 />
               </div>

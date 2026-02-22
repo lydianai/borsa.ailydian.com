@@ -70,3 +70,45 @@ coverage/
 
 # TypeScript
 *.tsbuildinfo
+
+# === Open-Source Exclusions ===
+# Model data
+*.pkl
+*.h5
+*.pt
+*.onnx
+*.safetensors
+
+# Encrypted data
+*.enc
+.data/
+
+# Internal configs
+.AISystem/
+.claude/
+.qoder/
+
+# Archived/internal content
+45-restored/
+45-backend/
+Telegram/
+Phyton-Service/
+_themes_archive/
+ailydian_client/
+scripts/
+
+# Deployment configs (use your own)
+vercel.json
+.vercelignore
+sentry.*.config.ts
+instrumentation.ts
+
+# Test scripts (internal)
+test-*.sh
+test-*.js
+test-*.ts
+\!tests/
+
+# Backup files
+*.backup
+*.bak

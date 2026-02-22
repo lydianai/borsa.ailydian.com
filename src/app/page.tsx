@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Ailydian TRADING DASHBOARD - ADVANCED COIN GRID
+ * LyTrade TRADING DASHBOARD - ADVANCED COIN GRID
  * TradingView-style premium layout with real-time data
  */
 
@@ -643,7 +643,7 @@ export default function AdvancedDashboard() {
               <>
                 {/* Overall Recommendation - Ailydian Çoklu Strateji Analizi */}
                 <div style={{ background: COLORS.bg.primary, border: `1px solid ${COLORS.border.active}`, borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
-                  <h3 className="neon-text" style={{ fontSize: '1.25rem', marginBottom: '12px' }}>🎯 Ailydian Çoklu Strateji Analizi</h3>
+                  <h3 className="neon-text" style={{ fontSize: '1.25rem', marginBottom: '12px' }}>🎯 LyTrade Çoklu Strateji Analizi</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '16px' }}>
                     <div>
                       <div style={{ color: COLORS.gray[500], fontSize: '12px', marginBottom: '4px' }}>Genel Sinyal</div>
@@ -796,7 +796,7 @@ export default function AdvancedDashboard() {
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text'
               }}>
-                Borsa Ailydian - AI Kripto Trading Platform
+                LyTrade Scanner - AI Kripto Trading Platform
               </h2>
             </div>
             <button onClick={() => setShowLogicModal(false)} style={{
@@ -848,7 +848,7 @@ export default function AdvancedDashboard() {
                   border: `1px solid ${COLORS.border.active}`
                 }}>
                   <p style={{ fontSize: '14px', color: COLORS.text.secondary, lineHeight: '1.8', margin: 0 }}>
-                    Borsa Ailydian, Python tabanlı yapay zeka modelleri ile desteklenen, 8 farklı strateji sunan profesyonel kripto para analiz platformudur.
+                    LyTrade Scanner, yapay zeka modelleri ile desteklenen, 11 farklı strateji sunan açık kaynak profesyonel kripto para analiz platformudur.
                     Binance Futures API ile gerçek zamanlı veri akışı, çoklu zaman dilimi analizi ve otomatik sinyal üretimi sağlar.
                   </p>
                 </div>

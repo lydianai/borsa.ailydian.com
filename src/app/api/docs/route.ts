@@ -9,22 +9,18 @@ import { NextResponse } from 'next/server';
 const API_DOCS = {
   openapi: '3.0.0',
   info: {
-    title: 'Ailydian Signal API',
-    version: '0.1.0',
-    description: 'Premium AI-Powered Cryptocurrency Trading Signal Platform API',
+    title: 'LyTrade Scanner API',
+    version: '1.0.0',
+    description: 'AI-Powered Cryptocurrency Trading Signal Platform API',
     contact: {
-      name: 'Ailydian Support',
-      url: 'https://ailydian.com',
+      name: 'LyTrade Support',
+      url: 'https://github.com/AiLydian/lytrade-scanner',
     },
   },
   servers: [
     {
       url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-      description: 'Development server',
-    },
-    {
-      url: 'https://ailydian.com',
-      description: 'Production server',
+      description: 'Local development server',
     },
   ],
   paths: {

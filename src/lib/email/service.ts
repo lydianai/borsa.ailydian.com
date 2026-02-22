@@ -9,8 +9,8 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@ailydian.com';
-const APP_NAME = 'Ailydian Signal';
+const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@example.com';
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'LyTrade Scanner';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export interface EmailOptions {
@@ -102,7 +102,7 @@ export async function sendVerificationEmail(email: string, token: string) {
  * Send admin notification for new user
  */
 export async function sendAdminNotification(userEmail: string, username: string, userId: string) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@ailydian.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
   const approvalUrl = `${APP_URL}/admin/users?userId=${userId}`;
 
   const html = `

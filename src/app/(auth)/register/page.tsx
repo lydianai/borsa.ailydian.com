@@ -183,7 +183,7 @@ export default function RegisterPage() {
                   <TrendingUp className="w-8 h-8" />
                 </div>
                 <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-500 text-transparent bg-clip-text">
-                  Ailydian Signal
+                  LyTrade Scanner
                 </h1>
               </div>
               <p className="text-xl text-gray-300 leading-relaxed">
@@ -236,7 +236,7 @@ export default function RegisterPage() {
                   <TrendingUp className="w-6 h-6" />
                 </div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
-                  Ailydian Signal
+                  LyTrade Scanner
                 </h1>
               </div>
               <p className="text-gray-400">Yeni hesap oluşturun</p>

@@ -219,7 +219,7 @@ function generateCommentary(_data: any, analysis: any, aiSignals: any, news: any
                          sellSignals > buySignals ? 'satış ağırlıklı' :
                          'dengeli';
 
-  const marketOverview = `Ailydian Signal platformumuz ${totalSignals} adet sinyal tespit etti. Bunların ${buySignals} tanesi ALIŞ, ${sellSignals} tanesi SATIŞ yönünde. Piyasa duyarlılığı şu an ${signalSentiment} görünüyor. ${
+  const marketOverview = `LyTrade Scanner platformumuz ${totalSignals} adet sinyal tespit etti. Bunların ${buySignals} tanesi ALIŞ, ${sellSignals} tanesi SATIŞ yönünde. Piyasa duyarlılığı şu an ${signalSentiment} görünüyor. ${
     avgChange > 1 ? 'Yatırımcı güveni yüksek seviyelerde ve alım baskısı devam ediyor.' :
     avgChange < -1 ? 'Piyasada temkinli bir hava hakim ve satış baskısı görülüyor.' :
     'Yatırımcılar dikkatli bir şekilde gelişmeleri takip ediyor.'
@@ -415,7 +415,7 @@ export async function GET(_request: NextRequest) {
       data: marketCommentary,
       cached: false,
       metadata: {
-        dataSource: 'Ailydian Signal Multi-Service Analysis',
+        dataSource: 'LyTrade Scanner Multi-Service Analysis',
         servicesUsed: [
           'BTC-ETH Analysis',
           'AI Signals',

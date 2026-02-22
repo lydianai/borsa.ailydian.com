@@ -1,16 +1,8 @@
-Contact: info@ailydian.com
+Contact: mailto:security@example.com
 Preferred-Languages: tr, en
-Canonical: https://borsa.ailydian.com/.well-known/security.txt
-Policy: https://ailydian.com/security-policy
-Hiring: https://ailydian.com/careers
 
-# Bug Bounty Program
-# Report security vulnerabilities to security@ailydian.com
+# Security Vulnerability Reporting
+# Report security vulnerabilities via GitHub Issues
+# https://github.com/AiLydian/lytrade-scanner/issues
 # Response time: 24-48 hours
 # Please include detailed steps to reproduce
-
-# Bot Protection Notice
-# This site employs enterprise-grade bot protection
-# Legitimate search engine crawlers (Google, Bing, Yandex) are welcome
-# AI scrapers and aggressive crawlers are blocked
-# See /robots.txt for full policy

@@ -712,7 +712,7 @@ export default function TraditionalMarketsDashboard() {
                 <>
                   {/* Overall Recommendation */}
                   <div style={{ background: COLORS.bg.primary, border: `1px solid ${COLORS.border.default}`, borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
-                    <h3 className="neon-text" style={{ fontSize: '1.25rem', marginBottom: '12px' }}>🎯 Ailydian Çoklu Strateji Analizi</h3>
+                    <h3 className="neon-text" style={{ fontSize: '1.25rem', marginBottom: '12px' }}>🎯 LyTrade Çoklu Strateji Analizi</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '16px' }}>
                       <div>
                         <div style={{ color: COLORS.text.muted, fontSize: '12px', marginBottom: '4px' }}>Genel Sinyal</div>

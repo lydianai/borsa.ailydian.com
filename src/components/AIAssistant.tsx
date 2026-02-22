@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Ailydian AI ASSISTANT
+ * LyTrade AI ASSISTANT
  * Advanced AI + All Strategies Combined
  * Real-time market data integration
  */
@@ -145,7 +145,7 @@ export function AIAssistant() {
           <div style={{ padding: '20px', borderBottom: '1px solid #444', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Icons.Bot style={{ width: '24px', height: '24px', color: '#ffffff' }} />
             <div style={{ flex: 1 }}>
-              <h3 className="neon-text" style={{ fontSize: '18px', margin: 0 }}>Ailydian AI Asistan</h3>
+              <h3 className="neon-text" style={{ fontSize: '18px', margin: 0 }}>LyTrade AI Asistan</h3>
               <p style={{ color: '#666', fontSize: '12px', margin: 0 }}>Gelişmiş AI + Tüm Stratejiler</p>
             </div>
             <button

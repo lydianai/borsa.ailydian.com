@@ -2,7 +2,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Ailydian Signal',
+  title: 'LyTrade Scanner',
   description: 'Kripto piyasalarında profesyonel sinyal analizi',
 };
 

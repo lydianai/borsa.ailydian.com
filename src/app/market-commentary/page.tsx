@@ -336,7 +336,7 @@ export default function MarketCommentaryPage() {
                   </button>
                 </div>
                 <div style={{ fontSize: '16px', color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>
-                  Ailydian Signal - Profesyonel Piyasa Analizi
+                  LyTrade Scanner - Profesyonel Piyasa Analizi
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
@@ -1135,7 +1135,7 @@ export default function MarketCommentaryPage() {
           {/* Footer */}
           <div style={{ textAlign: 'center', padding: '32px', color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>
             <div style={{ marginBottom: '8px' }}>
-              Powered by <span style={{ color: COLORS.premium, fontWeight: '700' }}>Ailydian Signal</span>
+              Powered by <span style={{ color: COLORS.premium, fontWeight: '700' }}>LyTrade Scanner</span>
             </div>
             <div>
               BEYAZ ŞAPKA: Bu analiz sadece eğitim ve bilgilendirme amaçlıdır

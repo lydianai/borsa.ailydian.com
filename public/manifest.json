@@ -1,7 +1,7 @@
 {
-  "name": "Ailydian Signal - AI Kripto Trading Platformu",
-  "short_name": "Ailydian Signal",
-  "description": "617 kripto para için gerçek zamanlı AI trading sinyalleri. 18+ strateji, whale takibi ve profesyonel piyasa analizi.",
+  "name": "LyTrade Scanner - AI Crypto Trading Platform",
+  "short_name": "LyTrade",
+  "description": "Real-time AI trading signals for 600+ crypto pairs. Multi-strategy analysis, whale tracking, and professional market insights.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
@@ -63,7 +63,7 @@
     {
       "name": "Market Scanner",
       "short_name": "Scanner",
-      "description": "Tüm 617 kripto parayı tara",
+      "description": "Scan all 600+ crypto pairs",
       "url": "/market-scanner",
       "icons": [
         {
@@ -76,7 +76,7 @@
     {
       "name": "Trading Signals",
       "short_name": "Signals",
-      "description": "Al/Sat sinyallerini görüntüle",
+      "description": "View buy/sell signals",
       "url": "/trading-signals",
       "icons": [
         {
@@ -87,9 +87,9 @@
       ]
     },
     {
-      "name": "Muhafazakâr Alım",
-      "short_name": "Konservatif",
-      "description": "5 koşul sağlayan güvenli sinyaller",
+      "name": "Conservative Signals",
+      "short_name": "Conservative",
+      "description": "Safe signals with 5 confirmations",
       "url": "/conservative-signals",
       "icons": [
         {
@@ -106,14 +106,14 @@
       "sizes": "1920x1080",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Ailydian Signal Dashboard - 617 Kripto Para Analizi"
+      "label": "LyTrade Scanner Dashboard - 600+ Crypto Analysis"
     },
     {
       "src": "/screenshots/mobile-home.png",
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Ailydian Signal Mobil - Gerçek Zamanlı Trading Sinyalleri"
+      "label": "LyTrade Scanner Mobile - Real-Time Trading Signals"
     }
   ],
   "related_applications": [],

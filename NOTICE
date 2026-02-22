@@ -1,41 +1,21 @@
 NOTICE
 
-This repository and all its contents are the intellectual property of AiLydian.
+LyTrade Scanner
+Copyright (c) 2025-2026 AiLydian
 
-Repository: borsa.ailydian.com
-Organization: AiLydian (https://ailydian.com)
-Fingerprint: AILY-34AF4BCB-2026
+This software is licensed under the MIT License.
+See the LICENSE file for the full license text.
 
-INTELLECTUAL PROPERTY NOTICE
-============================
+This product includes software developed by AiLydian (https://ailydian.com).
 
-All source code, algorithms, documentation, designs, and associated
-materials in this repository are protected by:
+THIRD-PARTY NOTICES
+===================
 
-1. Copyright law (Berne Convention, TRIPS Agreement)
-2. Trade secret law (Defend Trade Secrets Act)
-3. Proprietary software licensing
-4. International intellectual property treaties
+This project uses the following open-source libraries:
+- Next.js (MIT License) - https://nextjs.org
+- React (MIT License) - https://reactjs.org
+- Tailwind CSS (MIT License) - https://tailwindcss.com
+- Recharts (MIT License) - https://recharts.org
+- Lightweight Charts (Apache 2.0) - https://tradingview.github.io/lightweight-charts/
 
-RESTRICTIONS
-============
-
-Without express written permission from AiLydian, you may NOT:
-
-- Copy, reproduce, or duplicate any part of this codebase
-- Reverse engineer, decompile, or disassemble the software
-- Create derivative works based on this software
-- Distribute, sublicense, or transfer this software
-- Use any proprietary algorithms or methods in other projects
-- Remove or alter any copyright notices or watermarks
-
-MONITORING
-==========
-
-This repository is actively monitored for unauthorized use.
-Violations will be pursued under applicable intellectual property law.
-
-For licensing inquiries: info@ailydian.com
-For security reports: security@ailydian.com
-
-Copyright (c) 2025-2026 AiLydian. All Rights Reserved.
+For the full list of dependencies, see package.json.

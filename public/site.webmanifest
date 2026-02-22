@@ -1,7 +1,7 @@
 {
-  "name": "Borsa AI - Ailydian Signal",
-  "short_name": "Borsa AI",
-  "description": "Kripto Para Trading Sinyalleri - AI-Powered Crypto Trading Platform",
+  "name": "LyTrade Scanner",
+  "short_name": "LyTrade",
+  "description": "AI-Powered Crypto Trading Platform - Real-time signals for 600+ pairs",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
