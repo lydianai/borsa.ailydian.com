@@ -75,8 +75,8 @@ export async function learnCoinStrategies(symbol: string): Promise<AdaptiveWeigh
       trend: 'BULLISH', // BULLISH | BEARISH | SIDEWAYS
     };
 
-    // 4. Claude AI'dan ağırlık önerileri al
-    console.log(`🤖 Learning: Requesting weight suggestions from Claude AI...`);
+    // 4. AI'dan ağırlık önerileri al
+    console.log(`🤖 Learning: Requesting weight suggestions from AI...`);
     const aiSuggestion = await suggestCoinWeights({
       symbol,
       historicalPerformance,
@@ -180,7 +180,7 @@ export async function analyzeGlobalStrategyPerformance(
     console.log(`   ⭐ Rating: ${overallRating.toUpperCase()}`);
     console.log(`   📊 Data from ${coinPerformances.length} coins`);
 
-    // Claude AI'dan performans değerlendirmesi al
+    // AI'dan performans değerlendirmesi al
     const recentSignals = coinPerformances.slice(0, 10).map((c) => ({
       timestamp: new Date().toISOString(),
       signal: 'BUY' as const,
@@ -331,7 +331,7 @@ export async function createStrategyVariants(
 
   // Variant 3: Optimized (AI önerili)
   const optimizedParams = { ...baseParams };
-  // Gerçek implementasyonda Claude AI'dan öneriler alınacak
+  // Gerçek implementasyonda AI'dan öneriler alınacak
   variants.push({
     variantName: `${strategyName}-optimized`,
     params: optimizedParams,
