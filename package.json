@@ -1,7 +1,24 @@
 {
-  "name": "sarıdag-lydian-backend",
-  "version": "0.1.0",
-  "private": true,
+  "name": "lytrade-scanner",
+  "version": "1.0.0",
+  "description": "Real-time crypto trading scanner with 11 unified strategies, 158 technical indicators, and multi-timeframe analysis",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AiLydian/borsa.ailydian.com.git"
+  },
+  "keywords": [
+    "crypto",
+    "trading",
+    "scanner",
+    "binance",
+    "technical-analysis",
+    "ta-lib",
+    "wyckoff",
+    "nextjs",
+    "typescript",
+    "real-time"
+  ],
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
@@ -16,7 +33,6 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.67.0",
     "@auth/prisma-adapter": "^2.11.1",
     "@ixjb94/indicators": "^1.2.4",
     "@prisma/client": "^6.19.0",
@@ -37,7 +53,6 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "firebase-admin": "^13.6.0",
-    "groq-sdk": "^0.34.0",
     "ioredis": "^5.8.2",
     "lightweight-charts": "^5.0.9",
     "lru-cache": "^11.2.4",

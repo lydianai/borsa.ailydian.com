@@ -11,8 +11,8 @@
 
 import { Redis } from '@upstash/redis'
 
-// Obfuscated key prefix
-const _prefix = Buffer.from('Z3JvcV9ybA==', 'base64').toString('utf-8') // groq_rl
+// Redis key prefix for rate limiting
+const RATE_LIMIT_PREFIX = 'ai_rl'
 
 interface RateLimitResult {
   success: boolean
@@ -106,7 +106,7 @@ export class GroqRateLimiter {
     windowMs: number,
     now: number
   ): Promise<RateLimitResult> {
-    const key = `${_prefix}:${identifier}:${window}`
+    const key = `${RATE_LIMIT_PREFIX}:${identifier}:${window}`
 
     if (this.redis) {
       return this.checkWindowRedis(key, limit, windowMs, now)
@@ -223,7 +223,7 @@ export class GroqRateLimiter {
     tokens: number,
     now: number
   ): Promise<RateLimitResult> {
-    const key = `${_prefix}:${identifier}:tokens`
+    const key = `${RATE_LIMIT_PREFIX}:${identifier}:tokens`
     const windowMs = 60 * 1000 // 1 minute
     const windowStart = now - windowMs
 
@@ -310,9 +310,9 @@ export class GroqRateLimiter {
   }> {
     const now = Date.now()
 
-    const minuteKey = `${_prefix}:${identifier}:minute`
-    const dayKey = `${_prefix}:${identifier}:day`
-    const tokenKey = `${_prefix}:${identifier}:tokens`
+    const minuteKey = `${RATE_LIMIT_PREFIX}:${identifier}:minute`
+    const dayKey = `${RATE_LIMIT_PREFIX}:${identifier}:day`
+    const tokenKey = `${RATE_LIMIT_PREFIX}:${identifier}:tokens`
 
     if (this.redis) {
       try {
@@ -355,9 +355,9 @@ export class GroqRateLimiter {
   async resetLimit(identifier: string): Promise<void> {
     if (this.redis) {
       const keys = [
-        `${_prefix}:${identifier}:minute`,
-        `${_prefix}:${identifier}:day`,
-        `${_prefix}:${identifier}:tokens`
+        `${RATE_LIMIT_PREFIX}:${identifier}:minute`,
+        `${RATE_LIMIT_PREFIX}:${identifier}:day`,
+        `${RATE_LIMIT_PREFIX}:${identifier}:tokens`
       ]
 
       await Promise.all(keys.map(key => this.redis!.del(key)))

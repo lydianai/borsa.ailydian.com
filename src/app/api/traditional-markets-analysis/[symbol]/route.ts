@@ -1,18 +1,19 @@
 /**
  * TRADITIONAL MARKETS AI ANALYSIS API
- * Groq AI + Quantum Strategy Analysis for Forex, Metals, Indices
+ * AI + Quantum Strategy Analysis for Forex, Metals, Indices
  *
- * BEYAZ ŞAPKA UYUMLU:
- * - Public Groq API kullanımı
- * - Sadece real-time price data analizi
- * - 0 proprietary API kullanımı
+ * Provider-agnostic: Any OpenAI-compatible API via environment variables:
+ * - AI_API_KEY or GROQ_API_KEY: Your API key
+ * - AI_API_URL: API endpoint (default: Groq)
+ * - AI_MODEL: Model name (default: llama-3.3-70b-versatile)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
 
-// Obfuscated API key access
-const _k = Buffer.from('R1JPUV9BUElfS0VZ', 'base64').toString('utf-8');
+// AI Configuration
+const AI_API_URL = process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions';
+const AI_MODEL = process.env.AI_MODEL || 'llama-3.3-70b-versatile';
+const AI_API_KEY = process.env.AI_API_KEY || process.env.GROQ_API_KEY || '';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -47,9 +48,6 @@ export async function GET(
         { status: 400 }
       );
     }
-
-    // AI Analysis Engine
-    const groq = new Groq({ apiKey: process.env[_k] });
 
     const assetTypeMap = {
       metal: 'Değerli Metal (Precious Metal)',
@@ -88,14 +86,28 @@ ${assetType === 'metal' ? `
 
 ÖNEMLİ: Yatırım tavsiyesi değil, analiz paylaşıyorsun.`;
 
-    const completion = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-      max_tokens: 400,
-    });
+    let aiAnalysis = 'AI analizi şu anda kullanılamıyor.';
 
-    const aiAnalysis = completion.choices[0]?.message?.content || 'AI analizi şu anda kullanılamıyor.';
+    if (AI_API_KEY) {
+      const aiResponse = await fetch(AI_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${AI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: AI_MODEL,
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          max_tokens: 400,
+        }),
+      });
+
+      if (aiResponse.ok) {
+        const data = await aiResponse.json();
+        aiAnalysis = data.choices?.[0]?.message?.content || aiAnalysis;
+      }
+    }
 
     // Quantum Score Calculation (60-100 range, weighted by change and volatility)
     const baseScore = 60;

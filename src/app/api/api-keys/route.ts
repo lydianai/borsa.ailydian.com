@@ -15,8 +15,10 @@ import { cookies } from 'next/headers';
 import crypto from 'crypto';
 import { apiKeysDB } from '@/lib/database';
 
-// Obfuscated API endpoints
-const _modelsUrl = Buffer.from('aHR0cHM6Ly9hcGkuZ3JvcS5jb20vb3BlbmFpL3YxL21vZGVscw==', 'base64').toString('utf-8');
+// AI API models endpoint (for testing connection)
+const AI_MODELS_URL = process.env.AI_API_URL
+  ? process.env.AI_API_URL.replace('/chat/completions', '/models')
+  : 'https://api.groq.com/openai/v1/models';
 
 // API Keys Interface
 interface APIKeys {
@@ -414,7 +416,7 @@ async function testBinanceConnection(
  */
 async function testGroqConnection(apiKey: string): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch(_modelsUrl, {
+    const response = await fetch(AI_MODELS_URL, {
       headers: {
         Authorization: `Bearer ${apiKey}`,
       },
