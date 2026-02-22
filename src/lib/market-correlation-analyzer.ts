@@ -84,7 +84,7 @@ async function fetchMultipleOHLCV(symbols: string[], limit: number = 100): Promi
       const response = await fetch(
         `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1h&limit=${limit}`,
         {
-          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SardagAI/2.0)' },
+          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LyTradeAI/2.0)' },
           next: { revalidate: 300 }, // 5 min cache
         }
       );
@@ -125,7 +125,7 @@ async function fetchFundingRates(symbols: string[]): Promise<Map<string, Funding
 
   try {
     const response = await fetch('https://fapi.binance.com/fapi/v1/premiumIndex', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SardagAI/2.0)' },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LyTradeAI/2.0)' },
       next: { revalidate: 300 }, // 5 min cache
     });
 

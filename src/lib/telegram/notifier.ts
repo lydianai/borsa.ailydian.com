@@ -139,7 +139,7 @@ export class TelegramNotifier {
       }
 
       const testMessage = `✅ *Telegram Test Message*\n\n` +
-        `Your Sardag-Emrah trading system is now connected!\n\n` +
+        `Your LyTrade trading system is now connected!\n\n` +
         `Features:\n` +
         `• Real-time trading signals\n` +
         `• Risk management alerts\n` +

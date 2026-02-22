@@ -51,7 +51,7 @@ async function fetchOHLCVFromBinance(symbol: string, limit: number = 100): Promi
       `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1h&limit=${limit}`,
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; SardagAI/2.0)',
+          'User-Agent': 'Mozilla/5.0 (compatible; LyTradeAI/2.0)',
         },
         next: { revalidate: 60 },
         signal: AbortSignal.timeout(8000), // 8 saniye timeout - ENOMEM önleme
@@ -88,7 +88,7 @@ async function fetchOHLCVFromBinance(symbol: string, limit: number = 100): Promi
       `https://api.bybit.com/v5/market/kline?category=linear&symbol=${symbol}&interval=60&limit=${limit}`,
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; SardagAI/2.0)',
+          'User-Agent': 'Mozilla/5.0 (compatible; LyTradeAI/2.0)',
         },
         signal: AbortSignal.timeout(8000),
       }

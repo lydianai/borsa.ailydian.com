@@ -22,7 +22,7 @@ interface GlobalFilters {
   sortBy: SortBy;
 }
 
-const STORAGE_KEY = 'sardag-global-filters';
+const STORAGE_KEY = 'lytrade-global-filters';
 
 // Default values
 const DEFAULT_FILTERS: GlobalFilters = {

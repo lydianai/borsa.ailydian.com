@@ -11,7 +11,7 @@ export async function POST(_request: NextRequest) {
     const cookieStore = await cookies();
 
     // Clear auth cookie
-    cookieStore.delete('sardag_auth');
+    cookieStore.delete('lytrade_auth');
 
     return NextResponse.json({
       success: true,

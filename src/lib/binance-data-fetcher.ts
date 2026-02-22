@@ -154,7 +154,7 @@ export async function fetchBinanceFuturesData(): Promise<BinanceDataResult> {
       "https://fapi.binance.com/fapi/v1/exchangeInfo",
       {
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; SardagAI/1.0)",
+          "User-Agent": "Mozilla/5.0 (compatible; LyTradeAI/1.0)",
           "Accept": "application/json",
         },
       }
@@ -181,7 +181,7 @@ export async function fetchBinanceFuturesData(): Promise<BinanceDataResult> {
       `https://fapi.binance.com/fapi/v1/ticker/24hr?symbols=${JSON.stringify(usdtSymbols)}`,
       {
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; SardagAI/1.0)",
+          "User-Agent": "Mozilla/5.0 (compatible; LyTradeAI/1.0)",
           "Accept": "application/json",
         },
       }

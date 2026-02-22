@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     // Step 3: All checks passed - Create session
     const cookieStore = await cookies();
-    cookieStore.set('sardag_auth', 'authenticated', {
+    cookieStore.set('lytrade_auth', 'authenticated', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

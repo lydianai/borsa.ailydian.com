@@ -6,7 +6,7 @@ mkdir -p certificates
 # Generate CA private key and certificate
 openssl genrsa -des3 -out certificates/rootCA.key 2048
 openssl req -x509 -new -nodes -key certificates/rootCA.key -sha256 -days 1024 -out certificates/rootCA.pem \
-  -subj "/C=TR/ST=Istanbul/L=Istanbul/O=Sardag Software/OU=Development/CN=Sardag Local CA"
+  -subj "/C=TR/ST=Istanbul/L=Istanbul/O=LyTrade Software/OU=Development/CN=LyTrade Local CA"
 
 # Generate server private key
 openssl genrsa -out certificates/localhost.key 2048
@@ -24,7 +24,7 @@ distinguished_name = dn
 C=TR
 ST=Istanbul
 L=Istanbul
-O=Sardag Software
+O=LyTrade Software
 OU=Development
 CN=localhost
 
