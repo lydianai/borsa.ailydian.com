@@ -108,7 +108,7 @@ export class CoinListService {
 
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; SardagAI/1.0)',
+        'User-Agent': 'Mozilla/5.0 (compatible; LyTradeAI/1.0)',
       },
       signal: AbortSignal.timeout(10000), // 10 second timeout
     });
@@ -150,7 +150,7 @@ export class CoinListService {
 
       const response = await fetch(url, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; SardagAI/1.0)',
+          'User-Agent': 'Mozilla/5.0 (compatible; LyTradeAI/1.0)',
         },
         signal: AbortSignal.timeout(10000),
       });

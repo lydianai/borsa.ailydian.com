@@ -14,7 +14,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const PROJECT_ROOT = '/Users/sardag/Desktop/PROJELER/borsa.ailydian.com';
+const PROJECT_ROOT = '/home/lydian/Masaüstü/PROJELER/borsa.ailydian.com';
 
 console.log('🔥 SMART TYPESCRIPT FIXER');
 console.log('========================\n');

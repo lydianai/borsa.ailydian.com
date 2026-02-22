@@ -9,7 +9,7 @@ import { cookies } from 'next/headers';
 export async function GET(_request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const authCookie = cookieStore.get('sardag_auth');
+    const authCookie = cookieStore.get('lytrade_auth');
 
     return NextResponse.json({
       authenticated: authCookie?.value === 'authenticated',

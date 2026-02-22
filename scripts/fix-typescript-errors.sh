@@ -6,7 +6,7 @@
 
 set -e
 
-PROJECT_ROOT="/Users/sardag/Desktop/PROJELER/borsa.ailydian.com"
+PROJECT_ROOT="/home/lydian/Masaüstü/PROJELER/borsa.ailydian.com"
 cd "$PROJECT_ROOT"
 
 echo "🔥 STARTING TYPESCRIPT AUTO-FIX"

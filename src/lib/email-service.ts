@@ -75,7 +75,7 @@ class EmailService {
     }
 
     try {
-      const from = process.env.SMTP_FROM || 'noreply@sardag-trading.com';
+      const from = process.env.SMTP_FROM || 'noreply@ailydian.com';
 
       await this.transporter.sendMail({
         from,

@@ -70,7 +70,7 @@ async function fetchOHLCV(symbol: string, interval: string = '1h', limit: number
     const response = await fetch(
       `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`,
       {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SardagAI/2.0)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LyTradeAI/2.0)' },
         next: { revalidate: 300 }, // 5 min cache
       }
     );

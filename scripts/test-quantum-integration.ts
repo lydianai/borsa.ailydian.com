@@ -2,7 +2,7 @@
 
 /**
  * BlueQubit Quantum Integration Test Script
- * SarDag Emrah platformu için kuantum entegrasyon testi
+ * LyTrade platformu için kuantum entegrasyon testi
  */
 
 import { blueQubitClient } from "../src/lib/quantum/bluequbit-client.js";
