@@ -64,6 +64,14 @@ Thumbs.db
 *.swp
 *.swo
 
+# Broken/legacy files
+*.broken
+*.legacy
+*.OLD.tsx
+*.BACKUP-*
+*.new
+.!*
+
 # Testing
 coverage/
 .nyc_output/
@@ -111,4 +119,9 @@ test-*.ts
 
 # Backup files
 *.backup
+*.backup-*
 *.bak
+*.bak-*
+*.future
+*.orig
+*.old
