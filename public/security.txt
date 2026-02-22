@@ -3,6 +3,6 @@ Preferred-Languages: tr, en
 
 # Security Vulnerability Reporting
 # Report security vulnerabilities via GitHub Issues
-# https://github.com/AiLydian/lytrade-scanner/issues
+# https://github.com/lydianai/borsa.ailydian.com/issues
 # Response time: 24-48 hours
 # Please include detailed steps to reproduce

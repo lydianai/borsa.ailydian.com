@@ -30,7 +30,7 @@ Examples of unacceptable behavior:
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the project maintainers via [GitHub Issues](https://github.com/AiLydian/lytrade-scanner/issues). All complaints will
+reported to the project maintainers via [GitHub Issues](https://github.com/lydianai/borsa.ailydian.com/issues). All complaints will
 be reviewed and investigated.
 
 ## Attribution

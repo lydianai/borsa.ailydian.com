@@ -14,7 +14,7 @@ const API_DOCS = {
     description: 'AI-Powered Cryptocurrency Trading Signal Platform API',
     contact: {
       name: 'LyTrade Support',
-      url: 'https://github.com/AiLydian/lytrade-scanner',
+      url: 'https://github.com/lydianai/borsa.ailydian.com',
     },
   },
   servers: [

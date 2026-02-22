@@ -54,8 +54,8 @@ LyTrade Scanner is a self-hosted cryptocurrency trading signal platform that mon
 ### 1. Clone and Install
 
 ```bash
-git clone https://github.com/AiLydian/lytrade-scanner.git
-cd lytrade-scanner
+git clone https://github.com/lydianai/borsa.ailydian.com.git
+cd borsa.ailydian.com
 
 pnpm install
 ```
@@ -215,8 +215,8 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for gu
 
 ```bash
 # Fork the repo, then:
-git clone https://github.com/YOUR_USERNAME/lytrade-scanner.git
-cd lytrade-scanner
+git clone https://github.com/YOUR_USERNAME/borsa.ailydian.com.git
+cd borsa.ailydian.com
 pnpm install
 pnpm dev
 
@@ -225,7 +225,7 @@ pnpm dev
 
 ## Security
 
-If you discover a security vulnerability, please report it responsibly via [GitHub Security Advisories](https://github.com/AiLydian/lytrade-scanner/security/advisories/new). See [SECURITY.md](SECURITY.md) for details.
+If you discover a security vulnerability, please report it responsibly via [GitHub Security Advisories](https://github.com/lydianai/borsa.ailydian.com/security/advisories/new). See [SECURITY.md](SECURITY.md) for details.
 
 ## Disclaimer
 
