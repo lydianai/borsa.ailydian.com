@@ -6,7 +6,7 @@
 - [x] Optimize README (badges, comparison table, roadmap, CTA)
 - [x] Create 6 "good first issue" issues for contributors
 - [x] Add socialify banner
-- [ ] Submit to awesome-lists (see below)
+- [x] Submit to awesome-lists (see below)
 
 ### Week 2: Content Launch
 - [ ] Publish Dev.to article: "Building LyTrade Scanner: Open-Source Crypto Trading with Next.js 16"
@@ -31,17 +31,19 @@
 
 ## Awesome-List Submissions
 
-### Priority 1 (Submit First)
+### Priority 1 (Submitted)
 1. **botcrypto-io/awesome-crypto-trading-bots** (2,351 stars)
-   - PR: Add LyTrade Scanner to trading bots list
+   - PR #45: https://github.com/botcrypto-io/awesome-crypto-trading-bots/pull/45
+   - Added to "Open source bots" section (alphabetical order)
 
 2. **SpiralDevelopment/Awesome-Crypto-Trading** (188 stars)
-   - PR: Add to trading tools section
+   - PR #6: https://github.com/SpiralDevelopment/Awesome-Crypto-Trading/pull/6
+   - Added to "Market Screeners" and "Trading Bots" sections
 
-### Priority 2
-3. **shi-rudo/awesome-stock-trading** (447 stars)
-4. **just-nilux/awesome-tradingview** (378 stars)
-5. **nntaoli/awesome-cryptocurrency** (174 stars)
+### Priority 2 (Skipped - Not Relevant)
+3. **shi-rudo/awesome-stock-trading** (447 stars) - Stock-focused, no crypto section
+4. **just-nilux/awesome-tradingview** (378 stars) - PineScript-focused, not applicable
+5. **nntaoli/awesome-cryptocurrency** (174 stars) - Chinese language only
 
 ---
 
