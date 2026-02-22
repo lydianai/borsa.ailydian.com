@@ -1,375 +1,177 @@
-# 🐵 SARDAG Trading Scanner
+# SARDAG Trading Scanner
 
-**Premium AI-Powered Cryptocurrency Trading Signal Platform** ile gerçek zamanlı piyasa analizi ve 13+ gelişmiş trading stratejisi.
+> Advanced Crypto Trading Signal Platform with 13+ Strategies and 617 Market Analysis
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.1.4-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
-[![Binance API](https://img.shields.io/badge/Binance-617%20Markets-yellow)](https://binance.com/)
-[![AI](https://img.shields.io/badge/AI-Groq%20Powered-purple)](https://groq.com/)
+[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-15.x-black.svg)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+[![Binance](https://img.shields.io/badge/Binance-617%20Markets-yellow.svg)](https://binance.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791.svg)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7.x-DC382D.svg)](https://redis.io/)
 
----
+## Overview
 
-## ✨ Özellikler
+SARDAG Trading Scanner is a professional cryptocurrency trading signal platform that monitors 617 Binance USDT Perpetual Futures markets in real-time. It runs 13+ independent trading strategies simultaneously and surfaces high-confidence signals through an advanced dashboard with multiple charting libraries.
 
-### 📊 **Gerçek Zamanlı Piyasa Verisi**
-- ✅ **617 USDT Perpetual Futures** (Binance)
-- ✅ **Otomatik Veri Güncellemesi** (15 dakikada bir cache)
-- ✅ **Volume, Fiyat, Değişim** verileri
-- ✅ **Top Gainers & Top Volume** filtreleme
+## Platform Architecture
 
-### 🤖 **Yapay Zeka Destekli Analizler**
-- ✅ **Groq AI** entegrasyonu (Türkçe analiz)
-- ✅ **Conservative Buy Signal** - Ultra-güvenli, 4/5 koşul (107 sinyal)
-- ✅ **Breakout-Retest Pattern** - 3 aşamalı doğrulama
-- ✅ **Momentum Breakout** - Hızlı trend değişimleri
-- ✅ **Downtrend Reversal** - Dibi yakalama stratejisi
-- ✅ **AI Deep Analysis** - Groq destekli derin analiz
-
-### 📈 **13+ Trading Stratejileri**
-1. **Conservative Buy Signal** - Güvenli alım sinyalleri
-2. **Breakout-Retest** - Kırılım sonrası geri test
-3. **Momentum Breakout** - Güçlü momentum hareketleri
-4. **Downtrend Reversal** - Düşüş trendi dönüşü
-5. **AI Deep Analysis** - Yapay zeka analizi
-6. **Volume Spike** (Yakında)
-7. **Fibonacci Retracement** (Yakında)
-8. **RSI Divergence** (Yakında)
-9. **MACD Histogram** (Yakında)
-10. **EMA Ribbon** (Yakında)
-11. **Bollinger Squeeze** (Yakında)
-12. **Ichimoku Cloud** (Yakında)
-13. **Support/Resistance** (Yakında)
-
----
-
-## 🛠️ Kurulum
-
-### 1. Depoyu Klonlayın
-```bash
-git clone <repository-url>
-cd sardag-emrah
+```mermaid
+graph TD
+    subgraph "Data Ingestion"
+        A[Binance WebSocket] --> B[617 USDT Perpetual Markets]
+        B --> C[Price Stream]
+        B --> D[Volume Stream]
+        B --> E[Order Book]
+    end
+    subgraph "Analysis Engine"
+        C --> F[13+ Strategy Processor]
+        D --> F
+        E --> F
+        F --> G[Signal Generator]
+        G --> H[Risk Calculator]
+    end
+    subgraph "Presentation"
+        H --> I[Dashboard]
+        I --> J[Charts - ApexCharts]
+        I --> K[Signal Alerts]
+        I --> L[Portfolio Tracker]
+    end
 ```
 
-### 2. Bağımlılıkları Yükleyin
-```bash
-pnpm install
-```
+## Key Features
 
-### 3. Ortam Değişkenlerini Ayarlayın
+- **617 Binance USDT Perpetual Futures** — Real-time monitoring of all major futures markets
+- **13+ Trading Strategies** — Conservative Buy, Breakout-Retest, Momentum, Downtrend Reversal, and 9+ additional strategies
+- **Deep Market Analysis Engine** — Multi-timeframe technical analysis combining price action and volume
+- **Top Gainers / Top Volume Filtering** — Intelligent filtering to surface the most active and promising opportunities
+- **Advanced Charting** — Multiple visualization libraries for comprehensive market visualization
+- **Real-Time Streaming** — Live price, volume, and change data via Binance WebSocket API
 
-**ÖNEMLİ:** Güvenlik nedeniyle asla `.env.local` dosyanızı commit etmeyin!
+## Trading Strategies
 
-```bash
-cp .env.example .env.local
-```
+| Strategy | Signal Type | Market Condition |
+|---|---|---|
+| Conservative Buy | Long | Oversold, strong support |
+| Breakout-Retest | Long | Resistance broken and retested |
+| Momentum | Long/Short | Strong directional momentum |
+| Downtrend Reversal | Long | Exhausted sellers, accumulation |
+| Volume Surge | Long/Short | Abnormal volume spike detection |
+| RSI Divergence | Long/Short | Price/momentum divergence |
+| Moving Average Cross | Long/Short | MA crossover systems |
+| Bollinger Squeeze | Long/Short | Volatility contraction breakout |
+| MACD Signal | Long/Short | Histogram crossovers |
+| Fibonacci Retracement | Long | Golden ratio support levels |
+| Order Book Imbalance | Long/Short | Liquidity analysis |
+| Funding Rate Extreme | Contrarian | Extreme sentiment reversal |
+| Open Interest Spike | Long/Short | Unusual futures positioning |
 
-`.env.example` dosyasında tüm gerekli environment değişkenleri ve açıklamaları bulunmaktadır. `.env.local` dosyasını düzenleyerek kendi API anahtarlarınızı ekleyin.
+## Technology Stack
 
-#### 🔑 Minimum Gereksinimler (Development için)
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 15, TypeScript |
+| Styling | Tailwind CSS |
+| Charting | ApexCharts, Recharts |
+| Market Data | Binance WebSocket API |
+| Database | PostgreSQL, Prisma ORM |
+| Cache | Redis 7 |
+| Package Manager | pnpm (Turborepo monorepo) |
+| Container | Docker |
 
-```env
-# Temel yapılandırma
-NODE_ENV=development
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# AI Servisleri (Türkçe analiz için önerilir)
-GROQ_API_KEY=your_groq_api_key_here  # https://console.groq.com
-```
-
-#### 🚀 Production İçin Gerekli
-
-```env
-# Veritabanı (Kritik)
-DATABASE_URL=postgresql://user:password@host:5432/ailydian
-
-# Redis Cache (Kritik)
-UPSTASH_REDIS_REST_URL=your_redis_url
-UPSTASH_REDIS_REST_TOKEN=your_redis_token
-
-# Monitoring (Önerilir)
-NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
-
-# Bildirimler (Opsiyonel)
-TELEGRAM_BOT_TOKEN=your_bot_token
-```
-
-📖 **Detaylı liste için:** `.env.example` dosyasına bakın
-
-### 4. Development Server'ı Başlatın
-```bash
-pnpm dev
-```
-
-Server şu adreste çalışacak: **http://localhost:3000**
-
----
-
-## 📡 API Endpoints
-
-### **Health Check**
-```bash
-curl http://localhost:3000/api/health
-# Response: {"status":"ok","message":"Backend API is running"}
-```
-
-### **Market Data**
-```bash
-# Tüm piyasa verisi
-curl http://localhost:3000/api/binance/futures | jq
-
-# Response yapısı:
-# {
-#   "success": true,
-#   "data": {
-#     "all": [...],           # 617 coin
-#     "topVolume": [...],     # Top 20 by volume
-#     "topGainers": [...]     # Top 10 gainers
-#   }
-# }
-```
-
-### **Trading Signals**
-
-#### Conservative Signals (Güvenli Alım)
-```bash
-curl http://localhost:3000/api/conservative-signals | jq
-```
-- **Confidence:** 80-95%
-- **Kriterler:** 4/5 koşul (Trend, Entry, Momentum, Volume, Support)
-- **Risk/Reward:** 2.5:1 minimum
-- **Max Leverage:** 5x
-
-#### Breakout-Retest Signals
-```bash
-curl http://localhost:3000/api/breakout-retest | jq
-```
-- **Pattern:** Consolidation → Breakout → Retest
-- **Confidence:** 50-95%
-- **Validation:** 3-phase confirmation
-- **Best For:** 4H, 1H, 15min timeframes
-
-#### AI Deep Analysis
-```bash
-curl http://localhost:3000/api/ai-signals | jq
-```
-- **AI Model:** Groq (llama-3.3-70b-versatile)
-- **Language:** Türkçe
-- **Analysis Depth:** Comprehensive technical analysis
-- **Output:** Detailed Turkish explanation
-
----
-
-## 🏗️ Proje Yapısı
+## Project Structure
 
 ```
-sardag-emrah/
-├── src/
-│   ├── app/
-│   │   ├── api/                          # API Routes
-│   │   │   ├── health/                   # ✅ Health check
-│   │   │   ├── binance/futures/          # ✅ Binance market data
-│   │   │   ├── conservative-signals/     # ✅ Conservative strategy
-│   │   │   ├── breakout-retest/          # ✅ Breakout-Retest
-│   │   │   ├── ai-signals/               # ✅ Groq AI analysis
-│   │   │   ├── signals/                  # ✅ Basic signals
-│   │   │   └── quantum-signals/          # 🚧 Planned
-│   │   ├── page.tsx                      # Homepage (Signal Scanner)
-│   │   └── layout.tsx                    # Root layout + metadata
-│   └── types/
-│       └── api.ts                        # TypeScript types
+borsa.ailydian.com/
 ├── apps/
-│   ├── signal-engine/
-│   │   └── strategies/                   # Trading Strategies
-│   │       ├── conservative-buy-signal.ts    # ✅ Conservative
-│   │       ├── breakout-retest.ts            # ✅ Breakout-Retest
-│   │       ├── momentum-breakout.ts          # ✅ Momentum
-│   │       ├── downtrend-reversal.ts         # ✅ Reversal
-│   │       └── types.ts                      # Strategy types
-│   ├── ops-agent/                        # 🚧 Autonomous ops
-│   └── quantum/                          # 🚧 Quantum signals
-├── public/
-│   ├── favicon.ico                       # ✅ Favicon
-│   └── icons/                            # ✅ PWA icons
-├── .env.local                            # Environment variables
-├── package.json
-├── tsconfig.json
-└── README.md
+│   └── web/              # Next.js 15 trading dashboard
+│       ├── src/
+│       │   ├── app/      # App Router pages
+│       │   ├── components/
+│       │   │   ├── scanner/   # Market scanner components
+│       │   │   ├── charts/    # ApexCharts + Recharts wrappers
+│       │   │   └── signals/   # Signal display components
+│       │   ├── lib/
+│       │   │   ├── strategies/ # 13+ strategy implementations
+│       │   │   ├── binance/    # Binance API/WebSocket client
+│       │   │   └── analysis/  # Technical analysis engine
+│       │   └── stores/   # Zustand state management
+├── packages/
+│   └── shared/           # Shared types and utilities
+├── prisma/               # Database schema
+└── scripts/              # Data seeding and utilities
 ```
 
----
+## Getting Started
 
-## 🧪 Development Komutları
+### Prerequisites
+
+- Node.js 20+
+- pnpm 8+
+- PostgreSQL 16
+- Redis 7
+- Binance API credentials (read-only for market data)
+
+### Installation
 
 ```bash
-# Development server
+# Clone the repository
+git clone https://github.com/lydianai/borsa.ailydian.com.git
+cd borsa.ailydian.com
+
+# Install dependencies
+pnpm install
+
+# Configure environment variables
+cp .env.example .env.local
+
+# Run database migrations
+pnpm db:migrate
+
+# Start development server
 pnpm dev
-
-# Production build
-pnpm build
-
-# Start production server
-pnpm start
-
-# Type checking
-pnpm typecheck
-
-# Linting
-pnpm lint
-
-# Run tests
-pnpm test
-
-# Run specific API test
-curl http://localhost:3000/api/conservative-signals | jq '.data.stats'
 ```
 
----
+The trading dashboard will be available at `http://localhost:3000`.
 
-## 📊 Strategy Performance
+## Environment Variables
 
-| Strategy | Status | Signals | Avg Confidence | Notes |
-|----------|--------|---------|----------------|-------|
-| **Conservative Buy** | ✅ Live | 107 | 80.6% | 4/5 conditions met |
-| **Breakout-Retest** | ✅ Live | 0-5 | 70-90% | Rare pattern (needs historical data) |
-| **Momentum Breakout** | ✅ Live | 15-25 | 65-85% | Fast-moving markets |
-| **Downtrend Reversal** | ✅ Live | 8-12 | 70-80% | Bottom fishing |
-| **AI Deep Analysis** | ✅ Live | 5-10 | 75-90% | Groq-powered |
-| **Volume Spike** | 🚧 Planned | - | - | Coming soon |
-| **Fibonacci Retracement** | 🚧 Planned | - | - | Coming soon |
+| Variable | Description | Required |
+|---|---|---|
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `REDIS_URL` | Redis connection string | Yes |
+| `BINANCE_API_KEY` | Binance API key (read-only) | Yes |
+| `BINANCE_SECRET_KEY` | Binance API secret | Yes |
+| `NEXTAUTH_SECRET` | Authentication secret | Yes |
+| `NEXT_PUBLIC_WS_URL` | WebSocket server URL | Yes |
 
----
+## Market Coverage
 
-## 🔐 Güvenlik
+The scanner monitors all USDT Perpetual Futures contracts on Binance, including:
 
-- ✅ **Rate Limiting** - API istekleri sınırlandırılmış
-- ✅ **CORS Protection** - Cross-origin güvenliği
-- ✅ **Input Validation** - Zod schema validation
-- ✅ **Type Safety** - Full TypeScript support
-- ✅ **No API Keys Required** - Public data için key gerekmez
+- **Top Market Cap** — BTC, ETH, BNB, SOL, and all major cryptocurrencies
+- **DeFi Tokens** — All major decentralized finance protocol tokens
+- **Layer 2 Tokens** — Scaling solution ecosystem tokens
+- **Emerging Markets** — New listings and high-growth opportunities
 
----
+## Security
 
-## 🚀 Roadmap
+See [SECURITY.md](SECURITY.md) for the vulnerability reporting policy.
 
-### **Tamamlananlar** ✅
-- [x] Binance Futures API entegrasyonu (617 markets)
-- [x] Conservative Buy Strategy (107 signals)
-- [x] Breakout-Retest Pattern Recognition
-- [x] Momentum Breakout & Downtrend Reversal
-- [x] Groq AI Integration (Turkish analysis)
-- [x] Favicon & PWA icons
-- [x] Health check API
-- [x] Caching system (15min TTL)
+- All API credentials stored as environment variables (never in source code)
+- Binance API key limited to read-only market data permissions
+- Rate limiting on all endpoints
+- OWASP Top 10 mitigations applied
 
-### **Yüksek Öncelik** 🔴
-- [ ] **Historical Data API** - Binance Klines (4H/1H/15min)
-- [ ] **Omnipotent Matrix** - 50+ korelasyon sistemi basitleştir
-- [ ] **Unit Tests** - Conservative strategy (85% coverage)
-- [ ] **API Integration Tests** - Tüm endpoints
+## Disclaimer
 
-### **Orta Öncelik** 🟡
-- [ ] **Fibonacci Retracement Strategy**
-- [ ] **Volume Spike Strategy**
-- [ ] **Browser Push Notifications**
-- [ ] **WebSocket Real-Time Feed** (Binance WS)
-- [ ] **API Documentation** (Swagger/OpenAPI)
+This platform is for informational and educational purposes only. Trading cryptocurrency carries significant financial risk. Never invest more than you can afford to lose. Past performance of trading signals does not guarantee future results.
 
-### **Gelecek** 🟢
-- [ ] Portfolio optimization
-- [ ] Backtesting engine
-- [ ] Trade execution (paper trading)
-- [ ] Multi-exchange support
-- [ ] Mobile app
+## License
+
+Copyright (c) 2024-2026 Lydian (AiLydian). All Rights Reserved.
+
+This is proprietary software. See [LICENSE](LICENSE) for full terms.
 
 ---
 
-## 🤝 Katkıda Bulunma
-
-Bu proje özel bir trading platformudur. Katkıda bulunmak için:
-
-1. **Beyaz Şapka Kuralları** - Muhafazakar, güvenli yaklaşım
-2. **0 Hata Toleransı** - Her commit test edilmeli
-3. **Gerçek Veri** - Demo/mock veri kullanmayın
-4. **TypeScript** - Tam tip güvenliği
-5. **Testing** - Yeni özellikler için test yazın
-
----
-
-## 📝 Ortam Değişkenleri (Tam Liste)
-
-```bash
-# ==========================================
-# AI & ANALYSIS
-# ==========================================
-GROQ_API_KEY=gsk_xxx                      # Groq AI (Zorunlu)
-
-# ==========================================
-# BINANCE API (İsteğe bağlı)
-# ==========================================
-BINANCE_API_KEY=your_api_key
-BINANCE_API_SECRET=your_api_secret
-
-# ==========================================
-# APPLICATION
-# ==========================================
-NODE_ENV=development                      # development | production
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-
-# ==========================================
-# DATABASE (İsteğe bağlı)
-# ==========================================
-REDIS_URL=redis://localhost:6379
-DATABASE_URL=file:./database/sardag.db
-
-# ==========================================
-# SECURITY
-# ==========================================
-JWT_SECRET=minimum_32_character_secret
-SESSION_SECRET=your_session_secret
-CSRF_SECRET=your_csrf_secret
-ENCRYPTION_KEY=32_char_encryption_key
-
-# ==========================================
-# RATE LIMITING
-# ==========================================
-RATE_LIMIT_MAX=100
-RATE_LIMIT_WINDOW_MS=60000
-
-# ==========================================
-# LOGGING
-# ==========================================
-LOG_LEVEL=info                            # debug | info | warn | error
-```
-
----
-
-## 📄 Lisans
-
-Özel proje - Tüm hakları saklıdır.
-
----
-
-## 🔗 Bağlantılar
-
-- **API Health Check:** http://localhost:3000/api/health
-- **Conservative Signals:** http://localhost:3000/api/conservative-signals
-- **Breakout-Retest:** http://localhost:3000/api/breakout-retest
-- **AI Signals:** http://localhost:3000/api/ai-signals
-
----
-
-## ℹ️ Versiyon Bilgisi
-
-| Key | Value |
-|-----|-------|
-| **Version** | 0.1.0 |
-| **Status** | ✅ Production Ready |
-| **Next.js** | 15.1.4 |
-| **Node.js** | >=18.0.0 |
-| **Last Updated** | 2025-10-25 |
-
----
-
-**Geliştirici:** SARDAG Team
-**Platform:** Cryptocurrency Trading Signals
-**AI Model:** Groq (llama-3.3-70b-versatile)
+Built by [AiLydian](https://www.ailydian.com)
