@@ -100,7 +100,7 @@
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/ui": "^4.0.15",
     "autoprefixer": "^10.4.23",
-    "jsdom": "^27.2.0",
+    "jsdom": "^28.1.0",
     "node-cron": "^3.0.3",
     "prettier": "^3.0.0",
     "prisma": "^6.19.0",
